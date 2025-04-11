@@ -1,0 +1,127 @@
+# Tower Defense Game Project Intelligence
+
+## Project Patterns
+
+### Code Organization
+- Entity classes are in `src/entities/`
+- System managers are in `src/systems/`
+- Scene classes are in `src/scenes/`
+- Global game settings are defined in `src/index.js`
+- Documentation is maintained in `docs/`
+
+### Naming Conventions
+- Classes use PascalCase (e.g., `Tower`, `Enemy`, `GameScene`)
+- Methods and variables use camelCase (e.g., `spawnEnemy`, `handleTilePlacement`)
+- Constants use UPPER_SNAKE_CASE (e.g., `GAME_SETTINGS.TOWERS.BASIC`)
+- File names match class names (e.g., `Tower.js` contains the `Tower` class)
+
+### Code Style
+- ES6 module syntax (`import`/`export`) is used throughout
+- JSDoc comments are used for method documentation
+- Each class has a clear single responsibility
+- Event-driven communication is preferred over direct method calls
+- Phaser's scene registry is used for cross-scene data sharing
+
+## Implementation Patterns
+
+### Entity Creation
+- Entities are created through factory methods in GameScene
+- Entities are added to tracking arrays for update cycles
+- Entities are responsible for their own update logic
+- Entities communicate state changes via events
+
+### Game Flow
+- Wave progression is controlled by the WaveManager
+- Player resources are managed by the EconomyManager
+- Path calculation is handled by the PathManager
+- UI updates are triggered by events from the game scene
+
+### Asset Usage
+- Assets are preloaded in the scene's `preload` method
+- Asset keys follow a consistent pattern (e.g., `tower_basic`, `enemy_fast`)
+- Placeholder assets are used during development
+- Assets are stored in the `public/assets/` directory
+
+## Critical Implementation Paths
+
+### Tower Placement
+1. Player selects tower type in UI
+2. Tower type is stored in scene registry
+3. Player clicks on placement tile
+4. `handleTilePlacement` checks if player has enough resources
+5. If resources are sufficient, tower is created and added to the game
+
+### Enemy Spawning
+1. WaveManager determines when to spawn enemies
+2. `spawnEnemy` is called with the enemy type
+3. Enemy is created at the path start point
+4. Enemy follows path using segment-based movement
+5. Enemy is tracked for collision detection and game state
+
+### Projectile Firing
+1. Tower scans for enemies in range during update
+2. When target is found and cooldown elapsed, tower fires
+3. Projectile is created and aimed at target
+4. Projectile moves toward target or last known position
+5. Collision detection checks for hits with enemies
+
+### Wave Progression
+1. Player starts wave manually or previous wave ends
+2. WaveManager spawns enemies according to wave configuration
+3. Player defends against the wave
+4. When all enemies are defeated, wave is marked complete
+5. Player can start the next wave
+
+## Known Challenges
+
+### Performance Optimization
+- Many entities on screen can impact performance
+- Collision detection is potentially expensive
+- Visual effects need to be optimized for mobile
+
+### Game Balance
+- Tower costs, damage, and range need careful tuning
+- Enemy health, speed, and rewards require balancing
+- Wave composition affects difficulty curve
+
+### Technical Debt
+- Object pooling should be implemented for frequently created/destroyed objects
+- Spatial partitioning would improve collision detection performance
+- Asset loading could be optimized with texture atlases
+
+## User Preferences
+
+### Development Focus
+- Prioritize gameplay mechanics over visual polish
+- Implement core features before adding extensions
+- Maintain clean architecture for future expansion
+
+### Testing Approach
+- Manual testing of game mechanics
+- Balance testing through playthroughs
+- Performance testing with many entities
+
+## Tool Usage
+
+### Development Workflow
+- Use `npm start` to run the development server
+- Use `npm run build` for production builds
+- Use `npm run generate-assets` to create placeholder assets
+
+### Debugging
+- Check browser console for error messages
+- Use Phaser's debug mode for physics visualization
+- Monitor performance with browser dev tools
+
+## Project Evolution
+
+### Current Phase
+- Implementing core gameplay systems
+- Integrating components into complete game loop
+- Setting up foundation for future features
+
+### Next Phase
+- Complete all MVP features
+- Polish user experience
+- Balance gameplay difficulty
+- Add visual and audio feedback
