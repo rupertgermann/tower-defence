@@ -481,7 +481,7 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // Visual feedback
-        this.createHitEffect(projectile.x, projectile.y);
+        this.createHitEffect(projectile.x, projectile.y, projectile.projectileData.type);
     }
 
     applyAreaDamage(projectile, targetEnemy) {
@@ -519,22 +519,21 @@ export default class GameScene extends Phaser.Scene {
         this.createExplosionEffect(projectile.x, projectile.y, aoeRadius);
     }
 
-    createHitEffect(x, y) {
-        // Particle burst for hit effect (Phaser 3.60+ API, one-shot emitter)
-        const particles = this.add.particles({
-            key: 'explosion',
-            x: x,
-            y: y,
-            lifespan: 300,
-            speed: { min: 80, max: 180 },
-            scale: { start: 0.4, end: 0 },
-            quantity: 10,
-            alpha: { start: 0.8, end: 0 },
-            angle: { min: 0, max: 360 },
-            blendMode: 'ADD'
-        });
+    createHitEffect(x, y, type = 'basic') {
+        // Choose color based on projectile type
+        let tint = 0xffffff;
+        if (type === 'aoe') {
+            tint = 0xff6600; // orange for AoE
+        } else if (type === 'slow') {
+            tint = 0x00ffff; // cyan for slow
+        } else {
+            tint = 0xffff00; // yellow for basic
+        }
+        // Phaser 3.60+ API: use explode for one-shot burst, pass tint in config
+        const manager = this.add.particles('explosion');
+        manager.explode(10, x, y, { tint });
         this.time.delayedCall(350, () => {
-            particles.destroy();
+            manager.destroy();
         });
     }
 
