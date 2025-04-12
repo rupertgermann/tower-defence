@@ -1,6 +1,21 @@
 import Phaser from 'phaser';
 
 export default class Enemy extends Phaser.GameObjects.Container {
+    /**
+     * Override the destroy method to handle the data property correctly
+     * @param {boolean} fromScene - Whether this Game Object is being destroyed by the Scene
+     */
+    destroy(fromScene) {
+        // Store a reference to the data
+        const dataRef = this.data;
+        
+        // Set data to null to prevent Phaser from trying to destroy it
+        this.data = null;
+        
+        // Call parent destroy method
+        super.destroy(fromScene);
+    }
+    
     constructor(scene, x, y, type, data, path) {
         super(scene, x, y);
         
@@ -176,6 +191,10 @@ export default class Enemy extends Phaser.GameObjects.Container {
         
         this.isDying = true;
         
+        // Store a reference to the scene and economyManager
+        const scene = this.scene;
+        const economyManager = this.scene.economyManager;
+        
         // Play death animation
         this.scene.tweens.add({
             targets: this,
@@ -184,7 +203,7 @@ export default class Enemy extends Phaser.GameObjects.Container {
             duration: 300,
             onComplete: () => {
                 // Add kill to economy manager
-                this.scene.economyManager.addEnemyKill();
+                economyManager.addEnemyKill();
                 
                 // Destroy the enemy
                 this.destroy();

@@ -40,6 +40,16 @@ flowchart LR
 - Implementing proper collision detection between projectiles and enemies
 - Handling special cases like flying enemies and area effects
 
+### Recent Bug Fixes
+- Fixed errors that occurred when enemies were killed:
+  1. `this.data.destroy is not a function` error
+     - Root cause: Phaser's GameObject.destroy() method attempts to destroy all properties that have a destroy method
+     - Solution: Added a custom destroy() method to the Enemy class that sets data to null before calling the parent destroy method
+  
+  2. `Cannot read properties of undefined (reading 'economyManager')` error
+     - Root cause: The reference to scene was lost in the tween's onComplete callback after the enemy was destroyed
+     - Solution: Stored references to scene and economyManager in local variables before setting up the tween
+
 ### Design Challenges
 - Tuning tower and enemy parameters for balanced gameplay
 - Creating intuitive UI for tower selection and placement

@@ -18,4 +18,4 @@
 4. Currency system
 
 ## Blockers
-- None currently
+- ~~Bug: Enemy destruction error~~ (Fixed: Added custom destroy method to Enemy class)
