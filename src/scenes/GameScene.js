@@ -531,19 +531,25 @@ export default class GameScene extends Phaser.Scene {
             tint = 0xffff00; // yellow for basic
         }
         // Phaser 3.60+ API: use explode for one-shot burst, pass tint in config
-        const manager = this.add.particles('explosion');
-        manager.explode(10, x, y, { tint });
+        const emitter = this.add.particles(0, 0, 'explosion', {
+            tint,
+            lifespan: 350,
+            speed: { min: 80, max: 160 },
+            scale: { start: 0.4, end: 0 },
+            quantity: 10,
+            alpha: { start: 1, end: 0 },
+            angle: { min: 0, max: 360 },
+            blendMode: 'ADD'
+        });
+        emitter.explode(10, x, y);
         this.time.delayedCall(350, () => {
-            manager.destroy();
+            emitter.destroy();
         });
     }
 
     createExplosionEffect(x, y, radius) {
         // Particle burst for explosion effect (Phaser 3.60+ API, one-shot emitter)
-        const particles = this.add.particles({
-            key: 'explosion',
-            x: x,
-            y: y,
+        const emitter = this.add.particles(0, 0, 'explosion', {
             lifespan: 500,
             speed: { min: 100, max: 220 },
             scale: { start: radius / 120, end: 0 },
@@ -552,8 +558,9 @@ export default class GameScene extends Phaser.Scene {
             angle: { min: 0, max: 360 },
             blendMode: 'ADD'
         });
+        emitter.explode(20, x, y);
         this.time.delayedCall(550, () => {
-            particles.destroy();
+            emitter.destroy();
         });
     }
 
@@ -561,10 +568,7 @@ export default class GameScene extends Phaser.Scene {
      * Play enemy death animation at (x, y)
      */
     playDeathAnimation(x, y) {
-        const particles = this.add.particles({
-            key: 'explosion',
-            x: x,
-            y: y,
+        const emitter = this.add.particles(0, 0, 'explosion', {
             lifespan: 400,
             speed: { min: 60, max: 160 },
             scale: { start: 0.5, end: 0 },
@@ -573,8 +577,9 @@ export default class GameScene extends Phaser.Scene {
             angle: { min: 0, max: 360 },
             blendMode: 'ADD'
         });
+        emitter.explode(15, x, y);
         this.time.delayedCall(420, () => {
-            particles.destroy();
+            emitter.destroy();
         });
     }
 
