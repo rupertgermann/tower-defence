@@ -104,24 +104,15 @@
 ## Tool Usage
 
 ### Development Workflow
-- Use `npm start` to run the development server
-- Use `npm run build` for production builds
-- Use `npm run generate-assets` to create placeholder assets
+- don't start any dev servers, the dev server is controlled by the user
+- after implementing a new feature or fixing a bug, write a descriptive commit message. only return the message. dont do any git operations
 
 ### Debugging
 - Check browser console for error messages
 - Use Phaser's debug mode for physics visualization
 - Monitor performance with browser dev tools
 
-## Project Evolution
+## general
 
-### Current Phase
-- Implementing core gameplay systems
-- Integrating components into complete game loop
-- Setting up foundation for future features
+- remember: we use Phaser v3.88.2. always use the new api, Phaser 3.60+ particle API.
 
-### Next Phase
-- Complete all MVP features
-- Polish user experience
-- Balance gameplay difficulty
-- Add visual and audio feedback
