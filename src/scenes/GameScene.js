@@ -42,8 +42,11 @@ class AudioManager {
         const keys = ['attack', 'enemy_death', 'upgrade', 'wave_start', 'wave_end', 'ui_click', 'bgm'];
         for (const key of keys) {
             if (key === 'ui_click') {
-                // Set lower default volume for UI click sound
+                // Set lower default volume 
                 this.sounds[key] = this.scene.sound.add(key, { volume: 0.2 });
+            } else if (key === 'enemy_death') {
+                // Set lower default volume 
+                this.sounds[key] = this.scene.sound.add(key, { volume: 0.3 });
             } else {
                 this.sounds[key] = this.scene.sound.add(key);
             }
