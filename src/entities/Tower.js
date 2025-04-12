@@ -25,6 +25,17 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.rangeIndicator = scene.add.circle(0, 0, this.data.range, 0xffffff, 0.2);
         this.rangeIndicator.setVisible(false);
         this.add(this.rangeIndicator);
+
+        // Create level badge (text above tower)
+        this.levelBadge = scene.add.text(0, -38, `Lv.${this.level}`, {
+            fontSize: '16px',
+            fill: '#ffff00',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
+        });
+        this.levelBadge.setOrigin(0.5, 0.5);
+        this.add(this.levelBadge);
         
         // Set up input handling
         this.sprite.setInteractive();
@@ -155,7 +166,7 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     /**
-     * Play attack animation
+     * Play attack animation and particle effect
      */
     playAttackAnimation() {
         // Scale up and back down quickly
@@ -166,6 +177,20 @@ export default class Tower extends Phaser.GameObjects.Container {
             duration: 100,
             yoyo: true
         });
+
+        // Particle effect: muzzle flash/spark at tower center
+        if (!this.attackEmitter) {
+            this.attackEmitter = this.scene.add.particles(0, 0, 'explosion', {
+                lifespan: 250,
+                speed: { min: 60, max: 120 },
+                scale: { start: 0.18, end: 0 },
+                quantity: 8,
+                angle: { min: 0, max: 360 },
+                blendMode: 'ADD'
+            });
+            this.add(this.attackEmitter);
+        }
+        this.attackEmitter.explode(8, 0, 0);
     }
 
     /**
@@ -227,6 +252,12 @@ export default class Tower extends Phaser.GameObjects.Container {
         // Tint for level, can be replaced with frame/sprite/particle
         this.sprite.setTint(this.getUpgradeTint());
 
+        // Update level badge
+        if (this.levelBadge) {
+            this.levelBadge.setText(`Lv.${this.level}`);
+            this.levelBadge.setVisible(true);
+        }
+
         // Optionally, add a visual effect for upgrades
         if (!this.upgradeEffect) {
             this.upgradeEffect = this.scene.add.particles(0, 0, 'explosion', {
@@ -267,6 +298,11 @@ export default class Tower extends Phaser.GameObjects.Container {
 
             // Update visuals
             this.updateAppearance();
+
+            // Show level badge if hidden
+            if (this.levelBadge) {
+                this.levelBadge.setVisible(true);
+            }
 
             return true;
         }
