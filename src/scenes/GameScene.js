@@ -3,6 +3,8 @@ import PathManager from '../systems/PathManager.js';
 import WaveManager from '../systems/WaveManager.js';
 import EconomyManager from '../systems/EconomyManager.js';
 import Tower from '../entities/Tower.js';
+import MultiShotTower from '../entities/MultiShotTower.js';
+import SupportTower from '../entities/SupportTower.js';
 import Enemy from '../entities/Enemy.js';
 import Projectile from '../entities/Projectile.js';
 
@@ -41,7 +43,7 @@ class AudioManager {
         for (const key of keys) {
             if (key === 'ui_click') {
                 // Set lower default volume for UI click sound
-                this.sounds[key] = this.scene.sound.add(key, { volume: 0.1 });
+                this.sounds[key] = this.scene.sound.add(key, { volume: 0.2 });
             } else {
                 this.sounds[key] = this.scene.sound.add(key);
             }
@@ -283,13 +285,32 @@ export default class GameScene extends Phaser.Scene {
             this.economyManager.spendMoney(towerData.cost);
             
             // Create tower
-            const tower = new Tower(
-                this,
-                tile.x + 32,
-                tile.y + 32,
-                selectedTower.toLowerCase(),
-                towerData
-            );
+            let tower;
+            if (selectedTower === 'MULTISHOT') {
+                tower = new MultiShotTower(
+                    this,
+                    tile.x + 32,
+                    tile.y + 32,
+                    selectedTower.toLowerCase(),
+                    towerData
+                );
+            } else if (selectedTower === 'SUPPORT') {
+                tower = new SupportTower(
+                    this,
+                    tile.x + 32,
+                    tile.y + 32,
+                    selectedTower.toLowerCase(),
+                    towerData
+                );
+            } else {
+                tower = new Tower(
+                    this,
+                    tile.x + 32,
+                    tile.y + 32,
+                    selectedTower.toLowerCase(),
+                    towerData
+                );
+            }
             
             // Add to towers array
             this.towers.push(tower);

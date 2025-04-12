@@ -579,6 +579,12 @@ export default class UIScene extends Phaser.Scene {
                 return 0xff0000;
             case 'SLOW':
                 return 0x00ffff;
+            case 'SNIPER':
+                return 0xaa00ff;
+            case 'MULTISHOT':
+                return 0xff8800;
+            case 'SUPPORT':
+                return 0x00ff00;
             default:
                 return 0xffffff;
         }

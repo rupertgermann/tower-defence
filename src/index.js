@@ -66,6 +66,48 @@ window.GAME_SETTINGS = {
             upgradeDamageScale: 1.3,
             upgradeRangeScale: 1.10,
             upgradeFireRateScale: 0.9
+        },
+        SNIPER: {
+            name: 'Sniper Tower',
+            cost: 250,
+            damage: 80,
+            range: 350,
+            fireRate: 2500,
+            projectileSpeed: 600,
+            maxLevel: 3,
+            upgradeCostScaling: 0.7,
+            upgradeDamageScale: 1.5,
+            upgradeRangeScale: 1.10,
+            upgradeFireRateScale: 0.85
+        },
+        MULTISHOT: {
+            name: 'Multi-shot Tower',
+            cost: 220,
+            damage: 18,
+            range: 170,
+            fireRate: 1300,
+            projectileSpeed: 320,
+            targetCount: 3,
+            maxLevel: 3,
+            upgradeCostScaling: 0.65,
+            upgradeDamageScale: 1.35,
+            upgradeRangeScale: 1.10,
+            upgradeFireRateScale: 0.88
+        },
+        SUPPORT: {
+            name: 'Support Tower',
+            cost: 180,
+            damage: 0,
+            range: 120,
+            fireRate: 0,
+            buffType: 'fireRate',
+            buffAmount: 0.2, // 20% faster fire rate
+            buffRadius: 120,
+            maxLevel: 3,
+            upgradeCostScaling: 0.6,
+            upgradeDamageScale: 1.0,
+            upgradeRangeScale: 1.15,
+            upgradeFireRateScale: 1.0
         }
     },
     // Enemy types
