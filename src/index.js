@@ -24,6 +24,49 @@ const game = new Phaser.Game(config);
 
 // Global game settings
 window.GAME_SETTINGS = {
+    // Difficulty levels
+    DIFFICULTY: {
+        EASY: {
+            name: 'Easy',
+            enemyHealthMultiplier: 1.0,
+            enemySpeedMultiplier: 1.0,
+            enemyRewardMultiplier: 1.0,
+            enemyCountMultiplier: 1.0,
+            waveCountAdjustment: 0 // No extra waves
+        },
+        NORMAL: {
+            name: 'Normal',
+            enemyHealthMultiplier: 1.2,
+            enemySpeedMultiplier: 1.1,
+            enemyRewardMultiplier: 1.1,
+            enemyCountMultiplier: 1.2,
+            waveCountAdjustment: 2 // 2 extra waves
+        },
+        HARD: {
+            name: 'Hard',
+            enemyHealthMultiplier: 1.5,
+            enemySpeedMultiplier: 1.2,
+            enemyRewardMultiplier: 1.2,
+            enemyCountMultiplier: 1.4,
+            waveCountAdjustment: 3 // 3 extra waves
+        },
+        EXPERT: {
+            name: 'Expert',
+            enemyHealthMultiplier: 1.8,
+            enemySpeedMultiplier: 1.3,
+            enemyRewardMultiplier: 1.3,
+            enemyCountMultiplier: 1.6,
+            waveCountAdjustment: 4 // 4 extra waves
+        },
+        INSANE: {
+            name: 'Insane',
+            enemyHealthMultiplier: 2.2,
+            enemySpeedMultiplier: 1.4,
+            enemyRewardMultiplier: 1.4,
+            enemyCountMultiplier: 1.8,
+            waveCountAdjustment: 5 // 5 extra waves
+        }
+    },
     // Tower types
     TOWERS: {
         BASIC: {
@@ -202,6 +245,42 @@ window.GAME_SETTINGS = {
         { enemies: ['ARMORED', 'FLYING', 'HEALER'], count: 20, interval: 600 },
         { enemies: ['FAST', 'ARMORED', 'FLYING', 'SHIELD', 'SPLIT', 'TELEPORT'], count: 30, interval: 500 },
         { enemies: ['BOSS', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], count: 5, interval: 800, bossWave: true }
+    ],
+    
+    // Extra waves for higher difficulties
+    EXTRA_WAVES: [
+        // Extra wave 1 (for Normal+)
+        { 
+            enemies: ['FAST', 'ARMORED', 'FLYING', 'HEALER', 'SHIELD'], 
+            count: 35, 
+            interval: 450 
+        },
+        // Extra wave 2 (for Normal+)
+        { 
+            enemies: ['ARMORED', 'FLYING', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], 
+            count: 8, 
+            interval: 700, 
+            bossWave: true 
+        },
+        // Extra wave 3 (for Hard+)
+        { 
+            enemies: ['FAST', 'ARMORED', 'FLYING', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], 
+            count: 40, 
+            interval: 400 
+        },
+        // Extra wave 4 (for Expert+)
+        { 
+            enemies: ['ARMORED', 'FLYING', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], 
+            count: 45, 
+            interval: 350 
+        },
+        // Extra wave 5 (for Insane)
+        { 
+            enemies: ['BOSS', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], 
+            count: 10, 
+            interval: 600, 
+            bossWave: true 
+        }
     ],
     // Player starting stats
     PLAYER: {

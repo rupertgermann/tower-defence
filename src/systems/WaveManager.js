@@ -7,6 +7,69 @@ export default class WaveManager {
         this.spawnTimer = null;
         this.spawnIndex = 0;
         this.waveData = null;
+        
+        // Get difficulty settings
+        this.difficultyKey = scene.registry.get('selectedDifficulty') || 'EASY';
+        this.difficultySettings = window.GAME_SETTINGS.DIFFICULTY[this.difficultyKey];
+        
+        // Calculate total waves based on difficulty
+        this.totalWaves = window.GAME_SETTINGS.WAVES.length + 
+            this.getExtraWavesForDifficulty(this.difficultyKey);
+        
+        console.log(`WaveManager initialized with difficulty: ${this.difficultyKey}`);
+        console.log(`Total waves: ${this.totalWaves}`);
+    }
+
+    /**
+     * Get the number of extra waves to add based on difficulty
+     * @param {string} difficultyKey - The difficulty key
+     * @returns {number} Number of extra waves
+     */
+    getExtraWavesForDifficulty(difficultyKey) {
+        return window.GAME_SETTINGS.DIFFICULTY[difficultyKey].waveCountAdjustment;
+    }
+    
+    /**
+     * Get wave data for the specified wave number, accounting for difficulty
+     * @param {number} waveNumber - The wave number (1-based)
+     * @returns {Object} Wave data
+     */
+    getWaveData(waveNumber) {
+        const baseWaveCount = window.GAME_SETTINGS.WAVES.length;
+        
+        // If it's a base wave
+        if (waveNumber <= baseWaveCount) {
+            const baseWaveData = { ...window.GAME_SETTINGS.WAVES[waveNumber - 1] };
+            
+            // Apply difficulty scaling to enemy count
+            baseWaveData.count = Math.round(baseWaveData.count * this.difficultySettings.enemyCountMultiplier);
+            
+            // For higher difficulties, introduce tougher enemies earlier
+            if (this.difficultyKey !== 'EASY' && waveNumber <= 3) {
+                // Add more enemy types to early waves based on difficulty
+                if (this.difficultyKey === 'NORMAL' && waveNumber === 1) {
+                    baseWaveData.enemies = ['BASIC', 'FAST'];
+                } else if (this.difficultyKey === 'HARD' && waveNumber === 1) {
+                    baseWaveData.enemies = ['BASIC', 'FAST', 'ARMORED'];
+                } else if (this.difficultyKey === 'EXPERT' && waveNumber === 1) {
+                    baseWaveData.enemies = ['BASIC', 'FAST', 'ARMORED', 'FLYING'];
+                } else if (this.difficultyKey === 'INSANE' && waveNumber === 1) {
+                    baseWaveData.enemies = ['BASIC', 'FAST', 'ARMORED', 'FLYING', 'HEALER'];
+                }
+            }
+            
+            return baseWaveData;
+        } 
+        // If it's an extra wave
+        else {
+            const extraWaveIndex = waveNumber - baseWaveCount - 1;
+            const extraWaveData = { ...window.GAME_SETTINGS.EXTRA_WAVES[extraWaveIndex] };
+            
+            // Apply difficulty scaling to enemy count
+            extraWaveData.count = Math.round(extraWaveData.count * this.difficultySettings.enemyCountMultiplier);
+            
+            return extraWaveData;
+        }
     }
 
     /**
@@ -22,7 +85,7 @@ export default class WaveManager {
         }
 
         // Check if we've reached the end of all waves
-        if (this.currentWave >= window.GAME_SETTINGS.WAVES.length) {
+        if (this.currentWave >= this.totalWaves) {
             console.log('Reached end of waves, returning');
             return;
         }
@@ -31,8 +94,8 @@ export default class WaveManager {
         this.currentWave++;
         console.log(`Starting wave ${this.currentWave}`);
 
-        // Get wave data
-        this.waveData = window.GAME_SETTINGS.WAVES[this.currentWave - 1];
+        // Get wave data with difficulty scaling
+        this.waveData = this.getWaveData(this.currentWave);
         console.log('Wave data:', this.waveData);
         
         // Set up wave
@@ -145,7 +208,7 @@ export default class WaveManager {
      * @returns {number} Total number of waves
      */
     getTotalWaves() {
-        return window.GAME_SETTINGS.WAVES.length;
+        return this.totalWaves;
     }
 
     /**

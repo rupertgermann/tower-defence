@@ -231,11 +231,40 @@ export default class UIScene extends Phaser.Scene {
         const waveIcon = this.add.circle(400, 40, 15, 0x00ffff);
         this.uiContainer.add(waveIcon);
         
-        this.waveText = this.add.text(425, 30, `Wave: ${this.wave}/${window.GAME_SETTINGS.WAVES.length}`, {
+        // Get total waves from WaveManager if available, otherwise use base waves
+        const totalWaves = this.scene.get('GameScene').waveManager ? 
+            this.scene.get('GameScene').waveManager.getTotalWaves() : 
+            window.GAME_SETTINGS.WAVES.length;
+            
+        this.waveText = this.add.text(425, 30, `Wave: ${this.wave}/${totalWaves}`, {
             fontSize: '24px',
             fill: '#ffffff'
         });
         this.uiContainer.add(this.waveText);
+        
+        // Difficulty display
+        const difficultyKey = this.registry.get('selectedDifficulty') || 'EASY';
+        const difficultyData = window.GAME_SETTINGS.DIFFICULTY[difficultyKey];
+        
+        // Get color based on difficulty
+        let difficultyColor;
+        switch(difficultyKey) {
+            case 'EASY': difficultyColor = '#00aa00'; break;     // Green
+            case 'NORMAL': difficultyColor = '#0088cc'; break;   // Blue
+            case 'HARD': difficultyColor = '#aaaa00'; break;     // Yellow
+            case 'EXPERT': difficultyColor = '#dd6600'; break;   // Orange
+            case 'INSANE': difficultyColor = '#cc0000'; break;   // Red
+            default: difficultyColor = '#ffffff';
+        }
+        
+        const difficultyIcon = this.add.circle(600, 40, 15, 0xffffff);
+        this.uiContainer.add(difficultyIcon);
+        
+        this.difficultyText = this.add.text(625, 30, `Difficulty: ${difficultyData.name}`, {
+            fontSize: '24px',
+            fill: difficultyColor
+        });
+        this.uiContainer.add(this.difficultyText);
     }
 
     createTowerButtons() {
@@ -420,7 +449,10 @@ export default class UIScene extends Phaser.Scene {
         // Update wave
         if (data.wave !== undefined) {
             this.wave = data.wave;
-            this.waveText.setText(`Wave: ${this.wave}/${window.GAME_SETTINGS.WAVES.length}`);
+            
+            // Get total waves from WaveManager
+            const totalWaves = this.scene.get('GameScene').waveManager.getTotalWaves();
+            this.waveText.setText(`Wave: ${this.wave}/${totalWaves}`);
         }
     }
 

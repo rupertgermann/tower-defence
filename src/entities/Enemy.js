@@ -22,10 +22,16 @@ export default class Enemy extends Phaser.GameObjects.Container {
         // Add to scene
         scene.add.existing(this);
         
+        // Get difficulty multipliers
+        this.difficultyMultipliers = this.getDifficultyMultipliers(scene);
+        
         // Store enemy data
         this.type = type;
         this.data = { ...data }; // Clone data to avoid modifying original
         this.path = path;
+        
+        // Apply difficulty multipliers to enemy stats
+        this.applyDifficultyMultipliers();
         
         // Enemy state
         this.health = this.data.health;
@@ -46,6 +52,31 @@ export default class Enemy extends Phaser.GameObjects.Container {
         // Set up physics body
         scene.physics.world.enable(this);
         this.body.setCircle(16); // Adjust size as needed
+    }
+
+    /**
+     * Get difficulty multipliers from the scene registry
+     * @param {Phaser.Scene} scene - The scene
+     * @returns {Object} Difficulty multipliers
+     */
+    getDifficultyMultipliers(scene) {
+        // Get selected difficulty from registry (default to EASY if not set)
+        const difficultyKey = scene.registry.get('selectedDifficulty') || 'EASY';
+        return window.GAME_SETTINGS.DIFFICULTY[difficultyKey];
+    }
+    
+    /**
+     * Apply difficulty multipliers to enemy stats
+     */
+    applyDifficultyMultipliers() {
+        // Apply health multiplier
+        this.data.health = Math.round(this.data.health * this.difficultyMultipliers.enemyHealthMultiplier);
+        
+        // Apply speed multiplier
+        this.data.speed = Math.round(this.data.speed * this.difficultyMultipliers.enemySpeedMultiplier);
+        
+        // Apply reward multiplier
+        this.data.reward = Math.round(this.data.reward * this.difficultyMultipliers.enemyRewardMultiplier);
     }
 
     /**

@@ -406,7 +406,7 @@ export default class GameScene extends Phaser.Scene {
                     this.events.emit('waveCompleted', this.currentWave);
                     
                     // Check for victory
-                    if (this.currentWave >= window.GAME_SETTINGS.WAVES.length) {
+                    if (this.currentWave >= this.waveManager.getTotalWaves()) {
                         this.gameOver(true);
                     }
                 }
