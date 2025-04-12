@@ -10,8 +10,8 @@ flowchart LR
     B -->|Completed| C[Entity Base Classes]
     C -->|Completed| D[Path System]
     D -->|Completed| E[Tower Placement]
-    E -->|In Progress| F[Wave Management]
-    F -.->|Next| G[Enemy AI]
+    E -->|Completed| F[Wave Management]
+    F -->|In Progress| G[Enemy AI]
     G -.->|Next| H[Collision System]
     H -.->|Next| I[Economy System]
     I -.->|Next| J[Testing & Balance]
@@ -26,11 +26,16 @@ flowchart LR
 - Path system for enemy movement
 - Tower placement system on designated tiles
 - Asset generation for placeholder graphics
+- Wave management system for spawning enemies
+- Basic enemy AI with path following
+- Collision detection between projectiles and enemies
+- Economy system for resource management
 
 ### In Progress
-- Wave management system for spawning enemies
-- Integration of game systems (Path, Wave, Economy)
-- UI scene for player interaction
+- Game testing and balancing
+- Visual feedback for game events
+- Tower special abilities (AoE damage, slowing effect)
+- Enemy variety implementation (flying, armored types)
 
 ## Current Challenges
 
@@ -59,22 +64,22 @@ flowchart LR
 ## Next Steps
 
 ### Immediate Tasks
-1. Complete the wave manager integration with proper enemy spawning
-2. Implement basic enemy AI with path following
-3. Finalize collision detection between projectiles and enemies
-4. Complete the economy system for resource management
+1. Complete game testing and balancing
+2. Implement visual and audio feedback for game events
+3. Finalize tower special abilities
+4. Complete enemy variety implementation
 
 ### Short-term Goals
-1. Implement all tower types with their special abilities
-2. Create all enemy types with their unique characteristics
-3. Balance tower costs, damage, and enemy health
-4. Add visual and audio feedback for game events
-
-### Medium-term Goals
 1. Implement game state management (win/lose conditions)
 2. Add tower upgrading functionality
 3. Create additional maps with different layouts
 4. Implement save/load functionality
+
+### Medium-term Goals
+1. Add sound effects and background music
+2. Create visual effects for attacks and deaths
+3. Implement tutorial or help system
+4. Add score tracking and display
 
 ## Decision Log
 
@@ -83,6 +88,7 @@ flowchart LR
 - **Enemy Movement**: Implemented segment-based path following for smooth movement along predefined paths
 - **Wave System**: Designed progressive wave system with increasing difficulty and enemy variety
 - **UI Layout**: Created separate UI scene overlaid on game scene for cleaner architecture
+- **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction
 
 ### Pending Decisions
 - How to handle tower upgrades (branching paths vs. linear progression)
@@ -103,3 +109,4 @@ flowchart LR
 - Enemy path following and health management
 - Wave progression and enemy spawning
 - Resource management and tower placement
+- Game balance and difficulty progression

@@ -75,6 +75,18 @@ The GameScene acts as a factory for game entities:
 
 This centralizes entity creation and ensures proper initialization.
 
+### Strategy Pattern
+Different tower and enemy types implement different strategies:
+- Tower targeting strategies (closest, strongest, first, etc.)
+- Enemy movement strategies (ground, flying)
+- Tower attack strategies (single target, area effect, slowing)
+
+### Observer Pattern
+The game uses an observer pattern for UI updates:
+- Game state changes are observed by the UI
+- UI components update in response to state changes
+- This keeps the UI in sync with the game state
+
 ## Data Flow Patterns
 
 ### Game State Management
@@ -98,6 +110,27 @@ Enemies follow paths using a segment-based approach:
 2. Enemy moves from point to point along segments
 3. Movement is interpolated for smooth transitions
 4. Progress is tracked as a combination of segment index and position (t) within segment
+
+### Projectile Tracking
+Projectiles use a target-based movement system:
+1. Projectile is created with a reference to its target
+2. Projectile calculates angle to target each frame
+3. If target is lost, projectile continues in last known direction
+4. Collision detection checks for hits with enemies
+
+## Error Handling Patterns
+
+### Custom Destroy Pattern
+To handle Phaser's automatic destruction of object properties:
+1. Custom destroy methods are implemented in entity classes
+2. References to plain objects are nullified before calling parent destroy
+3. Local variables are used to store references needed in callbacks
+
+### Event-Based Error Recovery
+The game uses events to handle and recover from errors:
+1. Critical errors are broadcast as events
+2. Error handlers can respond appropriately
+3. The game can continue running even if some components fail
 
 ## Optimization Patterns
 

@@ -21,13 +21,26 @@
 ```
 tower-defence/
 ├── docs/                 # Documentation
+│   ├── concept.md        # Original game concept
+│   ├── mvp-plan.md       # MVP implementation plan
+│   ├── progress.md       # Development progress tracking
+│   └── bug-fix-plan.md   # Bug fix documentation
+├── memory-bank/          # Memory bank for project context
 ├── public/               # Static assets
 │   ├── index.html        # Main HTML entry point
 │   └── assets/           # Game assets (images)
 └── src/                  # Source code
     ├── entities/         # Game entity classes
+    │   ├── Enemy.js      # Enemy implementation
+    │   ├── Projectile.js # Projectile implementation
+    │   └── Tower.js      # Tower implementation
     ├── scenes/           # Phaser scene classes
+    │   ├── GameScene.js  # Main game scene
+    │   └── UIScene.js    # User interface scene
     ├── systems/          # Game system managers
+    │   ├── EconomyManager.js # Resource management
+    │   ├── PathManager.js    # Path definition and calculations
+    │   └── WaveManager.js    # Enemy wave spawning
     ├── index.js          # Main entry point
     └── assets-generator.js # Asset generation utility
 ```
@@ -76,6 +89,31 @@ The project includes a custom asset generator script (`assets-generator.js`) tha
 - Creates placeholder assets during development
 - Ensures consistent sizing and formatting
 - Generates variations of base assets
+
+## Game Configuration
+
+### Global Settings
+The game uses a global configuration object (`GAME_SETTINGS`) that defines:
+- Tower types and properties
+- Enemy types and properties
+- Wave configurations
+- Player starting stats
+
+This centralized configuration makes it easy to balance and tune the game.
+
+## Error Handling
+
+### Custom Destroy Methods
+To handle Phaser's automatic destruction of object properties:
+- Custom destroy methods are implemented in entity classes
+- References to plain objects are nullified before calling parent destroy
+- Local variables are used to store references needed in callbacks
+
+### Event-Based Error Recovery
+The game uses events to handle and recover from errors:
+- Critical errors are broadcast as events
+- Error handlers can respond appropriately
+- The game can continue running even if some components fail
 
 ## Performance Considerations
 

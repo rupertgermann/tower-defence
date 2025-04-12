@@ -35,6 +35,16 @@ Players are motivated by:
 - **Meaningful Choices**: Each tower type offers distinct advantages in different situations
 - **Visual Clarity**: Easy to distinguish between different tower and enemy types
 
+## Current Implementation Status
+The game has implemented the core gameplay mechanics:
+- Tower placement and targeting system
+- Enemy path following and health management
+- Wave-based progression system
+- Economy system for resource management
+- Basic UI for game interaction
+
+The focus is now on refining these systems, balancing gameplay, and adding visual and audio feedback to enhance the player experience.
+
 ## Problem Solving
 The game addresses several common issues in tower defense games:
 1. **Difficulty Balance**: Carefully tuned waves that provide challenge without frustration
@@ -61,6 +71,55 @@ The game addresses several common issues in tower defense games:
 - Strives to defeat all waves with perfect scores
 - Experiments with different strategies for replayability
 - Appreciates the challenge of the final boss wave
+
+## Game Features
+
+### Tower Types
+- **Basic Tower**: Standard attack tower with balanced stats
+  - Medium range, medium damage, medium fire rate
+  - Good all-around tower for general defense
+  
+- **Area of Effect (AoE) Tower**: Damages multiple enemies in a radius
+  - Shorter range but damages all enemies in blast radius
+  - Effective against groups of weaker enemies
+  - Can target flying enemies
+  
+- **Slowing Tower**: Reduces enemy movement speed temporarily
+  - Longer range but lower damage
+  - Applies slowing effect to enemies
+  - Can target flying enemies
+  - Strategic value in slowing enemies for other towers to hit
+
+### Enemy Types
+- **Basic Enemy**: Standard enemy with balanced stats
+  - Medium health, medium speed
+  - No special abilities
+  
+- **Fast Enemy**: Moves quickly but has less health
+  - Low health, high speed
+  - Requires quick targeting or slowing effects
+  
+- **Armored Enemy**: High health and damage resistance
+  - High health, low speed
+  - Damage reduction from attacks
+  - Requires sustained damage to defeat
+  
+- **Flying Enemy**: Can only be targeted by certain towers
+  - Medium health, medium speed
+  - Can only be targeted by AoE and Slowing towers
+  - Requires strategic tower placement
+  
+- **Boss Enemy**: Extremely powerful enemy that appears in the final wave
+  - Very high health, low speed
+  - Damage reduction from attacks
+  - Requires coordinated defense to defeat
+
+### Game Mechanics
+- **Path-based Movement**: Enemies follow predefined paths
+- **Tower Targeting**: Towers automatically target enemies within range
+- **Resource Management**: Players earn gold by defeating enemies
+- **Wave Progression**: Increasing difficulty with each wave
+- **Lives System**: Players lose lives when enemies reach the end of the path
 
 ## Success Criteria
 The game will be considered successful if players:
