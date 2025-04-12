@@ -22,9 +22,9 @@ class AudioManager {
     loadSounds() {
         // List of sound keys and file names
         const soundList = [
-            { key: 'attack', file: 'attack.mp3' },
-            { key: 'enemy_death', file: 'enemy_death.mp3' },
-            { key: 'upgrade', file: 'upgrade.mp3' },
+            { key: 'attack', file: 'attack.wav' },
+            { key: 'enemy_death', file: 'enemy_death.wav' },
+            { key: 'upgrade', file: 'upgrade.wav' },
             { key: 'wave_start', file: 'wave_start.mp3' },
             { key: 'wave_end', file: 'wave_end.mp3' },
             { key: 'ui_click', file: 'ui_click.mp3' },
@@ -39,13 +39,25 @@ class AudioManager {
         // Create sound objects after load
         const keys = ['attack', 'enemy_death', 'upgrade', 'wave_start', 'wave_end', 'ui_click', 'bgm'];
         for (const key of keys) {
-            this.sounds[key] = this.scene.sound.add(key);
+            if (key === 'ui_click') {
+                // Set lower default volume for UI click sound
+                this.sounds[key] = this.scene.sound.add(key, { volume: 0.1 });
+            } else {
+                this.sounds[key] = this.scene.sound.add(key);
+            }
         }
     }
 
     playSound(key, config = {}) {
         if (this.muted || !this.sounds[key]) return;
-        this.sounds[key].play({ volume: this.volume, ...config });
+        // Always use per-play volume for ui_click, as per Phaser 3.60+ best practice
+        if (key === 'ui_click' && config.volume === undefined) {
+            this.sounds[key].play({ ...config, volume: 0.1 });
+        } else if (config.volume !== undefined) {
+            this.sounds[key].play({ ...config });
+        } else {
+            this.sounds[key].play();
+        }
     }
 
     playMusic(key) {
@@ -128,6 +140,10 @@ export default class GameScene extends Phaser.Scene {
         // Create audio manager sounds
         if (this.audioManager) {
             this.audioManager.createSounds();
+            // Reduce UI click sound volume
+            if (this.audioManager.sounds['ui_click']) {
+                this.audioManager.sounds['ui_click'].setVolume(0.1);
+            }
             this.audioManager.playMusic('bgm');
         }
 
