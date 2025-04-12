@@ -194,6 +194,21 @@ export default class Enemy extends Phaser.GameObjects.Container {
         // Store a reference to the scene and economyManager
         const scene = this.scene;
         const economyManager = this.scene.economyManager;
+
+        // Enhanced visual effect: particle explosion on death
+        if (scene.add && scene.textures.exists('explosion')) {
+            const explosion = scene.add.particles(this.x, this.y, 'explosion', {
+                lifespan: 800,
+                speed: { min: 50, max: 120 },
+                scale: { start: 0.5, end: 0 },
+                quantity: 18,
+                blendMode: 'ADD'
+            });
+            // Remove particles after effect
+            scene.time.delayedCall(900, () => {
+                if (explosion) explosion.destroy();
+            });
+        }
         
         // Play death animation
         this.scene.tweens.add({
