@@ -131,6 +131,8 @@ export default class GameScene extends Phaser.Scene {
             this.audioManager.playMusic('bgm');
         }
 
+        // No persistent explosionParticles manager in Phaser 3.60+
+
         // Create map
         this.createMap();
 
@@ -518,11 +520,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createHitEffect(x, y) {
-        // Particle burst for hit effect
-        const particles = this.add.particles('explosion');
-        const emitter = particles.createEmitter({
-            x,
-            y,
+        // Particle burst for hit effect (Phaser 3.60+ API, one-shot emitter)
+        const particles = this.add.particles({
+            key: 'explosion',
+            x: x,
+            y: y,
             lifespan: 300,
             speed: { min: 80, max: 180 },
             scale: { start: 0.4, end: 0 },
@@ -531,18 +533,17 @@ export default class GameScene extends Phaser.Scene {
             angle: { min: 0, max: 360 },
             blendMode: 'ADD'
         });
-        // Destroy particles after effect
         this.time.delayedCall(350, () => {
             particles.destroy();
         });
     }
 
     createExplosionEffect(x, y, radius) {
-        // Particle burst for explosion effect
-        const particles = this.add.particles('explosion');
-        const emitter = particles.createEmitter({
-            x,
-            y,
+        // Particle burst for explosion effect (Phaser 3.60+ API, one-shot emitter)
+        const particles = this.add.particles({
+            key: 'explosion',
+            x: x,
+            y: y,
             lifespan: 500,
             speed: { min: 100, max: 220 },
             scale: { start: radius / 120, end: 0 },
@@ -551,7 +552,6 @@ export default class GameScene extends Phaser.Scene {
             angle: { min: 0, max: 360 },
             blendMode: 'ADD'
         });
-        // Destroy particles after effect
         this.time.delayedCall(550, () => {
             particles.destroy();
         });
@@ -561,10 +561,10 @@ export default class GameScene extends Phaser.Scene {
      * Play enemy death animation at (x, y)
      */
     playDeathAnimation(x, y) {
-        const particles = this.add.particles('explosion');
-        const emitter = particles.createEmitter({
-            x,
-            y,
+        const particles = this.add.particles({
+            key: 'explosion',
+            x: x,
+            y: y,
             lifespan: 400,
             speed: { min: 60, max: 160 },
             scale: { start: 0.5, end: 0 },
