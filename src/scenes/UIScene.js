@@ -18,6 +18,120 @@ export default class UIScene extends Phaser.Scene {
         this.towerButtons = [];
     }
 
+    /**
+     * Show tower info panel when a tower is selected
+     * @param {Tower} tower - The selected tower instance
+     */
+    showTowerInfo(tower) {
+        // Remove existing panel if present
+        if (this.towerInfoPanel) {
+            this.towerInfoPanel.destroy(true);
+        }
+
+        // Panel background
+        const panelWidth = 320;
+        const panelHeight = 220;
+        const panelX = 1280 - panelWidth - 30;
+        const panelY = 100;
+        this.towerInfoPanel = this.add.container(panelX, panelY);
+
+        const bg = this.add.rectangle(0, 0, panelWidth, panelHeight, 0x222244, 0.95);
+        bg.setOrigin(0, 0);
+        this.towerInfoPanel.add(bg);
+
+        // Tower name
+        const nameText = this.add.text(20, 15, `Tower: ${tower.data.name || tower.type}`, {
+            fontSize: '20px',
+            fill: '#ffffff'
+        });
+        this.towerInfoPanel.add(nameText);
+
+        // Tower level
+        const levelText = this.add.text(20, 50, `Level: ${tower.level} / ${tower.maxLevel || 3}`, {
+            fontSize: '18px',
+            fill: '#ffff00'
+        });
+        this.towerInfoPanel.add(levelText);
+
+        // Tower stats
+        const statsText = this.add.text(20, 80,
+            `Damage: ${Math.round(tower.data.damage)}\nRange: ${Math.round(tower.data.range)}\nFire Rate: ${Math.round(tower.data.fireRate)}ms`,
+            { fontSize: '16px', fill: '#ffffff' }
+        );
+        this.towerInfoPanel.add(statsText);
+
+        // Upgrade info
+        let canUpgrade = typeof tower.upgrade === 'function' && (!tower.maxLevel || tower.level < tower.maxLevel);
+        let upgradeCost = 0;
+        if (canUpgrade) {
+            // Calculate upgrade cost using tower's method or fallback
+            if (typeof tower.calculateUpgradeCost === 'function') {
+                upgradeCost = tower.calculateUpgradeCost();
+            } else {
+                upgradeCost = Math.floor(tower.data.cost * 0.5);
+            }
+        }
+
+        const upgradeText = this.add.text(20, 140,
+            canUpgrade
+                ? `Upgrade Cost: ${upgradeCost}g`
+                : `Max Level Reached`,
+            { fontSize: '16px', fill: canUpgrade ? '#00ff00' : '#ff4444' }
+        );
+        this.towerInfoPanel.add(upgradeText);
+
+        // Upgrade button
+        if (canUpgrade) {
+            const upgradeBtn = this.add.rectangle(panelWidth - 120, panelHeight - 50, 100, 40, 0x00aa00);
+            upgradeBtn.setOrigin(0, 0);
+            upgradeBtn.setInteractive();
+
+            const btnText = this.add.text(panelWidth - 70, panelHeight - 30, 'Upgrade', {
+                fontSize: '18px',
+                fill: '#ffffff'
+            });
+            btnText.setOrigin(0.5, 0.5);
+
+            this.towerInfoPanel.add(upgradeBtn);
+            this.towerInfoPanel.add(btnText);
+
+            upgradeBtn.on('pointerover', () => {
+                upgradeBtn.setFillStyle(0x00cc00);
+            });
+            upgradeBtn.on('pointerout', () => {
+                upgradeBtn.setFillStyle(0x00aa00);
+            });
+            upgradeBtn.on('pointerdown', () => {
+                if (tower.upgrade()) {
+                    // Play upgrade sound if available
+                    if (this.scene.get('GameScene').audioManager && typeof this.scene.get('GameScene').audioManager.playSound === 'function') {
+                        this.scene.get('GameScene').audioManager.playSound('upgrade');
+                    }
+                    // Refresh panel with new stats
+                    this.showTowerInfo(tower);
+                    // Update UI money
+                    this.scene.get('GameScene').events.emit('updateUI', { money: this.scene.get('GameScene').economyManager.getMoney() });
+                } else {
+                    this.showMessage('Cannot upgrade: insufficient funds or max level reached.', 1500);
+                }
+            });
+        }
+
+        // Close button
+        const closeBtn = this.add.rectangle(panelWidth - 40, 10, 30, 30, 0x444444);
+        closeBtn.setOrigin(0, 0);
+        closeBtn.setInteractive();
+        const closeX = this.add.text(panelWidth - 25, 25, 'X', { fontSize: '18px', fill: '#ffffff' });
+        closeX.setOrigin(0.5, 0.5);
+        this.towerInfoPanel.add(closeBtn);
+        this.towerInfoPanel.add(closeX);
+        closeBtn.on('pointerdown', () => {
+            this.towerInfoPanel.destroy(true);
+        });
+
+        this.uiContainer.add(this.towerInfoPanel);
+    }
+
     create() {
         // Get initial values
         this.lives = window.GAME_SETTINGS.PLAYER.lives;
@@ -44,6 +158,16 @@ export default class UIScene extends Phaser.Scene {
         
         // Listen for game events
         this.setupEventListeners();
+    }
+
+    /**
+     * Remove tower info panel if present
+     */
+    hideTowerInfo() {
+        if (this.towerInfoPanel) {
+            this.towerInfoPanel.destroy(true);
+            this.towerInfoPanel = null;
+        }
     }
 
     createUIBackground() {
@@ -238,6 +362,17 @@ export default class UIScene extends Phaser.Scene {
         
         // Listen for messages
         this.scene.get('GameScene').events.on('showMessage', this.showMessage, this);
+
+        // Listen for tower info display
+        this.scene.get('GameScene').events.on('showTowerInfo', this.showTowerInfo, this);
+
+        // Hide tower info when clicking elsewhere (optional: could be improved)
+        this.input.on('pointerdown', (pointer, currentlyOver) => {
+            // If click is not on a UI element or tower info panel, hide it
+            if (!currentlyOver.some(obj => obj === this.towerInfoPanel)) {
+                this.hideTowerInfo();
+            }
+        });
     }
 
     updateUI(data) {
@@ -300,6 +435,47 @@ export default class UIScene extends Phaser.Scene {
         this.registry.set('selectedTower', type);
     }
 
+    /**
+     * Show a large animated banner for wave events
+     */
+    showWaveBanner(text, color = '#ffff00') {
+        // Remove existing banner if present
+        if (this.waveBanner) {
+            this.waveBanner.destroy();
+        }
+        const banner = this.add.text(640, 120, text, {
+            fontSize: '56px',
+            fill: color,
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 8,
+            align: 'center'
+        });
+        banner.setOrigin(0.5, 0.5);
+        banner.setAlpha(0);
+        this.waveBanner = banner;
+
+        // Animate in, hold, then out
+        this.tweens.add({
+            targets: banner,
+            alpha: 1,
+            duration: 350,
+            yoyo: false,
+            onComplete: () => {
+                this.time.delayedCall(1100, () => {
+                    this.tweens.add({
+                        targets: banner,
+                        alpha: 0,
+                        duration: 400,
+                        onComplete: () => {
+                            banner.destroy();
+                        }
+                    });
+                });
+            }
+        });
+    }
+
     onWaveStarted(waveNumber) {
         // Update wave number
         this.wave = waveNumber;
@@ -308,6 +484,9 @@ export default class UIScene extends Phaser.Scene {
         // Disable wave button during wave
         this.setWaveButtonEnabled(false);
         this.waveButtonText.setText('Wave in Progress');
+
+        // Show animated wave start banner
+        this.showWaveBanner(`Wave ${this.wave} Start!`, '#00ff88');
     }
 
     onWaveCompleted(waveNumber) {
@@ -315,6 +494,9 @@ export default class UIScene extends Phaser.Scene {
         this.setWaveButtonEnabled(true);
         this.waveButtonText.setText('Start Next Wave');
         
+        // Show animated wave completed banner
+        this.showWaveBanner(`Wave ${waveNumber} Complete!`, '#ffff00');
+
         // Show wave completed message
         this.showMessage(`Wave ${waveNumber} Completed!`);
     }

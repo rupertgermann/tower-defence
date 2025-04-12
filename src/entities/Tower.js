@@ -193,40 +193,84 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     /**
+     * Calculate the upgrade cost for the next level
+     * @returns {number} Upgrade cost
+     */
+    calculateUpgradeCost() {
+        // Allow per-tower scaling, fallback to default
+        const baseCost = this.data.cost;
+        const upgradeScaling = this.data.upgradeCostScaling || 0.6; // default 60% of base per level
+        return Math.floor(baseCost * upgradeScaling * this.level);
+    }
+
+    /**
+     * Apply stat improvements for an upgrade
+     */
+    applyUpgradeEffects() {
+        // Allow per-tower scaling, fallback to defaults
+        const damageScale = this.data.upgradeDamageScale || 1.4;
+        const rangeScale = this.data.upgradeRangeScale || 1.15;
+        const fireRateScale = this.data.upgradeFireRateScale || 0.85;
+
+        this.data.damage = Math.round(this.data.damage * damageScale);
+        this.data.range = Math.round(this.data.range * rangeScale);
+        this.data.fireRate = Math.round(this.data.fireRate * fireRateScale);
+
+        // Update range indicator
+        this.rangeIndicator.setRadius(this.data.range);
+    }
+
+    /**
+     * Update the tower's appearance based on level
+     */
+    updateAppearance() {
+        // Tint for level, can be replaced with frame/sprite/particle
+        this.sprite.setTint(this.getUpgradeTint());
+
+        // Optionally, add a visual effect for upgrades
+        if (!this.upgradeEffect) {
+            this.upgradeEffect = this.scene.add.particles(0, 0, 'explosion', {
+                lifespan: 400,
+                speed: { min: 20, max: 60 },
+                scale: { start: 0.2, end: 0 },
+                quantity: 6,
+                blendMode: 'ADD'
+            });
+            this.add(this.upgradeEffect);
+        }
+        this.upgradeEffect.explode(6, 0, 0);
+    }
+
+    /**
      * Upgrade the tower to the next level
      * @returns {boolean} True if upgrade was successful
      */
     upgrade() {
-        // For MVP, we'll keep upgrades simple
-        if (this.level >= 3) {
+        // Use maxLevel from data or default to 3
+        this.maxLevel = this.data.maxLevel || 3;
+        if (this.level >= this.maxLevel) {
             return false; // Max level reached
         }
-        
-        // Calculate upgrade cost (50% of base cost per level)
-        const upgradeCost = Math.floor(this.data.cost * 0.5);
-        
+
+        const upgradeCost = this.calculateUpgradeCost();
+
         // Check if player has enough money
         if (this.scene.economyManager.getMoney() >= upgradeCost) {
             // Deduct cost
             this.scene.economyManager.spendMoney(upgradeCost);
-            
+
             // Increase level
             this.level++;
-            
+
             // Improve stats
-            this.data.damage *= 1.5;
-            this.data.range *= 1.2;
-            this.data.fireRate *= 0.8;
-            
-            // Update range indicator
-            this.rangeIndicator.setRadius(this.data.range);
-            
-            // Visual feedback
-            this.sprite.setTint(this.getUpgradeTint());
-            
+            this.applyUpgradeEffects();
+
+            // Update visuals
+            this.updateAppearance();
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -239,8 +283,12 @@ export default class Tower extends Phaser.GameObjects.Container {
             case 1:
                 return 0xffffff; // No tint
             case 2:
-                return 0xffff00; // Yellow tint
+                return 0x00ffcc; // Cyan tint
             case 3:
+                return 0xffff00; // Yellow tint
+            case 4:
+                return 0xff8800; // Orange tint
+            case 5:
                 return 0xff0000; // Red tint
             default:
                 return 0xffffff;

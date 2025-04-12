@@ -6,6 +6,73 @@ import Tower from '../entities/Tower.js';
 import Enemy from '../entities/Enemy.js';
 import Projectile from '../entities/Projectile.js';
 
+/**
+ * AudioManager handles sound effects and music
+ */
+class AudioManager {
+    constructor(scene) {
+        this.scene = scene;
+        this.sounds = {};
+        this.music = null;
+        this.volume = 0.5;
+        this.musicVolume = 0.3;
+        this.muted = false;
+    }
+
+    loadSounds() {
+        // List of sound keys and file names
+        const soundList = [
+            { key: 'attack', file: 'attack.mp3' },
+            { key: 'enemy_death', file: 'enemy_death.mp3' },
+            { key: 'upgrade', file: 'upgrade.mp3' },
+            { key: 'wave_start', file: 'wave_start.mp3' },
+            { key: 'wave_end', file: 'wave_end.mp3' },
+            { key: 'ui_click', file: 'ui_click.mp3' },
+            { key: 'bgm', file: 'bgm.mp3' }
+        ];
+        for (const { key, file } of soundList) {
+            this.scene.load.audio(key, `assets/${file}`);
+        }
+    }
+
+    createSounds() {
+        // Create sound objects after load
+        const keys = ['attack', 'enemy_death', 'upgrade', 'wave_start', 'wave_end', 'ui_click', 'bgm'];
+        for (const key of keys) {
+            this.sounds[key] = this.scene.sound.add(key);
+        }
+    }
+
+    playSound(key, config = {}) {
+        if (this.muted || !this.sounds[key]) return;
+        this.sounds[key].play({ volume: this.volume, ...config });
+    }
+
+    playMusic(key) {
+        if (this.music) this.music.stop();
+        if (!this.sounds[key]) return;
+        this.music = this.sounds[key];
+        this.music.play({ volume: this.musicVolume, loop: true });
+    }
+
+    setVolume(volume) {
+        this.volume = volume;
+    }
+
+    setMusicVolume(volume) {
+        this.musicVolume = volume;
+        if (this.music) this.music.setVolume(volume);
+    }
+
+    mute(muted = true) {
+        this.muted = muted;
+        if (this.music) this.music.setMute(muted);
+        for (const key in this.sounds) {
+            this.sounds[key].setMute(muted);
+        }
+    }
+}
+
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
@@ -23,6 +90,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        // Load audio assets
+        this.audioManager = new AudioManager(this);
+        this.audioManager.loadSounds();
         // Load map tiles
         this.load.image('tile', 'assets/tile.png');
         this.load.image('path', 'assets/path.png');
@@ -54,16 +124,22 @@ export default class GameScene extends Phaser.Scene {
         this.pathManager = new PathManager(this);
         this.waveManager = new WaveManager(this);
         this.economyManager = new EconomyManager(this);
-        
+
+        // Create audio manager sounds
+        if (this.audioManager) {
+            this.audioManager.createSounds();
+            this.audioManager.playMusic('bgm');
+        }
+
         // Create map
         this.createMap();
-        
+
         // Set up input handlers
         this.setupInputHandlers();
-        
+
         // Start the game
         this.events.emit('gameStart');
-        
+
         // Connect to UI scene
         this.scene.launch('UIScene');
         this.events.emit('updateUI', {
@@ -227,6 +303,45 @@ export default class GameScene extends Phaser.Scene {
                 this.waveManager.startNextWave();
             }
         });
+
+        // Show wave start indicator when a new wave begins
+        this.events.on('waveStarted', (waveNumber) => {
+            this.showWaveIndicator(`Wave ${waveNumber} Start`);
+        });
+
+        // Show wave end indicator when a wave is completed
+        this.events.on('waveCompleted', (waveNumber) => {
+            this.showWaveIndicator(`Wave ${waveNumber} Complete`);
+        });
+    }
+
+    /**
+     * Show a visual indicator for wave start/end
+     * @param {string} text - The text to display
+     */
+    showWaveIndicator(text) {
+        const width = this.game.config.width;
+        const height = this.game.config.height;
+        const banner = this.add.text(width / 2, height / 2, text, {
+            fontSize: '48px',
+            fill: '#fff',
+            fontStyle: 'bold',
+            stroke: '#000',
+            strokeThickness: 6,
+            align: 'center'
+        });
+        banner.setOrigin(0.5);
+        banner.setDepth(1000);
+
+        this.tweens.add({
+            targets: banner,
+            alpha: 0,
+            duration: 1200,
+            delay: 800,
+            onComplete: () => {
+                banner.destroy();
+            }
+        });
     }
 
     updateTowers(time, delta) {
@@ -266,7 +381,14 @@ export default class GameScene extends Phaser.Scene {
             if (enemy.isDead()) {
                 // Add money
                 this.economyManager.addMoney(enemy.data.reward);
-                
+
+                // Play enemy death sound
+                if (this.audioManager) {
+                    this.audioManager.playSound('enemy_death');
+                }
+                // Play death animation
+                this.playDeathAnimation(enemy.x, enemy.y);
+
                 // Remove enemy
                 enemy.destroy();
                 this.enemies.splice(i, 1);
@@ -334,6 +456,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     handleProjectileHit(projectile, enemy) {
+        // Play attack sound
+        if (this.audioManager) {
+            this.audioManager.playSound('attack');
+        }
         // Calculate damage (considering armor)
         let damage = projectile.projectileData.damage;
         if (enemy.data.armor) {
@@ -392,34 +518,63 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createHitEffect(x, y) {
-        const hit = this.add.image(x, y, 'explosion');
-        hit.setScale(0.5);
-        hit.setAlpha(0.8);
-        
-        this.tweens.add({
-            targets: hit,
-            alpha: 0,
-            scale: 0.2,
-            duration: 200,
-            onComplete: () => {
-                hit.destroy();
-            }
+        // Particle burst for hit effect
+        const particles = this.add.particles('explosion');
+        const emitter = particles.createEmitter({
+            x,
+            y,
+            lifespan: 300,
+            speed: { min: 80, max: 180 },
+            scale: { start: 0.4, end: 0 },
+            quantity: 10,
+            alpha: { start: 0.8, end: 0 },
+            angle: { min: 0, max: 360 },
+            blendMode: 'ADD'
+        });
+        // Destroy particles after effect
+        this.time.delayedCall(350, () => {
+            particles.destroy();
         });
     }
 
     createExplosionEffect(x, y, radius) {
-        const explosion = this.add.image(x, y, 'explosion');
-        explosion.setScale(radius / 100);
-        explosion.setAlpha(0.8);
-        
-        this.tweens.add({
-            targets: explosion,
-            alpha: 0,
-            scale: radius / 50,
-            duration: 300,
-            onComplete: () => {
-                explosion.destroy();
-            }
+        // Particle burst for explosion effect
+        const particles = this.add.particles('explosion');
+        const emitter = particles.createEmitter({
+            x,
+            y,
+            lifespan: 500,
+            speed: { min: 100, max: 220 },
+            scale: { start: radius / 120, end: 0 },
+            quantity: 20,
+            alpha: { start: 0.9, end: 0 },
+            angle: { min: 0, max: 360 },
+            blendMode: 'ADD'
+        });
+        // Destroy particles after effect
+        this.time.delayedCall(550, () => {
+            particles.destroy();
+        });
+    }
+
+    /**
+     * Play enemy death animation at (x, y)
+     */
+    playDeathAnimation(x, y) {
+        const particles = this.add.particles('explosion');
+        const emitter = particles.createEmitter({
+            x,
+            y,
+            lifespan: 400,
+            speed: { min: 60, max: 160 },
+            scale: { start: 0.5, end: 0 },
+            quantity: 15,
+            alpha: { start: 1, end: 0 },
+            angle: { min: 0, max: 360 },
+            blendMode: 'ADD'
+        });
+        this.time.delayedCall(420, () => {
+            particles.destroy();
         });
     }
 

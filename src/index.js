@@ -31,7 +31,12 @@ window.GAME_SETTINGS = {
             damage: 20,
             range: 150,
             fireRate: 1000, // ms between shots
-            projectileSpeed: 300
+            projectileSpeed: 300,
+            maxLevel: 3,
+            upgradeCostScaling: 0.6,
+            upgradeDamageScale: 1.4,
+            upgradeRangeScale: 1.15,
+            upgradeFireRateScale: 0.85
         },
         AOE: {
             name: 'Area Effect Tower',
@@ -40,7 +45,12 @@ window.GAME_SETTINGS = {
             range: 120,
             fireRate: 1500,
             projectileSpeed: 250,
-            aoeRadius: 50
+            aoeRadius: 50,
+            maxLevel: 3,
+            upgradeCostScaling: 0.65,
+            upgradeDamageScale: 1.35,
+            upgradeRangeScale: 1.12,
+            upgradeFireRateScale: 0.88
         },
         SLOW: {
             name: 'Slowing Tower',
@@ -50,7 +60,12 @@ window.GAME_SETTINGS = {
             fireRate: 1200,
             projectileSpeed: 350,
             slowFactor: 0.5, // 50% speed reduction
-            slowDuration: 2000 // 2 seconds
+            slowDuration: 2000, // 2 seconds
+            maxLevel: 3,
+            upgradeCostScaling: 0.55,
+            upgradeDamageScale: 1.3,
+            upgradeRangeScale: 1.10,
+            upgradeFireRateScale: 0.9
         }
     },
     // Enemy types
