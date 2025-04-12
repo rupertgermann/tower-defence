@@ -71,15 +71,24 @@ flowchart LR
 
 ### Short-term Goals
 1. Implement game state management (win/lose conditions)
-2. Add tower upgrading functionality
-3. Create additional maps with different layouts
-4. Implement save/load functionality
+2. Begin Phase 1 of the expansion plan:
+   - Implement tower upgrading functionality
+   - Enhance visual effects
+   - Add sound effects and music
 
 ### Medium-term Goals
-1. Add sound effects and background music
-2. Create visual effects for attacks and deaths
-3. Implement tutorial or help system
-4. Add score tracking and display
+1. Continue with Phase 2 of the expansion plan:
+   - Add additional tower types
+   - Create multiple maps with different layouts
+   - Implement enemy special abilities
+
+### Long-term Goals
+1. Implement Phase 3 and 4 features:
+   - Meta-progression system
+   - Save/load functionality
+   - Tutorial system
+   - Performance optimization
+   - Special abilities and power-ups
 
 ## Decision Log
 
@@ -89,12 +98,14 @@ flowchart LR
 - **Wave System**: Designed progressive wave system with increasing difficulty and enemy variety
 - **UI Layout**: Created separate UI scene overlaid on game scene for cleaner architecture
 - **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction
+- **Expansion Plan**: Created a comprehensive four-phase expansion plan to add features beyond the MVP
 
 ### Pending Decisions
 - How to handle tower upgrades (branching paths vs. linear progression)
 - Visual effects for different tower attacks and enemy deaths
 - Implementation of sound effects and background music
 - Approach for saving game progress
+- Resource allocation for expansion plan implementation
 
 ## Integration Points
 
