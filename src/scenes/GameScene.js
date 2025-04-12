@@ -8,6 +8,10 @@ import Tower from '../entities/Tower.js';
 import MultiShotTower from '../entities/MultiShotTower.js';
 import SupportTower from '../entities/SupportTower.js';
 import Enemy from '../entities/Enemy.js';
+import HealerEnemy from '../entities/HealerEnemy.js';
+import ShieldEnemy from '../entities/ShieldEnemy.js';
+import SplitEnemy from '../entities/SplitEnemy.js';
+import TeleportEnemy from '../entities/TeleportEnemy.js';
 import Projectile from '../entities/Projectile.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -574,19 +578,73 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
-    spawnEnemy(type) {
-        const enemyData = window.GAME_SETTINGS.ENEMIES[type];
-        const startPoint = this.pathManager.getStartPoint();
-        
-        const enemy = new Enemy(
-            this,
-            startPoint.x,
-            startPoint.y,
-            type.toLowerCase(),
-            enemyData,
-            this.pathManager.getPath()
-        );
-        
+    /**
+     * Spawn an enemy of the given type.
+     * Supports special abilities by selecting the correct class.
+     * Optionally accepts x, y, data, path, currentPathIndex, t for advanced spawning (e.g., SplitEnemy).
+     */
+    spawnEnemy(type, x, y, data, path, currentPathIndex, t) {
+        const enemyType = type.toLowerCase();
+        const enemyData = data || window.GAME_SETTINGS.ENEMIES[type];
+        const usePath = path || this.pathManager.getPath();
+        let spawnPoint;
+        if (typeof x === 'number' && typeof y === 'number') {
+            spawnPoint = { x, y };
+        } else {
+            spawnPoint = this.pathManager.getStartPoint();
+        }
+
+        let enemy;
+        if (enemyType === 'healer') {
+            enemy = new HealerEnemy(
+                this,
+                spawnPoint.x,
+                spawnPoint.y,
+                enemyType,
+                enemyData,
+                usePath
+            );
+        } else if (enemyType === 'shield') {
+            enemy = new ShieldEnemy(
+                this,
+                spawnPoint.x,
+                spawnPoint.y,
+                enemyType,
+                enemyData,
+                usePath
+            );
+        } else if (enemyType === 'split') {
+            enemy = new SplitEnemy(
+                this,
+                spawnPoint.x,
+                spawnPoint.y,
+                enemyType,
+                enemyData,
+                usePath
+            );
+            // Optionally set path index/t for mid-path spawns
+            if (typeof currentPathIndex === 'number') enemy.currentPathIndex = currentPathIndex;
+            if (typeof t === 'number') enemy.t = t;
+        } else if (enemyType === 'teleport') {
+            enemy = new TeleportEnemy(
+                this,
+                spawnPoint.x,
+                spawnPoint.y,
+                enemyType,
+                enemyData,
+                usePath
+            );
+        } else {
+            enemy = new Enemy(
+                this,
+                spawnPoint.x,
+                spawnPoint.y,
+                enemyType,
+                enemyData,
+                usePath
+            );
+        }
+
         this.enemies.push(enemy);
     }
 
