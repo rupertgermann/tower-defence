@@ -168,7 +168,22 @@ export default class Enemy extends Phaser.GameObjects.Container {
     takeDamage(amount) {
         // Reduce health
         this.health -= amount;
-        
+
+        // Particle effect: hit spark at enemy position
+        if (!this.hitEmitter) {
+            this.hitEmitter = this.scene.add.particles(0, 0, 'explosion', {
+                lifespan: 180,
+                speed: { min: 40, max: 90 },
+                scale: { start: 0.13, end: 0 },
+                quantity: 6,
+                angle: { min: 0, max: 360 },
+                tint: [0xffff00, 0xff8800, 0xffffff],
+                blendMode: 'ADD'
+            });
+            this.add(this.hitEmitter);
+        }
+        this.hitEmitter.explode(6, 0, 0);
+
         // Check if dead
         if (this.health <= 0) {
             this.die();
