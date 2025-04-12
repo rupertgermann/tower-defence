@@ -595,6 +595,8 @@ export default class GameScene extends Phaser.Scene {
         }
 
         let enemy;
+        // Instrumentation: log type and class
+        let debugClass = 'Enemy';
         if (enemyType === 'healer') {
             enemy = new HealerEnemy(
                 this,
@@ -604,6 +606,7 @@ export default class GameScene extends Phaser.Scene {
                 enemyData,
                 usePath
             );
+            debugClass = 'HealerEnemy';
         } else if (enemyType === 'shield') {
             enemy = new ShieldEnemy(
                 this,
@@ -613,6 +616,7 @@ export default class GameScene extends Phaser.Scene {
                 enemyData,
                 usePath
             );
+            debugClass = 'ShieldEnemy';
         } else if (enemyType === 'split') {
             enemy = new SplitEnemy(
                 this,
@@ -622,6 +626,7 @@ export default class GameScene extends Phaser.Scene {
                 enemyData,
                 usePath
             );
+            debugClass = 'SplitEnemy';
             // Optionally set path index/t for mid-path spawns
             if (typeof currentPathIndex === 'number') enemy.currentPathIndex = currentPathIndex;
             if (typeof t === 'number') enemy.t = t;
@@ -634,6 +639,7 @@ export default class GameScene extends Phaser.Scene {
                 enemyData,
                 usePath
             );
+            debugClass = 'TeleportEnemy';
         } else {
             enemy = new Enemy(
                 this,
@@ -644,6 +650,10 @@ export default class GameScene extends Phaser.Scene {
                 usePath
             );
         }
+
+        // Debug: log instantiation
+        // eslint-disable-next-line no-console
+        console.log(`[spawnEnemy] type: ${type}, enemyType: ${enemyType}, class: ${debugClass}`);
 
         this.enemies.push(enemy);
     }

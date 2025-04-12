@@ -150,6 +150,44 @@ window.GAME_SETTINGS = {
             reward: 100,
             damage: 5,
             armor: 0.5
+        },
+        HEALER: {
+            name: 'Healer Enemy',
+            health: 120,
+            speed: 90,
+            reward: 30,
+            damage: 1,
+            healRadius: 100,
+            healAmount: 10,
+            healInterval: 2000
+        },
+        SHIELD: {
+            name: 'Shield Enemy',
+            health: 140,
+            speed: 80,
+            reward: 35,
+            damage: 1,
+            shieldDuration: 1500,
+            shieldCooldown: 3500
+        },
+        SPLIT: {
+            name: 'Split Enemy',
+            health: 90,
+            speed: 110,
+            reward: 18,
+            damage: 1,
+            splitCount: 2,
+            splitType: 'BASIC',
+            splitData: { health: 40, speed: 120, reward: 8, damage: 1 }
+        },
+        TELEPORT: {
+            name: 'Teleport Enemy',
+            health: 100,
+            speed: 105,
+            reward: 28,
+            damage: 1,
+            teleportInterval: 2500,
+            teleportDistance: 2
         }
     },
     // Wave configuration
@@ -161,9 +199,9 @@ window.GAME_SETTINGS = {
         { enemies: ['ARMORED', 'FLYING'], count: 15, interval: 1000 },
         { enemies: ['FAST', 'FLYING'], count: 20, interval: 800 },
         { enemies: ['BASIC', 'FAST', 'ARMORED', 'FLYING'], count: 25, interval: 700 },
-        { enemies: ['ARMORED', 'FLYING'], count: 20, interval: 600 },
-        { enemies: ['FAST', 'ARMORED', 'FLYING'], count: 30, interval: 500 },
-        { enemies: ['BOSS'], count: 1, interval: 0, bossWave: true }
+        { enemies: ['ARMORED', 'FLYING', 'HEALER'], count: 20, interval: 600 },
+        { enemies: ['FAST', 'ARMORED', 'FLYING', 'SHIELD', 'SPLIT', 'TELEPORT'], count: 30, interval: 500 },
+        { enemies: ['BOSS', 'HEALER', 'SHIELD', 'SPLIT', 'TELEPORT'], count: 5, interval: 800, bossWave: true }
     ],
     // Player starting stats
     PLAYER: {
