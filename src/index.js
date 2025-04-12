@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import MapSelectScene from './scenes/MapSelectScene.js';
 import GameScene from './scenes/GameScene.js';
 import UIScene from './scenes/UIScene.js';
 
@@ -15,7 +16,7 @@ const config = {
             debug: false
         }
     },
-    scene: [GameScene, UIScene]
+    scene: [MapSelectScene, GameScene, UIScene]
 };
 
 // Initialize the game

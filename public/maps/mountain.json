@@ -1,0 +1,32 @@
+{
+  "name": "Mountain",
+  "theme": "mountain",
+  "background": "mountain_bg",
+  "width": 20,
+  "height": 12,
+  "tileSize": 64,
+  "paths": [
+    [
+      { "x": 0, "y": 6 },
+      { "x": 3, "y": 6 },
+      { "x": 3, "y": 3 },
+      { "x": 8, "y": 3 },
+      { "x": 8, "y": 9 },
+      { "x": 14, "y": 9 },
+      { "x": 14, "y": 2 },
+      { "x": 19, "y": 2 }
+    ]
+  ],
+  "placementRestrictions": [
+    { "x": 5, "y": 7, "width": 3, "height": 2 },
+    { "x": 12, "y": 4, "width": 2, "height": 2 }
+  ],
+  "specialTiles": [
+    { "x": 10, "y": 5, "type": "elevation_high" },
+    { "x": 11, "y": 5, "type": "elevation_high" }
+  ],
+  "elevation": [
+    { "x": 10, "y": 5, "level": 2 },
+    { "x": 11, "y": 5, "level": 2 }
+  ]
+}

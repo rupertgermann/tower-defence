@@ -3,6 +3,7 @@ import PathManager from '../systems/PathManager.js';
 import WaveManager from '../systems/WaveManager.js';
 import EconomyManager from '../systems/EconomyManager.js';
 import AudioManager from '../systems/AudioManager.js';
+import MapManager from '../systems/MapManager.js';
 import Tower from '../entities/Tower.js';
 import MultiShotTower from '../entities/MultiShotTower.js';
 import SupportTower from '../entities/SupportTower.js';
@@ -12,12 +13,15 @@ import Projectile from '../entities/Projectile.js';
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
-        
+
+        // Map keys for available maps
+        this.MAP_KEYS = ['forest', 'desert', 'mountain'];
+
         // Game state
         this.isGameOver = false;
         this.isPaused = false;
         this.currentWave = 0;
-        
+
         // Game objects
         this.towers = [];
         this.enemies = [];
@@ -39,26 +43,30 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('tile', 'assets/tile.png');
         this.load.image('path', 'assets/path.png');
         this.load.image('placement', 'assets/placement.png');
-        
+
         // Load tower assets
         this.load.image('tower_basic', 'assets/tower_basic.png');
         this.load.image('tower_aoe', 'assets/tower_aoe.png');
         this.load.image('tower_slow', 'assets/tower_slow.png');
-        
+
         // Load enemy assets
         this.load.image('enemy_basic', 'assets/enemy_basic.png');
         this.load.image('enemy_fast', 'assets/enemy_fast.png');
         this.load.image('enemy_armored', 'assets/enemy_armored.png');
         this.load.image('enemy_flying', 'assets/enemy_flying.png');
         this.load.image('enemy_boss', 'assets/enemy_boss.png');
-        
+
         // Load projectile assets
         this.load.image('projectile_basic', 'assets/projectile_basic.png');
         this.load.image('projectile_aoe', 'assets/projectile_aoe.png');
         this.load.image('projectile_slow', 'assets/projectile_slow.png');
-        
+
         // Load effects
         this.load.image('explosion', 'assets/explosion.png');
+
+        // Preload map JSON files
+        this.mapManager = new MapManager(this);
+        this.mapManager.preloadMaps(this.MAP_KEYS);
     }
 
     create() {
@@ -73,7 +81,19 @@ export default class GameScene extends Phaser.Scene {
         // Play background music
         this.audioManager.playMusic('bgm');
 
-        // No persistent explosionParticles manager in Phaser 3.60+
+        // Initialize MapManager and load maps
+        if (!this.mapManager) {
+            this.mapManager = new MapManager(this);
+        }
+        this.mapManager.createMaps(this.MAP_KEYS);
+
+        // Set current map (use selected map from registry if available)
+        const selectedMap = this.registry.get('selectedMap');
+        if (selectedMap && this.MAP_KEYS.includes(selectedMap)) {
+            this.mapManager.setCurrentMap(selectedMap);
+        } else {
+            this.mapManager.setCurrentMap(this.MAP_KEYS[0]);
+        }
 
         // Create map
         this.createMap();
@@ -109,14 +129,21 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createMap() {
+        // Get current map data from MapManager
+        const mapData = this.mapManager.getCurrentMap();
+        if (!mapData) {
+            console.error('No map data loaded!');
+            return;
+        }
+
         // Create the base map
         this.map = this.add.group();
-        
+
         // Map dimensions (in tiles)
-        const mapWidth = 20;
-        const mapHeight = 12;
-        const tileSize = 64;
-        
+        const mapWidth = mapData.width;
+        const mapHeight = mapData.height;
+        const tileSize = mapData.tileSize;
+
         // Create background tiles
         for (let y = 0; y < mapHeight; y++) {
             for (let x = 0; x < mapWidth; x++) {
@@ -125,70 +152,79 @@ export default class GameScene extends Phaser.Scene {
                 this.map.add(tile);
             }
         }
-        
-        // Define path coordinates (will be replaced with actual path data)
-        const pathCoordinates = [
-            { x: 0, y: 5 },
-            { x: 5, y: 5 },
-            { x: 5, y: 2 },
-            { x: 10, y: 2 },
-            { x: 10, y: 8 },
-            { x: 15, y: 8 },
-            { x: 15, y: 5 },
-            { x: 19, y: 5 }
-        ];
-        
-        // Create path tiles
-        for (const coord of pathCoordinates) {
-            const pathTile = this.add.image(coord.x * tileSize, coord.y * tileSize, 'path');
-            pathTile.setOrigin(0, 0);
-            this.map.add(pathTile);
+
+        // Create path tiles for all paths
+        for (const path of mapData.paths) {
+            for (const coord of path) {
+                const pathTile = this.add.image(coord.x * tileSize, coord.y * tileSize, 'path');
+                pathTile.setOrigin(0, 0);
+                this.map.add(pathTile);
+            }
         }
-        
-        // Set up path for enemies to follow
-        this.pathManager.setPath(pathCoordinates.map(coord => ({
+
+        // Set up path for enemies to follow (use first path for now)
+        const mainPath = mapData.paths[0];
+        this.pathManager.setPath(mainPath.map(coord => ({
             x: coord.x * tileSize + tileSize / 2,
             y: coord.y * tileSize + tileSize / 2
         })));
-        
-        // Create tower placement tiles
-        this.createPlacementTiles(mapWidth, mapHeight, tileSize, pathCoordinates);
+
+        // Create tower placement tiles, pass placement restrictions and special tiles
+        this.createPlacementTiles(mapWidth, mapHeight, tileSize, mapData.paths, mapData.placementRestrictions || []);
     }
 
-    createPlacementTiles(mapWidth, mapHeight, tileSize, pathCoordinates) {
+    createPlacementTiles(mapWidth, mapHeight, tileSize, paths, placementRestrictions) {
+        // Flatten all path coordinates for easy lookup
+        const pathCoords = new Set();
+        for (const path of paths) {
+            for (const coord of path) {
+                pathCoords.add(`${coord.x},${coord.y}`);
+            }
+        }
+
+        // Build a set of restricted tiles
+        const restricted = new Set();
+        for (const area of placementRestrictions) {
+            for (let dx = 0; dx < area.width; dx++) {
+                for (let dy = 0; dy < area.height; dy++) {
+                    restricted.add(`${area.x + dx},${area.y + dy}`);
+                }
+            }
+        }
+
         // Create placement tiles (where towers can be placed)
         for (let y = 0; y < mapHeight; y++) {
             for (let x = 0; x < mapWidth; x++) {
-                // Skip if this is a path tile
-                if (pathCoordinates.some(coord => coord.x === x && coord.y === y)) {
+                // Skip if this is a path tile or restricted area
+                if (pathCoords.has(`${x},${y}`) || restricted.has(`${x},${y}`)) {
                     continue;
                 }
-                
+
                 // Create placement tile
                 const placementTile = this.add.image(x * tileSize, y * tileSize, 'placement');
                 placementTile.setOrigin(0, 0);
                 placementTile.setAlpha(0.3);
                 placementTile.setInteractive();
-                
+
                 // Store grid position
                 placementTile.gridPosition = { x, y };
-                
+
                 // Add to placement tiles array
                 this.placementTiles.push(placementTile);
-                
+
                 // Set up event handlers
                 placementTile.on('pointerover', () => {
                     if (!placementTile.hasTower) {
                         placementTile.setAlpha(0.6);
                     }
                 });
-                
+
                 placementTile.on('pointerout', () => {
                     if (!placementTile.hasTower) {
                         placementTile.setAlpha(0.3);
                     }
                 });
-                
+
                 placementTile.on('pointerdown', () => {
                     this.handleTilePlacement(placementTile);
                 });
