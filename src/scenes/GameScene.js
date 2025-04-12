@@ -2,93 +2,12 @@ import Phaser from 'phaser';
 import PathManager from '../systems/PathManager.js';
 import WaveManager from '../systems/WaveManager.js';
 import EconomyManager from '../systems/EconomyManager.js';
+import AudioManager from '../systems/AudioManager.js';
 import Tower from '../entities/Tower.js';
 import MultiShotTower from '../entities/MultiShotTower.js';
 import SupportTower from '../entities/SupportTower.js';
 import Enemy from '../entities/Enemy.js';
 import Projectile from '../entities/Projectile.js';
-
-/**
- * AudioManager handles sound effects and music
- */
-class AudioManager {
-    constructor(scene) {
-        this.scene = scene;
-        this.sounds = {};
-        this.music = null;
-        this.volume = 0.5;
-        this.musicVolume = 0.3;
-        this.muted = false;
-    }
-
-    loadSounds() {
-        // List of sound keys and file names
-        const soundList = [
-            { key: 'attack', file: 'attack.wav' },
-            { key: 'enemy_death', file: 'enemy_death.wav' },
-            { key: 'upgrade', file: 'upgrade.wav' },
-            { key: 'wave_start', file: 'wave_start.mp3' },
-            { key: 'wave_end', file: 'wave_end.mp3' },
-            { key: 'ui_click', file: 'ui_click.mp3' },
-            { key: 'bgm', file: 'bgm.mp3' }
-        ];
-        for (const { key, file } of soundList) {
-            this.scene.load.audio(key, `assets/${file}`);
-        }
-    }
-
-    createSounds() {
-        // Create sound objects after load
-        const keys = ['attack', 'enemy_death', 'upgrade', 'wave_start', 'wave_end', 'ui_click', 'bgm'];
-        for (const key of keys) {
-            if (key === 'ui_click') {
-                // Set lower default volume 
-                this.sounds[key] = this.scene.sound.add(key, { volume: 0.2 });
-            } else if (key === 'enemy_death') {
-                // Set lower default volume 
-                this.sounds[key] = this.scene.sound.add(key, { volume: 0.3 });
-            } else {
-                this.sounds[key] = this.scene.sound.add(key);
-            }
-        }
-    }
-
-    playSound(key, config = {}) {
-        if (this.muted || !this.sounds[key]) return;
-        // Always use per-play volume for ui_click, as per Phaser 3.60+ best practice
-        if (key === 'ui_click' && config.volume === undefined) {
-            this.sounds[key].play({ ...config, volume: 0.1 });
-        } else if (config.volume !== undefined) {
-            this.sounds[key].play({ ...config });
-        } else {
-            this.sounds[key].play();
-        }
-    }
-
-    playMusic(key) {
-        if (this.music) this.music.stop();
-        if (!this.sounds[key]) return;
-        this.music = this.sounds[key];
-        this.music.play({ volume: this.musicVolume, loop: true });
-    }
-
-    setVolume(volume) {
-        this.volume = volume;
-    }
-
-    setMusicVolume(volume) {
-        this.musicVolume = volume;
-        if (this.music) this.music.setVolume(volume);
-    }
-
-    mute(muted = true) {
-        this.muted = muted;
-        if (this.music) this.music.setMute(muted);
-        for (const key in this.sounds) {
-            this.sounds[key].setMute(muted);
-        }
-    }
-}
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -108,8 +27,14 @@ export default class GameScene extends Phaser.Scene {
 
     preload() {
         // Load audio assets
-        this.audioManager = new AudioManager(this);
-        this.audioManager.loadSounds();
+        this.load.audio('attack', 'assets/attack.wav');
+        this.load.audio('enemy_death', 'assets/enemy_death.wav');
+        this.load.audio('upgrade', 'assets/upgrade.wav');
+        this.load.audio('wave_start', 'assets/wave_start.mp3');
+        this.load.audio('wave_end', 'assets/wave_end.mp3');
+        this.load.audio('ui_click', 'assets/ui_click.mp3');
+        this.load.audio('bgm', 'assets/bgm.mp3');
+
         // Load map tiles
         this.load.image('tile', 'assets/tile.png');
         this.load.image('path', 'assets/path.png');
@@ -142,15 +67,11 @@ export default class GameScene extends Phaser.Scene {
         this.waveManager = new WaveManager(this);
         this.economyManager = new EconomyManager(this);
 
-        // Create audio manager sounds
-        if (this.audioManager) {
-            this.audioManager.createSounds();
-            // Reduce UI click sound volume
-            if (this.audioManager.sounds['ui_click']) {
-                this.audioManager.sounds['ui_click'].setVolume(0.1);
-            }
-            this.audioManager.playMusic('bgm');
-        }
+        // Initialize audio manager
+        this.audioManager = new AudioManager(this);
+
+        // Play background music
+        this.audioManager.playMusic('bgm');
 
         // No persistent explosionParticles manager in Phaser 3.60+
 
