@@ -102,10 +102,12 @@ export default class UIScene extends Phaser.Scene {
                 upgradeBtn.setFillStyle(0x00aa00);
             });
             upgradeBtn.on('pointerdown', () => {
+                const audioManager = this.scene.get('GameScene').audioManager;
+                if (audioManager) audioManager.playSound('ui_click');
                 if (tower.upgrade()) {
                     // Play upgrade sound if available
-                    if (this.scene.get('GameScene').audioManager && typeof this.scene.get('GameScene').audioManager.playSound === 'function') {
-                        this.scene.get('GameScene').audioManager.playSound('upgrade');
+                    if (audioManager && typeof audioManager.playSound === 'function') {
+                        audioManager.playSound('upgrade');
                     }
                     // Refresh panel with new stats
                     this.showTowerInfo(tower);
@@ -126,6 +128,8 @@ export default class UIScene extends Phaser.Scene {
         this.towerInfoPanel.add(closeBtn);
         this.towerInfoPanel.add(closeX);
         closeBtn.on('pointerdown', () => {
+            const audioManager = this.scene.get('GameScene').audioManager;
+            if (audioManager) audioManager.playSound('ui_click');
             this.towerInfoPanel.destroy(true);
         });
 
@@ -158,6 +162,24 @@ export default class UIScene extends Phaser.Scene {
         
         // Listen for game events
         this.setupEventListeners();
+
+        // Add mute/unmute button (top right)
+        const audioManager = this.scene.get('GameScene').audioManager;
+        this.isMuted = false;
+        this.muteButton = this.add.rectangle(1240, 20, 32, 32, 0x444444);
+        this.muteButton.setOrigin(0, 0);
+        this.muteButton.setInteractive();
+        this.muteIcon = this.add.text(1256, 36, '🔊', { fontSize: '20px', fill: '#ffffff' });
+        this.muteIcon.setOrigin(0.5, 0.5);
+        this.uiContainer.add(this.muteButton);
+        this.uiContainer.add(this.muteIcon);
+
+        this.muteButton.on('pointerdown', () => {
+            this.isMuted = !this.isMuted;
+            if (audioManager) audioManager.mute(this.isMuted);
+            this.muteIcon.setText(this.isMuted ? '🔇' : '🔊');
+            if (audioManager) audioManager.playSound('ui_click');
+        });
     }
 
     /**
@@ -280,6 +302,8 @@ export default class UIScene extends Phaser.Scene {
             });
             
             button.on('pointerdown', () => {
+                const audioManager = this.scene.get('GameScene').audioManager;
+                if (audioManager) audioManager.playSound('ui_click');
                 this.selectTower(type);
             });
             
@@ -322,6 +346,8 @@ export default class UIScene extends Phaser.Scene {
         });
         
         this.waveButton.on('pointerdown', () => {
+            const audioManager = this.scene.get('GameScene').audioManager;
+            if (audioManager) audioManager.playSound('ui_click');
             // Notify game scene to start next wave
             this.scene.get('GameScene').waveManager.startNextWave();
             

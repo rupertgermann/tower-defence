@@ -1,5 +1,7 @@
 # Tower Defense Game Active Context
 
+_Last Memory Bank Review: 12.4.2025, 17:23 (Europe/Berlin) — All memory bank files reviewed and current._
+
 ## Current Development Focus
 
 The project is currently in the implementation phase of the MVP (Minimum Viable Product). The core architecture and systems have been established, and the focus is now on completing the remaining game mechanics and integrating all components into a fully playable game.
