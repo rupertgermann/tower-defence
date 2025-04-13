@@ -7,9 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default {
-  experiments: {
-    outputModule: true,
-  },
+  // Remove experiments for module output as it conflicts with HMR
   mode: 'development',
   entry: './src/index.js',
   output: {
