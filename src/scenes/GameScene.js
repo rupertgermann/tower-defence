@@ -772,17 +772,13 @@ showVictoryBanner() {
     scoreText.setOrigin(0.5);
     scoreText.setDepth(1001);
     
-    // Add click handler to return to main menu (on the entire screen)
+    // Add click handler to reload the browser window (on the entire screen)
     this.input.once('pointerdown', () => {
-        console.log('Victory banner clicked - returning to menu');
-        // Stop any sounds
+        console.log('Victory banner clicked - reloading window');
         if (this.audioManager) {
             this.audioManager.stopAll();
         }
-        
-        // Return to map select scene
-        this.scene.stop('UIScene');
-        this.scene.start('MapSelectScene');
+        window.location.reload();
     });
     
     // Add animation effects

@@ -18,16 +18,23 @@ export default class MapSelectScene extends Phaser.Scene {
     create() {
         this.mapManager.createMaps(this.MAP_KEYS);
 
+        // Game Title
+        this.add.text(640, 35, 'Tower Defense', {
+            fontSize: '80px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+
         // Title
-        this.add.text(640, 50, 'Select a Map', {
-            fontSize: '48px',
+        this.add.text(640, 90, 'Select a Map', {
+            fontSize: '22px',
             fill: '#fff',
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
         // Map selection
         const mapStartY = 150;
-        const mapSpacing = 100;
+        const mapSpacing = 70;
         this.mapButtons = [];
 
         this.MAP_KEYS.forEach((key, idx) => {
@@ -36,13 +43,13 @@ export default class MapSelectScene extends Phaser.Scene {
 
             // Map name
             this.add.text(400, y, mapData ? mapData.name : key, {
-                fontSize: '32px',
+                fontSize: '22px',
                 fill: '#fff'
             }).setOrigin(0, 0.5);
 
             // Simple preview (theme)
             this.add.text(700, y, mapData ? `Theme: ${mapData.theme}` : '', {
-                fontSize: '24px',
+                fontSize: '22px',
                 fill: '#aaa'
             }).setOrigin(0, 0.5);
 
@@ -51,7 +58,7 @@ export default class MapSelectScene extends Phaser.Scene {
                 .setInteractive()
                 .setOrigin(0.5);
             this.add.text(1100, y, 'Select', {
-                fontSize: '28px',
+                fontSize: '22px',
                 fill: '#fff'
             }).setOrigin(0.5);
 
@@ -64,7 +71,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
         // Difficulty selection title
         this.add.text(640, 400, 'Select Difficulty', {
-            fontSize: '36px',
+            fontSize: '22px',
             fill: '#fff',
             fontStyle: 'bold'
         }).setOrigin(0.5);

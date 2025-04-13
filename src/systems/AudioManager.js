@@ -91,4 +91,13 @@ export default class AudioManager {
             }
         }
     }
+
+    /**
+     * Stop all currently playing sounds and music
+     */
+    stopAll() {
+        if (this.scene.sound) {
+            this.scene.sound.stopAll();
+        }
+    }
 }

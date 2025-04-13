@@ -43,6 +43,19 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     /**
+     * Clean up all child objects and emitters when destroying the tower
+     */
+    destroy(fromScene) {
+        if (this.sprite && this.sprite.destroy) this.sprite.destroy();
+        if (this.rangeIndicator && this.rangeIndicator.destroy) this.rangeIndicator.destroy();
+        if (this.levelBadge && this.levelBadge.destroy) this.levelBadge.destroy();
+        if (this.attackEmitter && this.attackEmitter.destroy) this.attackEmitter.destroy();
+        if (this.upgradeEffect && this.upgradeEffect.destroy) this.upgradeEffect.destroy();
+        // Do NOT destroy this.data (plain object, not a GameObject)
+        super.destroy(fromScene);
+    }
+
+    /**
      * Set up interactive events for the tower
      */
     setupInteractive() {
