@@ -25,6 +25,7 @@ export default class GameScene extends Phaser.Scene {
         this.isGameOver = false;
         this.isPaused = false;
         this.currentWave = 0;
+        this.gameEnded = false;
 
         // Game objects
         this.towers = [];
@@ -306,15 +307,34 @@ export default class GameScene extends Phaser.Scene {
                 this.waveManager.startNextWave();
             }
         });
+        
+        // Force victory for testing (press V key)
+        this.input.keyboard.on('keydown-V', () => {
+            console.log('V key pressed - forcing victory');
+            this.gameOver(true);
+        });
 
         // Show wave start indicator when a new wave begins
         this.events.on('waveStarted', (waveNumber) => {
             this.showWaveIndicator(`Wave ${waveNumber} Start`);
         });
 
-        // Show wave end indicator when a wave is completed
+        // Show wave end indicator and check for victory when a wave is completed
         this.events.on('waveCompleted', (waveNumber) => {
             this.showWaveIndicator(`Wave ${waveNumber} Complete`);
+            console.log(`Wave ${waveNumber} completed. GameScene.currentWave=${this.currentWave}, WaveManager.currentWave=${this.waveManager.getCurrentWave()}`);
+            // Robust, single-responsibility victory check
+            const totalWaves = this.waveManager.getTotalWaves();
+            if (waveNumber >= totalWaves && !this.isGameOver && !this.gameEnded) {
+                console.log(`Victory condition met: waveNumber=${waveNumber}, totalWaves=${totalWaves}`);
+                this.gameOver(true);
+            }
+        });
+
+        // Listen for wave started events to update current wave
+        this.events.on('waveStarted', (waveNumber) => {
+            this.currentWave = waveNumber;
+            console.log(`Wave ${waveNumber} started. GameScene.currentWave=${this.currentWave}, WaveManager.currentWave=${this.waveManager.getCurrentWave()}`);
         });
     }
 
@@ -403,11 +423,19 @@ export default class GameScene extends Phaser.Scene {
                 
                 // Check if all enemies are defeated
                 if (this.enemies.length === 0 && !this.waveManager.isWaveInProgress()) {
+                    this.currentWave = this.waveManager.getCurrentWave(); // Ensure currentWave is up to date
                     this.events.emit('waveCompleted', this.currentWave);
                     
                     // Check for victory
-                    if (this.currentWave >= this.waveManager.getTotalWaves()) {
+                    const totalWaves = this.waveManager.getTotalWaves();
+                    console.log(`Checking victory condition: currentWave=${this.currentWave}, totalWaves=${totalWaves}, comparison result=${this.currentWave >= totalWaves}`);
+                    
+                    // Force victory for testing if we're on the last wave
+                    if (this.currentWave >= totalWaves) {
+                        console.log(`Victory condition met: currentWave=${this.currentWave}, totalWaves=${totalWaves}`);
                         this.gameOver(true);
+                    } else {
+                        console.log(`Not yet victory: need wave ${totalWaves}, current wave is ${this.currentWave}`);
                     }
                 }
             }
@@ -676,14 +704,114 @@ export default class GameScene extends Phaser.Scene {
         this.projectiles.push(projectile);
     }
 
-    gameOver(victory) {
-        this.isGameOver = true;
-        
-        // Emit game over event
-        this.events.emit('gameOver', {
-            victory,
-            wave: this.currentWave,
-            score: this.economyManager.getScore()
-        });
+gameOver(victory) {
+    this.isGameOver = true;
+    
+    // Emit game over event
+    this.events.emit('gameOver', {
+        victory,
+        wave: this.currentWave,
+        score: this.economyManager.getScore()
+    });
+    
+    console.log(`gameOver called with victory=${victory}, gameEnded=${this.gameEnded}`);
+    
+    // Show victory banner if player won
+    if (victory && !this.gameEnded) {
+        console.log('Showing victory banner');
+        this.showVictoryBanner();
+    } else if (victory) {
+        console.log('Victory but gameEnded is true, not showing banner');
     }
+}
+
+/**
+ * Display a victory banner when all waves are successfully defended
+ */
+showVictoryBanner() {
+    console.log('showVictoryBanner method called');
+    
+    // Set flag to prevent multiple banners
+    this.gameEnded = true;
+    
+    // Create full-screen semi-transparent background
+    const width = this.game.config.width;
+    const height = this.game.config.height;
+    const background = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
+    background.setOrigin(0.5);
+    background.setDepth(1000);
+    
+    // Create victory text in gold
+    const victoryText = this.add.text(width / 2, height / 2 - 80, 'VICTORY!', {
+        fontSize: '96px',
+        fontStyle: 'bold',
+        fill: '#FFD700', // Gold color
+        stroke: '#000000',
+        strokeThickness: 8,
+        align: 'center'
+    });
+    victoryText.setOrigin(0.5);
+    victoryText.setDepth(1001);
+    
+    // Create instruction text
+    const instructionText = this.add.text(width / 2, height / 2 + 60, 'Click anywhere to return to main menu', {
+        fontSize: '32px',
+        fill: '#FFFFFF',
+        align: 'center'
+    });
+    instructionText.setOrigin(0.5);
+    instructionText.setDepth(1001);
+    
+    // Add score text
+    const score = this.economyManager.getScore();
+    const scoreText = this.add.text(width / 2, height / 2, `Score: ${score}`, {
+        fontSize: '48px',
+        fill: '#00FF00', // Green color
+        align: 'center'
+    });
+    scoreText.setOrigin(0.5);
+    scoreText.setDepth(1001);
+    
+    // Add click handler to return to main menu (on the entire screen)
+    this.input.once('pointerdown', () => {
+        console.log('Victory banner clicked - returning to menu');
+        // Stop any sounds
+        if (this.audioManager) {
+            this.audioManager.stopAll();
+        }
+        
+        // Return to map select scene
+        this.scene.stop('UIScene');
+        this.scene.start('MapSelectScene');
+    });
+    
+    // Add animation effects
+    this.tweens.add({
+        targets: victoryText,
+        scale: { from: 0.5, to: 1.2, yoyo: true, repeat: -1 },
+        duration: 1000,
+        ease: 'Sine.easeInOut'
+    });
+    
+    this.tweens.add({
+        targets: instructionText,
+        alpha: { from: 0, to: 1 },
+        duration: 500,
+        delay: 500
+    });
+    
+    this.tweens.add({
+        targets: scoreText,
+        scale: { from: 0.8, to: 1.1 },
+        duration: 800,
+        ease: 'Back.out'
+    });
+    
+    // Play victory sound if available
+    if (this.audioManager) {
+        this.audioManager.playSound('wave_end');
+    }
+    
+    console.log('Victory banner created and displayed');
+}
 }

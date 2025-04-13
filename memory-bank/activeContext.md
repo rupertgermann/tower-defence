@@ -1,6 +1,6 @@
 # Tower Defense Game Active Context
 
-_Last Memory Bank Review: 12.4.2025, 18:49 (Europe/Berlin) — All memory bank files reviewed and current._
+_Last Memory Bank Review: 13.4.2025, 18:02 (Europe/Berlin) — All memory bank files reviewed and current._
 
 ## Current Development Focus
 
@@ -13,10 +13,11 @@ flowchart LR
     C -->|Completed| D[Path System]
     D -->|Completed| E[Tower Placement]
     E -->|Completed| F[Wave Management]
-    F -->|In Progress| G[Enemy AI]
-    G -.->|Next| H[Collision System]
-    H -.->|Next| I[Economy System]
-    I -.->|Next| J[Testing & Balance]
+    F -->|Completed| G[Enemy AI]
+    G -->|Completed| H[Collision System]
+    H -->|Completed| I[Economy System]
+    I -->|In Progress| J[Victory/Defeat Conditions]
+    J -.->|Next| K[Testing & Balance]
 ```
 
 ## Recent Developments
@@ -32,6 +33,7 @@ flowchart LR
 - Basic enemy AI with path following
 - Collision detection between projectiles and enemies
 - Economy system for resource management
+- Victory banner implementation with interactive return to menu
 
 ### In Progress
 - Game testing and balancing
@@ -73,6 +75,8 @@ flowchart LR
 
 ### Short-term Goals
 1. Implement game state management (win/lose conditions)
+   - ✅ Victory condition and banner implemented
+   - 🔄 Defeat condition needs improvement
 2. Begin Phase 1 of the expansion plan:
    - Implement tower upgrading functionality
    - Enhance visual effects
@@ -101,6 +105,7 @@ flowchart LR
 - **UI Layout**: Created separate UI scene overlaid on game scene for cleaner architecture
 - **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction
 - **Expansion Plan**: Created a comprehensive four-phase expansion plan to add features beyond the MVP
+- **Victory Banner**: Implemented a dedicated victory banner in GameScene.js with gold text, semi-transparent background, and return-to-menu functionality
 
 ### Pending Decisions
 - How to handle tower upgrades (branching paths vs. linear progression)
@@ -108,6 +113,7 @@ flowchart LR
 - Implementation of sound effects and background music
 - Approach for saving game progress
 - Resource allocation for expansion plan implementation
+- Improved defeat screen with game statistics
 
 ## Integration Points
 
@@ -116,6 +122,7 @@ flowchart LR
 - **Wave-Economy System**: Defeating enemies provides resources for tower placement
 - **UI-Game Interaction**: Player actions in UI need to affect game state
 - **Path-Enemy Connection**: Enemies need to follow the defined paths
+- **Victory-Scene Transition**: Victory banner needs to properly transition back to map selection
 
 ### Testing Focus
 - Tower targeting and firing mechanics
@@ -123,3 +130,4 @@ flowchart LR
 - Wave progression and enemy spawning
 - Resource management and tower placement
 - Game balance and difficulty progression
+- Victory and defeat conditions

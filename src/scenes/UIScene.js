@@ -560,16 +560,16 @@ export default class UIScene extends Phaser.Scene {
     }
 
     onGameOver(data) {
-        // Show game over message
-        if (data.victory) {
-            this.showMessage('Victory!\nAll waves defeated!', 0);
-        } else {
+        // Show game over message only for defeat
+        if (!data.victory) {
             this.showMessage('Game Over!\nYour base was destroyed!', 0);
         }
         
         // Disable wave button
         this.setWaveButtonEnabled(false);
-        this.waveButtonText.setText('Game Over');
+        this.waveButtonText.setText(data.victory ? 'Victory!' : 'Game Over');
+        
+        console.log(`UIScene.onGameOver called with victory=${data.victory}`);
     }
 
     showMessage(message, duration = 2000) {
