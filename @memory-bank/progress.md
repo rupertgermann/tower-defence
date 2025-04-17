@@ -13,3 +13,21 @@
 ---
 
 This update provides a clear roadmap for the entity management refactor, ensuring all steps are tracked and nothing is missed during implementation.
+
+---
+
+## Fixed 'undefined is not iterable' crash in SupportTower (2025-04-17)
+
+### Implemented Features
+- Updated `SupportTower.applyBuff` to iterate over `this.scene.towerManager.getAll()` instead of `this.scene.towers`.
+- Added a guard to ensure `towerManager` exists before iterating, preventing runtime crashes if the manager is missing.
+
+### Encountered Errors
+- Game would crash after some time with: `TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))` in `SupportTower.applyBuff`.
+- Root cause: `this.scene.towers` was undefined, as towers are managed via `TowerManager`.
+
+### How Issues Were Fixed
+- Changed the iteration to use the correct tower source: `this.scene.towerManager.getAll()`.
+- Added a fallback to an empty array if `towerManager` is missing, ensuring safe iteration.
+
+---

@@ -33,7 +33,8 @@ export default class SupportTower extends Tower {
     }
 
     // Buff towers in range
-    for (const tower of this.scene.towers) {
+    const towers = this.scene.towerManager && this.scene.towerManager.getAll ? this.scene.towerManager.getAll() : [];
+    for (const tower of towers) {
       if (tower === this) continue;
       if (this.isTowerInBuffRange(tower)) {
         this.applyBuffToTower(tower);
