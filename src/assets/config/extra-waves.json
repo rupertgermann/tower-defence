@@ -1,0 +1,7 @@
+[
+  {"enemies": ["FAST","ARMORED","FLYING","HEALER","SHIELD"], "count": 35, "interval": 450},
+  {"enemies": ["ARMORED","FLYING","HEALER","SHIELD","SPLIT","TELEPORT"], "count": 8, "interval": 700, "bossWave": true},
+  {"enemies": ["FAST","ARMORED","FLYING","HEALER","SHIELD","SPLIT","TELEPORT"], "count": 40, "interval": 400},
+  {"enemies": ["ARMORED","FLYING","HEALER","SHIELD","SPLIT","TELEPORT"], "count": 45, "interval": 350},
+  {"enemies": ["BOSS","HEALER","SHIELD","SPLIT","TELEPORT"], "count": 10, "interval": 600, "bossWave": true}
+]

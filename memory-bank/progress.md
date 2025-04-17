@@ -140,7 +140,12 @@ pie title Implementation Progress
 
 ## Progress Log
 
-## Victory Banner Implementation
+### Task 1.1 - Extract common utilities into `/src/utils/`
+- **Implemented Features**: Created `src/utils/math.js` with math helpers (`distance`, `lerp`, `angleBetween`) and refactored `PathManager.js` to use these utilities.
+- **Encountered Errors**: None.
+- **Fixes Applied**: N/A.
+
+### Victory Banner Implementation
 
 - **Implemented Features**: Added a victory banner in `GameScene.js` that displays when all waves are successfully defended. The banner includes a semi-transparent background, 'VICTORY!' text in gold, and instructions to click to return to the main menu. A `gameEnded` flag was also added to prevent multiple banners from showing.
 - **Implementation Details**: 
@@ -154,8 +159,23 @@ pie title Implementation Progress
 - **Encountered Errors**: Previously faced syntax errors due to an unterminated string literal in the victory banner text caused by an improper line break.
 - **Fixes Applied**: Corrected the syntax error by properly escaping the line break in the string, resolving all related lint errors.
 
-## HMR Bug Fix in Webpack Config
+### HMR Bug Fix in Webpack Config
 
 - **Implemented Features**: Fixed the Hot Module Replacement (HMR) error by updating the webpack configuration.
 - **Encountered Errors**: Error message 'HMR is not implemented for module chunk format yet' appeared on the command line after code changes.
 - **Fixes Applied**: Removed the `experiments.outputModule` setting from `webpack.config.js` as it was conflicting with HMR functionality.
+
+### Task 1.2 - Convert Scenes & Entities to ES6 modules
+- **Implemented Features**: Converted each Scene and Entity to ES6 modules with proper `import`/`export` statements and updated all import paths.
+- **Encountered Errors**: None.
+- **Fixes Applied**: Ensured consistent module structure and file naming.
+
+### Task 1.3 - Introduce EventEmitter utility
+- **Implemented Features**: Created `src/utils/EventEmitter.js`; refactored Tower and UIScene to use global emitter for `showTowerInfo` events.
+- **Encountered Errors**: None.
+- **Fixes Applied**: N/A.
+
+### Task 1.4 - Externalize configuration data
+- **Implemented Features**: Moved towers, waves, extra waves into JSON under `/src/assets/config` and maps into `/public/maps`; updated `index.js` to import JSON configs and MapManager to load maps.
+- **Encountered Errors**: None.
+- **Fixes Applied**: Updated code to reference JSON configurations.

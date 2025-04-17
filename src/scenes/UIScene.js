@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import emitter from '../utils/EventEmitter.js';
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -419,7 +420,7 @@ export default class UIScene extends Phaser.Scene {
         this.scene.get('GameScene').events.on('showMessage', this.showMessage, this);
 
         // Listen for tower info display
-        this.scene.get('GameScene').events.on('showTowerInfo', this.showTowerInfo, this);
+        emitter.on('showTowerInfo', this.showTowerInfo, this);
 
         // Hide tower info when clicking elsewhere (optional: could be improved)
         this.input.on('pointerdown', (pointer, currentlyOver) => {

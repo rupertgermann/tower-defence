@@ -3,10 +3,10 @@
 This document enumerates all tasks derived from the improvement plan.
 
 ## Phase 1 – Architecture & Code Quality
-- [ ] 1.1 Extract common utilities (math, vector ops, pathfinding) into `/src/utils/`
-- [ ] 1.2 Convert each Scene and Entity into its own ES6 module
-- [ ] 1.3 Introduce a lightweight `EventEmitter` to decouple Scene ↔ Entity communication
-- [ ] 1.4 Move configuration data (waves, tower stats, map layouts) into `/assets/config/`
+- [x] 1.1 Extract common utilities (math, vector ops, pathfinding) into `/src/utils/`
+- [x] 1.2 Convert each Scene and Entity into its own ES6 module
+- [x] 1.3 Introduce a lightweight `EventEmitter` to decouple Scene ↔ Entity communication
+- [x] 1.4 Move configuration data (waves, tower stats, map layouts) into `/assets/config/`
 
 ## Phase 2 – Maintainability & Type Safety
 - [ ] 2.1 Add ESLint & Prettier with pre-commit hook

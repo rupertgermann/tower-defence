@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import emitter from '../utils/EventEmitter.js';
 
 export default class Tower extends Phaser.GameObjects.Container {
     constructor(scene, x, y, type, data) {
@@ -68,8 +69,8 @@ export default class Tower extends Phaser.GameObjects.Container {
         });
         
         this.sprite.on('pointerdown', () => {
-            // Show tower info or upgrade options
-            this.scene.events.emit('showTowerInfo', this);
+            // Show tower info via global EventEmitter
+            emitter.emit('showTowerInfo', this);
         });
     }
 
