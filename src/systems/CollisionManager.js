@@ -18,9 +18,44 @@ export default class CollisionManager {
             enemy.getBounds()
           )
         ) {
-          this.scene.handleProjectileHit(projectile, enemy);
+          // Handle projectile hit logic here
+          // 1. Spawn hit effect
+          if (this.scene.effectSpawner) {
+            this.scene.effectSpawner.createHitEffect(enemy.x, enemy.y);
+          }
+          // 2. Damage enemy
+          if (typeof enemy.takeDamage === 'function') {
+            enemy.takeDamage(projectile.projectileData.damage);
+          }
+          // 3. Play sound
+          if (this.scene.audioManager) {
+            this.scene.audioManager.playSound('attack');
+          }
+          // 4. Award money/score if enemy is killed
+          if (enemy.isDead && enemy.isDead()) {
+            if (this.scene.economyManager) {
+              this.scene.economyManager.enemiesKilled++;
+              this.scene.economyManager.money += enemy.data.reward || 0;
+              this.scene.economyManager.updateScore && this.scene.economyManager.updateScore();
+              // Emit UI update event for money and score
+              this.scene.events.emit('updateUI', {
+                money: this.scene.economyManager.money,
+                score: this.scene.economyManager.score,
+                lives: this.scene.economyManager.lives
+              });
+            }
+            // Remove enemy from group
+            this.scene.enemyManager.removeEnemy(enemy);
+            if (this.scene.effectSpawner) {
+              this.scene.effectSpawner.createExplosionEffect(enemy.x, enemy.y, 32);
+            }
+            if (this.scene.audioManager) {
+              this.scene.audioManager.playSound('enemy_death');
+            }
+          }
+          // Remove projectile
           projectile.destroy();
-          projectiles.splice(i, 1);
+          this.scene.projectileManager.removeProjectile(projectile);
           break;
         }
       }

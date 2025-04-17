@@ -182,7 +182,7 @@ export default class WaveManager {
   checkWaveCompletion() {
     // If there are no enemies left, the wave is complete
     if (
-      this.scene.enemies.length === 0 &&
+      this.scene.enemyManager.getAll().length === 0 &&
       this.spawnIndex >= this.waveData.count
     ) {
       this.waveInProgress = false;
