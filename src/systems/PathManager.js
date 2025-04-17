@@ -52,38 +52,19 @@ export default class PathManager {
       this.pathGraphics = this.scene.add.graphics();
     }
 
-    // Set line style
-    this.pathGraphics.lineStyle(2, 0xffff00, 0.5);
-
-    // Draw lines between path points
-    for (let i = 0; i < this.path.length - 1; i++) {
-      const startPoint = this.path[i];
-      const endPoint = this.path[i + 1];
-
-      this.pathGraphics.lineBetween(
-        startPoint.x,
-        startPoint.y,
-        endPoint.x,
-        endPoint.y
+    // Only show start and end dots (green and blue)
+    if (this.path.length > 0) {
+      // Start point: green dot
+      this.pathGraphics.fillStyle(0x00ff00, 0.8);
+      this.pathGraphics.fillCircle(this.path[0].x, this.path[0].y, 8);
+      // End point: blue dot
+      this.pathGraphics.fillStyle(0x0000ff, 0.8);
+      this.pathGraphics.fillCircle(
+        this.path[this.path.length - 1].x,
+        this.path[this.path.length - 1].y,
+        8
       );
     }
-
-    // Draw circles at each path point
-    this.pathGraphics.fillStyle(0xff0000, 0.5);
-    for (const point of this.path) {
-      this.pathGraphics.fillCircle(point.x, point.y, 5);
-    }
-
-    // Make start and end points more visible
-    this.pathGraphics.fillStyle(0x00ff00, 0.8);
-    this.pathGraphics.fillCircle(this.path[0].x, this.path[0].y, 8);
-
-    this.pathGraphics.fillStyle(0x0000ff, 0.8);
-    this.pathGraphics.fillCircle(
-      this.path[this.path.length - 1].x,
-      this.path[this.path.length - 1].y,
-      8
-    );
   }
 
   /**
