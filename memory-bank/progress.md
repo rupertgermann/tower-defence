@@ -179,3 +179,8 @@ pie title Implementation Progress
 - **Implemented Features**: Moved towers, waves, extra waves into JSON under `/src/assets/config` and maps into `/public/maps`; updated `index.js` to import JSON configs and MapManager to load maps.
 - **Encountered Errors**: None.
 - **Fixes Applied**: Updated code to reference JSON configurations.
+
+### Task 1.5 - Fix tower info panel listener context
+- **Implemented Features**: Bound `showTowerInfo` listener via arrow function in UIScene.js to preserve scene this context.
+- **Encountered Errors**: Uncaught TypeError: Cannot read properties of undefined (reading 'towerInfoPanel') when selecting a tower.
+- **Fixes Applied**: Updated `emitter.on('showTowerInfo', ...)` to use `(tower) => this.showTowerInfo(tower)` ensuring `this.towerInfoPanel` is defined correctly.
