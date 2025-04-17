@@ -33,17 +33,6 @@ export default class Tower extends Phaser.GameObjects.Container {
     this.rangeIndicator.setVisible(false);
     this.add(this.rangeIndicator);
 
-    // Create level badge (text above tower)
-    this.levelBadge = scene.add.text(0, -38, `Lv.${this.level}`, {
-      fontSize: '16px',
-      fill: '#ffff00',
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 3,
-    });
-    this.levelBadge.setOrigin(0.5, 0.5);
-    this.add(this.levelBadge);
-
     // Set up input handling
     this.sprite.setInteractive();
     this.setupInteractive();
@@ -56,7 +45,6 @@ export default class Tower extends Phaser.GameObjects.Container {
     if (this.sprite && this.sprite.destroy) this.sprite.destroy();
     if (this.rangeIndicator && this.rangeIndicator.destroy)
       this.rangeIndicator.destroy();
-    if (this.levelBadge && this.levelBadge.destroy) this.levelBadge.destroy();
     if (this.attackEmitter && this.attackEmitter.destroy)
       this.attackEmitter.destroy();
     if (this.upgradeEffect && this.upgradeEffect.destroy)
@@ -285,12 +273,6 @@ export default class Tower extends Phaser.GameObjects.Container {
     this.sprite.setTexture(`tower_${this.type.toLowerCase()}_${this.level}`);
     this.sprite.setTint(this.getUpgradeTint());
 
-    // Update level badge
-    if (this.levelBadge) {
-      this.levelBadge.setText(`Lv.${this.level}`);
-      this.levelBadge.setVisible(true);
-    }
-
     // Optionally, add a visual effect for upgrades
     if (!this.upgradeEffect) {
       this.upgradeEffect = this.scene.add.particles(0, 0, 'explosion', {
@@ -331,11 +313,6 @@ export default class Tower extends Phaser.GameObjects.Container {
 
       // Update visuals
       this.updateAppearance();
-
-      // Show level badge if hidden
-      if (this.levelBadge) {
-        this.levelBadge.setVisible(true);
-      }
 
       return true;
     }

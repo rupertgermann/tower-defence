@@ -26,6 +26,7 @@ pie title Implementation Progress
 - ✅ Projectile base class with movement
 - ✅ Tower special abilities (basic implementation)
 - ✅ Enemy variety (basic implementation)
+- ✅ Removed textual level badge labels; towers display level via icons only
 
 ### UI Elements
 - ✅ Game UI layout with top and bottom bars
@@ -35,7 +36,7 @@ pie title Implementation Progress
 - ✅ Wave control button
 
 ### Assets
-- ✅ Basic placeholder assets for towers, enemies, and projectiles
+- ✅ Dynamic tower sprite assets per type and upgrade level (replaced placeholders)
 - ✅ Map tiles for background, path, and placement areas
 
 ### Polish
