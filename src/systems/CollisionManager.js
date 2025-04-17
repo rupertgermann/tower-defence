@@ -4,7 +4,9 @@ export default class CollisionManager {
   }
 
   checkCollisions() {
-    const { projectiles, enemies } = this.scene;
+    // Use manager accessors to get arrays
+    const projectiles = this.scene.projectileManager.getAll();
+    const enemies = this.scene.enemyManager.getAll();
     for (let i = projectiles.length - 1; i >= 0; i--) {
       const projectile = projectiles[i];
       for (let j = enemies.length - 1; j >= 0; j--) {

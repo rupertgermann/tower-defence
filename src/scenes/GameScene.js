@@ -15,6 +15,9 @@ import TeleportEnemy from '../entities/TeleportEnemy.js';
 import Projectile from '../entities/Projectile.js';
 import CollisionManager from '../systems/CollisionManager.js';
 import EffectSpawner from '../systems/EffectSpawner.js';
+import TowerManager from '../systems/TowerManager.js';
+import EnemyManager from '../systems/EnemyManager.js';
+import ProjectileManager from '../systems/ProjectileManager.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -30,9 +33,9 @@ export default class GameScene extends Phaser.Scene {
     this.gameEnded = false;
 
     // Game objects
-    this.towers = [];
-    this.enemies = [];
-    this.projectiles = [];
+    this.towerManager = null;
+    this.enemyManager = null;
+    this.projectileManager = null;
     this.placementTiles = [];
 
     // New helpers
@@ -128,15 +131,20 @@ export default class GameScene extends Phaser.Scene {
     // Initialize new helpers
     this.collisionManager = new CollisionManager(this);
     this.effectSpawner = new EffectSpawner(this);
+
+    // Initialize managers
+    this.towerManager = new TowerManager(this);
+    this.enemyManager = new EnemyManager(this);
+    this.projectileManager = new ProjectileManager(this);
   }
 
   update(time, delta) {
     if (this.isGameOver || this.isPaused) return;
 
     // Update all game entities
-    this.updateTowers(time, delta);
-    this.updateEnemies(time, delta);
-    this.updateProjectiles(time, delta);
+    this.towerManager.update(time, delta, this.enemyManager.getAll());
+    this.enemyManager.update(time, delta);
+    this.projectileManager.update(time, delta);
 
     // Check for collisions
     this.collisionManager.checkCollisions();
@@ -311,8 +319,8 @@ export default class GameScene extends Phaser.Scene {
         );
       }
 
-      // Add to towers array
-      this.towers.push(tower);
+      // Add to tower manager
+      this.towerManager.addTower(tower);
 
       // Mark tile as occupied
       tile.hasTower = true;
@@ -405,174 +413,6 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  updateTowers(time, delta) {
-    for (const tower of this.towers) {
-      tower.update(time, delta, this.enemies);
-    }
-  }
-
-  updateEnemies(time, delta) {
-    for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const enemy = this.enemies[i];
-
-      // Update enemy
-      enemy.update(time, delta);
-
-      // Check if enemy reached the end
-      if (enemy.hasReachedEnd()) {
-        // Damage player
-        this.economyManager.takeDamage(enemy.data.damage);
-
-        // Remove enemy
-        enemy.destroy();
-        this.enemies.splice(i, 1);
-
-        // Update UI
-        this.events.emit('updateUI', {
-          lives: this.economyManager.getLives(),
-        });
-
-        // Check for game over
-        if (this.economyManager.getLives() <= 0) {
-          this.gameOver(false);
-        }
-      }
-
-      // Check if enemy is dead
-      if (enemy.isDead()) {
-        // Add money
-        this.economyManager.addMoney(enemy.data.reward);
-
-        // Play enemy death sound
-        if (this.audioManager) {
-          this.audioManager.playSound('enemy_death');
-        }
-        // Play death animation
-        this.playDeathAnimation(enemy.x, enemy.y);
-
-        // Remove enemy
-        enemy.destroy();
-        this.enemies.splice(i, 1);
-
-        // Update UI
-        this.events.emit('updateUI', {
-          money: this.economyManager.getMoney(),
-        });
-
-        // Check if all enemies are defeated
-        if (this.enemies.length === 0 && !this.waveManager.isWaveInProgress()) {
-          this.currentWave = this.waveManager.getCurrentWave(); // Ensure currentWave is up to date
-          this.events.emit('waveCompleted', this.currentWave);
-
-          // Check for victory
-          const totalWaves = this.waveManager.getTotalWaves();
-          console.log(
-            `Checking victory condition: currentWave=${
-              this.currentWave
-            }, totalWaves=${totalWaves}, comparison result=${
-              this.currentWave >= totalWaves
-            }`
-          );
-
-          // Force victory for testing if we're on the last wave
-          if (this.currentWave >= totalWaves) {
-            console.log(
-              `Victory condition met: currentWave=${this.currentWave}, totalWaves=${totalWaves}`
-            );
-            this.gameOver(true);
-          } else {
-            console.log(
-              `Not yet victory: need wave ${totalWaves}, current wave is ${this.currentWave}`
-            );
-          }
-        }
-      }
-    }
-  }
-
-  updateProjectiles(time, delta) {
-    for (let i = this.projectiles.length - 1; i >= 0; i--) {
-      const projectile = this.projectiles[i];
-
-      // Update projectile
-      projectile.update(time, delta);
-
-      // Check if projectile is out of bounds
-      if (projectile.isOutOfBounds()) {
-        projectile.destroy();
-        this.projectiles.splice(i, 1);
-      }
-    }
-  }
-
-  handleProjectileHit(projectile, enemy) {
-    if (this.audioManager) {
-      this.audioManager.playSound('attack');
-    }
-    let damage = projectile.projectileData.damage;
-    if (enemy.data.armor) {
-      damage *= 1 - enemy.data.armor;
-    }
-
-    // Apply damage
-    enemy.takeDamage(damage);
-
-    // Handle special effects
-    if (projectile.projectileData.type === 'aoe') {
-      this.applyAreaDamage(projectile, enemy);
-    } else if (projectile.projectileData.type === 'slow') {
-      enemy.applySlowEffect(
-        projectile.projectileData.slowFactor,
-        projectile.projectileData.slowDuration
-      );
-    }
-
-    // Visual feedback
-    this.effectSpawner.createHitEffect(
-      projectile.x,
-      projectile.y,
-      projectile.projectileData.type
-    );
-  }
-
-  applyAreaDamage(projectile, targetEnemy) {
-    const aoeRadius = projectile.projectileData.aoeRadius;
-
-    for (const enemy of this.enemies) {
-      // Skip the target enemy (already damaged)
-      if (enemy === targetEnemy) continue;
-
-      // Skip flying enemies if projectile can't hit them
-      if (enemy.data.flying && !projectile.projectileData.canHitFlying) {
-        continue;
-      }
-
-      // Calculate distance
-      const distance = Phaser.Math.Distance.Between(
-        projectile.x,
-        projectile.y,
-        enemy.x,
-        enemy.y
-      );
-
-      // Apply damage if within radius
-      if (distance <= aoeRadius) {
-        // Calculate damage (considering armor and distance falloff)
-        let damage =
-          projectile.projectileData.damage * (1 - (distance / aoeRadius) * 0.5);
-        if (enemy.data.armor) {
-          damage *= 1 - enemy.data.armor;
-        }
-
-        // Apply damage
-        enemy.takeDamage(damage);
-      }
-    }
-
-    // Visual feedback
-    this.effectSpawner.createExplosionEffect(projectile.x, projectile.y, aoeRadius);
-  }
-
   spawnEnemy(type, x, y, data, path, currentPathIndex, t) {
     const enemyType = type.toLowerCase();
     const enemyData = data || window.GAME_SETTINGS.ENEMIES[type];
@@ -648,7 +488,7 @@ export default class GameScene extends Phaser.Scene {
       `[spawnEnemy] type: ${type}, enemyType: ${enemyType}, class: ${debugClass}`
     );
 
-    this.enemies.push(enemy);
+    this.enemyManager.addEnemy(enemy);
   }
 
   spawnProjectile(tower, target, type, data) {
@@ -661,7 +501,7 @@ export default class GameScene extends Phaser.Scene {
       target
     );
 
-    this.projectiles.push(projectile);
+    this.projectileManager.addProjectile(projectile);
   }
 
   gameOver(victory) {

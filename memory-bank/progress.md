@@ -201,3 +201,8 @@ pie title Implementation Progress
 - **Implemented Features**: Added an implementation checklist for Event System Standardization to `docs/implementation-plan.md`. Audited the codebase and confirmed all custom emitter usages and the utility file are removed. All events now use Phaser’s event system, with code comments clarifying event usage.
 - **Encountered Errors**: No errors encountered during audit and checklist implementation.
 - **How Errors Were Fixed**: N/A
+
+### GameScene Complexity Reduction: Entity Managers (2025-04-17)
+- **Implemented Features**: Extracted tower, enemy, and projectile logic from `GameScene.js` into dedicated `TowerManager.js`, `EnemyManager.js`, and `ProjectileManager.js` classes. Refactored `GameScene.js` to delegate all entity management to these helpers, reducing file complexity and improving maintainability.
+- **Encountered Errors**: No errors encountered during this modularization.
+- **How Errors Were Fixed**: N/A
