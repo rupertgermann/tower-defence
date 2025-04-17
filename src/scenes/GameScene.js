@@ -238,8 +238,35 @@ export default class GameScene extends Phaser.Scene {
     // Create placement tiles (where towers can be placed)
     for (let y = 0; y < mapHeight; y++) {
       for (let x = 0; x < mapWidth; x++) {
-        // Skip if this is a path tile or restricted area
-        if (pathCoords.has(`${x},${y}`) || restricted.has(`${x},${y}`)) {
+        // --- Path Overlay: Add interactive feedback for path tiles ---
+        if (pathCoords.has(`${x},${y}`)) {
+          // Add a transparent interactive rectangle over each path tile
+          const pathOverlay = this.add.rectangle(
+            x * tileSize + tileSize / 2,
+            y * tileSize + tileSize / 2,
+            tileSize,
+            tileSize,
+            0xff0000,
+            0.12 // subtle red overlay
+          );
+          pathOverlay.setOrigin(0.5, 0.5);
+          pathOverlay.setInteractive({ useHandCursor: true });
+          pathOverlay.on('pointerover', () => {
+            pathOverlay.setFillStyle(0xff0000, 0.28);
+            this.input.setDefaultCursor('not-allowed');
+          });
+          pathOverlay.on('pointerout', () => {
+            pathOverlay.setFillStyle(0xff0000, 0.12);
+            this.input.setDefaultCursor('default');
+          });
+          pathOverlay.on('pointerdown', () => {
+            // Show a UI message (requires UIScene event)
+            this.events.emit('showMessage', 'You cannot build on the path!');
+          });
+          continue;
+        }
+        // --- End Path Overlay ---
+        if (restricted.has(`${x},${y}`)) {
           continue;
         }
 
@@ -275,6 +302,16 @@ export default class GameScene extends Phaser.Scene {
         placementTile.on('pointerdown', () => {
           this.handleTilePlacement(placementTile);
         });
+      }
+    }
+    // Debug: Ensure no placement tiles overlap path tiles
+    if (process.env.NODE_ENV === 'development' || window.DEBUG_PATH_TILES) {
+      for (const tile of this.placementTiles) {
+        const { x, y } = tile.gridPosition;
+        if (pathCoords.has(`${x},${y}`)) {
+          console.warn('Placement tile incorrectly created on path:', x, y);
+          tile.setTint(0xff00ff);
+        }
       }
     }
   }
