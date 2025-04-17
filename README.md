@@ -23,9 +23,11 @@ A modern, extensible tower defense game built with Phaser 3.88.2 and ES6 modules
 
 - **6 Tower Types**: Basic, Area Effect, Slowing, Sniper, Multi-shot, Support
 - **Tower Upgrades**: Improve stats and visuals
-- **Multiple Enemy Types**: Fast, armored, flying, boss
+- **Multiple Enemy Types**: Fast, armored, flying, healer, shield, split, teleport, boss
 - **Visual & Audio Effects**: For attacks, deaths, upgrades, and UI
 - **Manual & Automatic Wave Progression**
+- **Map & Difficulty Selection**
+- **Config-Driven Extensibility** for towers, enemies, waves, and maps
 - **Clean, Event-Driven Architecture** for easy feature expansion
 
 ---
@@ -118,7 +120,11 @@ Defend your base from waves of enemies by building and upgrading towers. Survive
 - **Fast**: Moves quickly, low health.
 - **Armored**: High health, reduced damage taken.
 - **Flying**: Ignores some tower types.
-- **Boss**: Very high health, strong.
+- **Healer**: Periodically heals itself or nearby enemies.
+- **Shield**: Temporarily immune to damage with an active shield.
+- **Split**: Splits into smaller enemies upon death.
+- **Teleport**: Periodically jumps ahead along the path.
+- **Boss**: Very high health, strong, may combine special abilities.
 
 ### Tips & Strategy
 
@@ -133,6 +139,7 @@ Defend your base from waves of enemies by building and upgrading towers. Survive
 ## Assets
 
 - Tower and enemy sprites are in `public/assets/`.
+- All towers, enemies, and waves are defined in JSON config files for easy expansion.
 - **To add new tower types:** Place images named `tower_sniper.png`, `tower_multishot.png`, and `tower_support.png` in `public/assets/` for best visuals. Placeholder images will be used if not present.
 
 ---
@@ -142,12 +149,14 @@ Defend your base from waves of enemies by building and upgrading towers. Survive
 - [Phaser 3.88.2](https://phaser.io/)
 - ES6 modules
 - Webpack
+- Babel
+- Custom asset generator script
 
 ---
 
 ## Project Structure
 
-- `src/` - Game source code (entities, systems, scenes)
+- `src/` - Game source code (entities, systems, scenes, utilities, config)
 - `public/` - Static assets and HTML entry point
 - `docs/` - Design and planning documents
 - `memory-bank/` - Project context and documentation

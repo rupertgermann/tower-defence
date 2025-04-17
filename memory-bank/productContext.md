@@ -78,48 +78,83 @@ The game addresses several common issues in tower defense games:
 - **Basic Tower**: Standard attack tower with balanced stats
   - Medium range, medium damage, medium fire rate
   - Good all-around tower for general defense
-  
+
 - **Area of Effect (AoE) Tower**: Damages multiple enemies in a radius
   - Shorter range but damages all enemies in blast radius
   - Effective against groups of weaker enemies
   - Can target flying enemies
-  
+
 - **Slowing Tower**: Reduces enemy movement speed temporarily
   - Longer range but lower damage
   - Applies slowing effect to enemies
   - Can target flying enemies
   - Strategic value in slowing enemies for other towers to hit
 
+- **Multi-shot Tower**: Fires at multiple enemies simultaneously
+  - Medium range, moderate damage, targets several enemies per shot
+  - Effective against clustered or fast-moving enemies
+
+- **Support Tower**: Buffs nearby towers (e.g., increased fire rate)
+  - Does not attack directly, but increases effectiveness of other towers within range
+  - Strategic placement can significantly boost defense
+
+- **Sniper Tower**: Long-range, high-damage single-target attacks
+  - Highest range, slow fire rate, very high damage
+  - Ideal for picking off high-value or distant targets
+
 ### Enemy Types
 - **Basic Enemy**: Standard enemy with balanced stats
   - Medium health, medium speed
   - No special abilities
-  
+
 - **Fast Enemy**: Moves quickly but has less health
   - Low health, high speed
   - Requires quick targeting or slowing effects
-  
+
 - **Armored Enemy**: High health and damage resistance
   - High health, low speed
   - Damage reduction from attacks
   - Requires sustained damage to defeat
-  
+
 - **Flying Enemy**: Can only be targeted by certain towers
   - Medium health, medium speed
-  - Can only be targeted by AoE and Slowing towers
+  - Can only be targeted by AoE, Slowing, and some advanced towers
   - Requires strategic tower placement
-  
+
+- **Healer Enemy**: Heals itself or other enemies over time
+  - Medium health, medium speed
+  - Periodically restores health to itself or nearby enemies
+  - Increases wave survivability
+
+- **Shield Enemy**: Activates a shield to absorb damage
+  - High health, low speed
+  - Temporarily immune to damage while shield is active
+  - Requires timing or sustained fire to defeat
+
+- **Split Enemy**: Splits into smaller enemies upon death
+  - Medium health, medium speed
+  - On death, spawns two or more weaker enemies
+  - Can overwhelm defenses if not managed
+
+- **Teleport Enemy**: Teleports forward along the path
+  - Medium health, medium speed
+  - Periodically jumps ahead, bypassing some defenses
+  - Forces adaptive tower placement
+
 - **Boss Enemy**: Extremely powerful enemy that appears in the final wave
   - Very high health, low speed
   - Damage reduction from attacks
+  - May combine abilities (e.g., shield, healing)
   - Requires coordinated defense to defeat
 
 ### Game Mechanics
-- **Path-based Movement**: Enemies follow predefined paths
-- **Tower Targeting**: Towers automatically target enemies within range
+- **Path-based Movement**: Enemies follow predefined paths (multiple maps supported)
+- **Tower Targeting**: Towers automatically target enemies within range, with advanced targeting and multi-target logic
 - **Resource Management**: Players earn gold by defeating enemies
-- **Wave Progression**: Increasing difficulty with each wave
+- **Wave Progression**: Increasing difficulty with each wave, including extra/boss waves and advanced enemy types
 - **Lives System**: Players lose lives when enemies reach the end of the path
+- **Config-Driven Extensibility**: Towers, enemies, and waves are defined in JSON configs for easy expansion and balancing
+- **Map and Difficulty Selection**: Players can choose different maps and difficulty levels at the start of the game
 
 ## Success Criteria
 The game will be considered successful if players:

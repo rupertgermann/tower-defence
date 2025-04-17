@@ -34,25 +34,39 @@ These scenes run in parallel, with the UIScene overlaid on top of the GameScene.
 
 ### Entity Component Pattern
 Game objects are implemented as self-contained entities with their own update logic:
-- **Tower**: Handles targeting, firing, and upgrades
-- **Enemy**: Manages path following, health, and effects
-- **Projectile**: Controls movement and collision detection
+- **Tower**: Handles targeting, firing, upgrades, and special mechanics
+  - **Advanced Towers**:
+    - **MultiShotTower**: Fires at multiple targets simultaneously
+    - **SupportTower**: Buffs nearby towers (e.g., increased fire rate)
+    - **SniperTower**: Long-range, high-damage single-target attacks
+  - Towers use config-driven properties for cost, damage, range, fire rate, and upgrade scaling.
+- **Enemy**: Manages path following, health, effects, and special abilities
+  - **Advanced Enemies**:
+    - **HealerEnemy**: Heals itself or other enemies over time
+    - **ShieldEnemy**: Activates a shield to absorb damage
+    - **SplitEnemy**: Splits into smaller enemies upon death
+    - **TeleportEnemy**: Teleports forward along the path
+  - Enemies use config-driven properties for health, speed, resistances, and abilities.
+- **Projectile**: Controls movement, collision detection, and area-of-effect (AoE) or slow effects
 
 Each entity encapsulates its own state and behavior while interacting with other entities through well-defined interfaces.
 
 ### System Manager Pattern
 Complex game systems are abstracted into manager classes:
 - **PathManager**: Handles path definition and calculations
-- **WaveManager**: Controls enemy wave spawning and progression
-- **EconomyManager**: Manages player resources and scoring
+- **WaveManager**: Controls enemy wave spawning, progression, and extra/boss waves using config-driven data
+- **EconomyManager**: Manages player resources, scoring, bonuses, and statistics
+- **AudioManager**: Loads and plays sound effects and music, manages volume/mute state
+- **MapManager**: Handles loading, selection, and switching of multiple maps
 
 These managers provide services to the game scene and entities, maintaining their own internal state.
 
 ### Event-Driven Communication
-The game uses Phaser's event system for loose coupling between components:
-- Game events (wave start/end, enemy death, etc.) are broadcast
+The game uses Phaser's event system and a custom EventEmitter utility for loose coupling between components:
+- Game events (wave start/end, enemy death, tower info, etc.) are broadcast
 - Components subscribe to relevant events
-- UI updates are triggered via events from the game scene
+- UI and audio feedback are triggered via events from the game scene and systems
+- EventEmitter utility provides a decoupled publish/subscribe pattern for custom events
 
 ```mermaid
 sequenceDiagram
@@ -70,22 +84,24 @@ sequenceDiagram
 
 ### Factory Method Pattern
 The GameScene acts as a factory for game entities:
-- `spawnEnemy()`: Creates enemy instances
-- `spawnProjectile()`: Creates projectile instances
+- `spawnEnemy()`: Creates enemy instances, including advanced types based on config
+- `spawnProjectile()`: Creates projectile instances, including AoE and slow projectiles
 
 This centralizes entity creation and ensures proper initialization.
 
 ### Strategy Pattern
 Different tower and enemy types implement different strategies:
-- Tower targeting strategies (closest, strongest, first, etc.)
-- Enemy movement strategies (ground, flying)
-- Tower attack strategies (single target, area effect, slowing)
+- Tower targeting strategies (closest, strongest, first, multi-target)
+- Enemy movement strategies (ground, flying, teleporting)
+- Tower attack strategies (single target, area effect, slowing, buffing)
+- Enemy defense strategies (shielding, healing, splitting)
 
 ### Observer Pattern
-The game uses an observer pattern for UI updates:
-- Game state changes are observed by the UI
-- UI components update in response to state changes
-- This keeps the UI in sync with the game state
+The game uses an observer pattern for UI and audio updates:
+- Game state changes are observed by the UI (UIScene)
+- UI components update in response to state changes (resources, wave info, tower info, messages)
+- AudioManager responds to events for sound/music feedback
+- This keeps the UI and audio in sync with the game state
 
 ## Data Flow Patterns
 

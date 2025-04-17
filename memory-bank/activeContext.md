@@ -1,6 +1,6 @@
 # Tower Defense Game Active Context
 
-_Last Memory Bank Review: 13.4.2025, 18:02 (Europe/Berlin) — All memory bank files reviewed and current._
+_Last Memory Bank Review: 17.4.2025, 15:49 (Europe/Berlin) — All memory bank files reviewed and current._
 
 ## Current Development Focus
 
@@ -16,8 +16,9 @@ flowchart LR
     F -->|Completed| G[Enemy AI]
     G -->|Completed| H[Collision System]
     H -->|Completed| I[Economy System]
-    I -->|In Progress| J[Victory/Defeat Conditions]
-    J -.->|Next| K[Testing & Balance]
+    I -->|Completed| J[Victory Banner]
+    J -->|In Progress| K[Defeat Condition]
+    K -.->|Next| L[Testing & Balance]
 ```
 
 ## Recent Developments
@@ -34,12 +35,14 @@ flowchart LR
 - Collision detection between projectiles and enemies
 - Economy system for resource management
 - Victory banner implementation with interactive return to menu
+- Enemy destruction bug fixes (custom destroy method, tween callback context)
 
 ### In Progress
-- Game testing and balancing
-- Visual feedback for game events
-- Tower special abilities (AoE damage, slowing effect)
-- Enemy variety implementation (flying, armored types)
+- Game testing and balancing (MVP core loop is functionally complete)
+- Visual and audio feedback for game events
+- Finalizing tower special abilities (AoE, slowing)
+- Completing enemy variety (flying, armored)
+- Improving defeat condition and defeat screen
 
 ## Current Challenges
 
@@ -68,15 +71,14 @@ flowchart LR
 ## Next Steps
 
 ### Immediate Tasks
-1. Complete game testing and balancing
-2. Implement visual and audio feedback for game events
-3. Finalize tower special abilities
-4. Complete enemy variety implementation
+1. Complete game testing and balancing (focus on difficulty curve and resource tuning)
+2. Implement visual and audio feedback for game events (attacks, deaths, UI)
+3. Finalize tower special abilities (AoE, slowing)
+4. Complete enemy variety implementation (flying, armored)
+5. Improve defeat condition and defeat screen
 
 ### Short-term Goals
-1. Implement game state management (win/lose conditions)
-   - ✅ Victory condition and banner implemented
-   - 🔄 Defeat condition needs improvement
+1. Polish game state management (defeat screen, game statistics)
 2. Begin Phase 1 of the expansion plan:
    - Implement tower upgrading functionality
    - Enhance visual effects
@@ -103,13 +105,13 @@ flowchart LR
 - **Enemy Movement**: Implemented segment-based path following for smooth movement along predefined paths
 - **Wave System**: Designed progressive wave system with increasing difficulty and enemy variety
 - **UI Layout**: Created separate UI scene overlaid on game scene for cleaner architecture
-- **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction
+- **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction; fixed tween callback context bug
 - **Expansion Plan**: Created a comprehensive four-phase expansion plan to add features beyond the MVP
 - **Victory Banner**: Implemented a dedicated victory banner in GameScene.js with gold text, semi-transparent background, and return-to-menu functionality
 
 ### Pending Decisions
 - How to handle tower upgrades (branching paths vs. linear progression)
-- Visual effects for different tower attacks and enemy deaths
+- Visual and audio effects for different tower attacks and enemy deaths
 - Implementation of sound effects and background music
 - Approach for saving game progress
 - Resource allocation for expansion plan implementation
