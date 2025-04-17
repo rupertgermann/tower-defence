@@ -1,29 +1,28 @@
 export default class TowerManager {
   constructor(scene) {
     this.scene = scene;
-    this.towers = [];
+    this.towerGroup = this.scene.add.group();
   }
 
   update(time, delta, enemies) {
-    for (const tower of this.towers) {
+    this.towerGroup.getChildren().forEach(tower => {
       tower.update(time, delta, enemies);
-    }
+    });
   }
 
   addTower(tower) {
-    this.towers.push(tower);
+    this.towerGroup.add(tower);
   }
 
   removeTower(tower) {
-    const idx = this.towers.indexOf(tower);
-    if (idx !== -1) this.towers.splice(idx, 1);
+    this.towerGroup.remove(tower, true, true);
   }
 
   getAll() {
-    return this.towers;
+    return this.towerGroup.getChildren();
   }
 
   clear() {
-    this.towers = [];
+    this.towerGroup.clear(true, true);
   }
 }

@@ -1,17 +1,16 @@
 export default class EnemyManager {
   constructor(scene) {
     this.scene = scene;
-    this.enemies = [];
+    this.enemyGroup = this.scene.add.group();
   }
 
   update(time, delta) {
-    for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const enemy = this.enemies[i];
+    this.enemyGroup.getChildren().forEach(enemy => {
       enemy.update(time, delta);
       if (enemy.hasReachedEnd()) {
         this.scene.economyManager.takeDamage(enemy.data.damage);
         enemy.destroy();
-        this.enemies.splice(i, 1);
+        this.enemyGroup.remove(enemy, true, true);
         this.scene.events.emit('updateUI', {
           lives: this.scene.economyManager.getLives(),
         });
@@ -19,23 +18,22 @@ export default class EnemyManager {
           this.scene.gameOver(false);
         }
       }
-    }
+    });
   }
 
   addEnemy(enemy) {
-    this.enemies.push(enemy);
+    this.enemyGroup.add(enemy);
   }
 
   removeEnemy(enemy) {
-    const idx = this.enemies.indexOf(enemy);
-    if (idx !== -1) this.enemies.splice(idx, 1);
+    this.enemyGroup.remove(enemy, true, true);
   }
 
   getAll() {
-    return this.enemies;
+    return this.enemyGroup.getChildren();
   }
 
   clear() {
-    this.enemies = [];
+    this.enemyGroup.clear(true, true);
   }
 }

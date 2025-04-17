@@ -1,34 +1,32 @@
 export default class ProjectileManager {
   constructor(scene) {
     this.scene = scene;
-    this.projectiles = [];
+    this.projectileGroup = this.scene.add.group();
   }
 
   update(time, delta) {
-    for (let i = this.projectiles.length - 1; i >= 0; i--) {
-      const projectile = this.projectiles[i];
+    this.projectileGroup.getChildren().forEach(projectile => {
       projectile.update(time, delta);
       if (projectile.isOutOfBounds()) {
         projectile.destroy();
-        this.projectiles.splice(i, 1);
+        this.projectileGroup.remove(projectile, true, true);
       }
-    }
+    });
   }
 
   addProjectile(projectile) {
-    this.projectiles.push(projectile);
+    this.projectileGroup.add(projectile);
   }
 
   removeProjectile(projectile) {
-    const idx = this.projectiles.indexOf(projectile);
-    if (idx !== -1) this.projectiles.splice(idx, 1);
+    this.projectileGroup.remove(projectile, true, true);
   }
 
   getAll() {
-    return this.projectiles;
+    return this.projectileGroup.getChildren();
   }
 
   clear() {
-    this.projectiles = [];
+    this.projectileGroup.clear(true, true);
   }
 }
