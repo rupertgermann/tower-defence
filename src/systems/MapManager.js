@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 
 /**
  * MapManager handles loading, storing, and switching between multiple maps.
- * It loads map data from JSON files in the src/maps/ directory.
+ * It loads map data from JSON files in the public/maps/ directory.
  */
 export default class MapManager {
   /**
