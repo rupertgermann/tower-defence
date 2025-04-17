@@ -13,6 +13,8 @@ import ShieldEnemy from '../entities/ShieldEnemy.js';
 import SplitEnemy from '../entities/SplitEnemy.js';
 import TeleportEnemy from '../entities/TeleportEnemy.js';
 import Projectile from '../entities/Projectile.js';
+import CollisionManager from '../systems/CollisionManager.js';
+import EffectSpawner from '../systems/EffectSpawner.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -32,6 +34,10 @@ export default class GameScene extends Phaser.Scene {
     this.enemies = [];
     this.projectiles = [];
     this.placementTiles = [];
+
+    // New helpers
+    this.collisionManager = null;
+    this.effectSpawner = null;
   }
 
   preload() {
@@ -118,6 +124,10 @@ export default class GameScene extends Phaser.Scene {
       money: window.GAME_SETTINGS.PLAYER.money,
       wave: this.currentWave,
     });
+
+    // Initialize new helpers
+    this.collisionManager = new CollisionManager(this);
+    this.effectSpawner = new EffectSpawner(this);
   }
 
   update(time, delta) {
@@ -129,7 +139,7 @@ export default class GameScene extends Phaser.Scene {
     this.updateProjectiles(time, delta);
 
     // Check for collisions
-    this.checkCollisions();
+    this.collisionManager.checkCollisions();
 
     // Update wave manager
     this.waveManager.update(time, delta);
@@ -495,43 +505,10 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  checkCollisions() {
-    for (let i = this.projectiles.length - 1; i >= 0; i--) {
-      const projectile = this.projectiles[i];
-
-      for (let j = this.enemies.length - 1; j >= 0; j--) {
-        const enemy = this.enemies[j];
-
-        // Skip if enemy is flying and projectile can't hit flying enemies
-        if (enemy.data.flying && !projectile.projectileData.canHitFlying) {
-          continue;
-        }
-
-        // Check for collision
-        if (
-          Phaser.Geom.Intersects.RectangleToRectangle(
-            projectile.getBounds(),
-            enemy.getBounds()
-          )
-        ) {
-          // Handle hit
-          this.handleProjectileHit(projectile, enemy);
-
-          // Remove projectile
-          projectile.destroy();
-          this.projectiles.splice(i, 1);
-          break;
-        }
-      }
-    }
-  }
-
   handleProjectileHit(projectile, enemy) {
-    // Play attack sound
     if (this.audioManager) {
       this.audioManager.playSound('attack');
     }
-    // Calculate damage (considering armor)
     let damage = projectile.projectileData.damage;
     if (enemy.data.armor) {
       damage *= 1 - enemy.data.armor;
@@ -542,10 +519,8 @@ export default class GameScene extends Phaser.Scene {
 
     // Handle special effects
     if (projectile.projectileData.type === 'aoe') {
-      // Area of effect damage
       this.applyAreaDamage(projectile, enemy);
     } else if (projectile.projectileData.type === 'slow') {
-      // Slow effect
       enemy.applySlowEffect(
         projectile.projectileData.slowFactor,
         projectile.projectileData.slowDuration
@@ -553,7 +528,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Visual feedback
-    this.createHitEffect(
+    this.effectSpawner.createHitEffect(
       projectile.x,
       projectile.y,
       projectile.projectileData.type
@@ -595,77 +570,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Visual feedback
-    this.createExplosionEffect(projectile.x, projectile.y, aoeRadius);
+    this.effectSpawner.createExplosionEffect(projectile.x, projectile.y, aoeRadius);
   }
 
-  createHitEffect(x, y, type = 'basic') {
-    // Choose color based on projectile type
-    let tint = 0xffffff;
-    if (type === 'aoe') {
-      tint = 0xff6600; // orange for AoE
-    } else if (type === 'slow') {
-      tint = 0x00ffff; // cyan for slow
-    } else {
-      tint = 0xffff00; // yellow for basic
-    }
-    // Phaser 3.60+ API: use explode for one-shot burst, pass tint in config
-    const emitter = this.add.particles(0, 0, 'explosion', {
-      tint,
-      lifespan: 350,
-      speed: { min: 80, max: 160 },
-      scale: { start: 0.4, end: 0 },
-      quantity: 10,
-      alpha: { start: 1, end: 0 },
-      angle: { min: 0, max: 360 },
-      blendMode: 'ADD',
-    });
-    emitter.explode(10, x, y);
-    this.time.delayedCall(350, () => {
-      emitter.destroy();
-    });
-  }
-
-  createExplosionEffect(x, y, radius) {
-    // Particle burst for explosion effect (Phaser 3.60+ API, one-shot emitter)
-    const emitter = this.add.particles(0, 0, 'explosion', {
-      lifespan: 500,
-      speed: { min: 100, max: 220 },
-      scale: { start: radius / 120, end: 0 },
-      quantity: 20,
-      alpha: { start: 0.9, end: 0 },
-      angle: { min: 0, max: 360 },
-      blendMode: 'ADD',
-    });
-    emitter.explode(20, x, y);
-    this.time.delayedCall(550, () => {
-      emitter.destroy();
-    });
-  }
-
-  /**
-   * Play enemy death animation at (x, y)
-   */
-  playDeathAnimation(x, y) {
-    const emitter = this.add.particles(0, 0, 'explosion', {
-      lifespan: 400,
-      speed: { min: 60, max: 160 },
-      scale: { start: 0.5, end: 0 },
-      quantity: 15,
-      alpha: { start: 1, end: 0 },
-      angle: { min: 0, max: 360 },
-      blendMode: 'ADD',
-    });
-    emitter.explode(15, x, y);
-    this.time.delayedCall(420, () => {
-      emitter.destroy();
-    });
-  }
-
-  /**
-   * Spawn an enemy of the given type.
-   * Supports special abilities by selecting the correct class.
-   * Optionally accepts x, y, data, path, currentPathIndex, t for advanced spawning (e.g., SplitEnemy).
-   */
   spawnEnemy(type, x, y, data, path, currentPathIndex, t) {
     const enemyType = type.toLowerCase();
     const enemyData = data || window.GAME_SETTINGS.ENEMIES[type];
@@ -876,5 +783,24 @@ export default class GameScene extends Phaser.Scene {
     }
 
     console.log('Victory banner created and displayed');
+  }
+
+  /**
+   * Play enemy death animation at (x, y)
+   */
+  playDeathAnimation(x, y) {
+    const emitter = this.add.particles(0, 0, 'explosion', {
+      lifespan: 400,
+      speed: { min: 60, max: 160 },
+      scale: { start: 0.5, end: 0 },
+      quantity: 15,
+      alpha: { start: 1, end: 0 },
+      angle: { min: 0, max: 360 },
+      blendMode: 'ADD',
+    });
+    emitter.explode(15, x, y);
+    this.time.delayedCall(420, () => {
+      emitter.destroy();
+    });
   }
 }

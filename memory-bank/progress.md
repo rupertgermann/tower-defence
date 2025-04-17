@@ -191,3 +191,8 @@ pie title Implementation Progress
 - **Implemented Features**: Added a detailed, actionable task list to `docs/implementation-plan.md` under section 7, outlining the process for reducing complexity in `GameScene.js` by extracting complex logic into helper modules/classes and integrating them back into the scene.
 - **Encountered Errors**: No errors encountered during this documentation update step.
 - **How Errors Were Fixed**: N/A
+
+### GameScene Complexity Reduction: Collision & Effect Logic Modularized (2025-04-17)
+- **Implemented Features**: Extracted collision handling into `CollisionManager.js` and effect spawning into `EffectSpawner.js`. Updated `GameScene.js` to use these helpers, removed redundant methods, and delegated responsibilities accordingly. All logic for projectile-enemy collisions and hit/explosion effects is now modularized.
+- **Encountered Errors**: No errors encountered during refactor and extraction.
+- **How Errors Were Fixed**: N/A
