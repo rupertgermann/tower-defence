@@ -661,9 +661,6 @@ export default class UIScene extends Phaser.Scene {
 
     // Show animated wave completed banner
     this.showWaveBanner(`Wave ${waveNumber} Complete!`, '#ffff00');
-
-    // Show wave completed message
-    this.showMessage(`Wave ${waveNumber} Completed!`);
   }
 
   onGameOver(data) {

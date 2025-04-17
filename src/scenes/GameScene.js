@@ -339,14 +339,8 @@ export default class GameScene extends Phaser.Scene {
       this.gameOver(true);
     });
 
-    // Show wave start indicator when a new wave begins
-    this.events.on('waveStarted', (waveNumber) => {
-      this.showWaveIndicator(`Wave ${waveNumber} Start`);
-    });
-
     // Show wave end indicator and check for victory when a wave is completed
     this.events.on('waveCompleted', (waveNumber) => {
-      this.showWaveIndicator(`Wave ${waveNumber} Complete`);
       console.log(
         `Wave ${waveNumber} completed. GameScene.currentWave=${
           this.currentWave
