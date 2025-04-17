@@ -30,7 +30,32 @@ This plan outlines actionable steps to improve the Tower Defense project based o
 - Remove or wrap debug output in a development flag.
 
 ## 7. GameScene Complexity Reduction
-- Identify and extract complex logic (e.g., collision handling, effect spawning) from GameScene into helper classes or modules.
+### Implementation Task List
+
+1. **Audit GameScene.js**
+   - Identify complex logic sections, especially those related to collision handling, effect spawning, and any other large or multi-responsibility code blocks.
+
+2. **Define Helper Modules/Classes**
+   - Plan and create new helper modules or classes for each major responsibility:
+     - Collision handling (e.g., `CollisionManager.js`)
+     - Effect spawning (e.g., `EffectSpawner.js`)
+     - Any other identified complex logic (e.g., scoring, wave management, etc.)
+
+3. **Extract Logic**
+   - Move the identified logic from `GameScene.js` into the new helper modules/classes.
+   - Ensure each helper class/module has a clear, single responsibility and a simple interface for use by `GameScene`.
+
+4. **Integrate Helpers into GameScene**
+   - Refactor `GameScene.js` to use the new helper modules/classes.
+   - Replace direct logic with calls to the appropriate helper.
+
+5. **Testing and Validation**
+   - Test the refactored `GameScene` to ensure all features work as before.
+   - Confirm that code readability and maintainability have improved.
+
+6. **Documentation**
+   - Document the new helper modules/classes.
+   - Add comments in `GameScene.js` indicating which logic was extracted and where it now resides.
 
 ## Event System Standardization Plan
 

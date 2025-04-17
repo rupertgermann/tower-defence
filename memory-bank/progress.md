@@ -186,3 +186,8 @@ pie title Implementation Progress
 - **Implemented Features**: Bound `showTowerInfo` listener via arrow function in UIScene.js to preserve scene this context.
 - **Encountered Errors**: Uncaught TypeError: Cannot read properties of undefined (reading 'towerInfoPanel') when selecting a tower.
 - **Fixes Applied**: Updated `emitter.on('showTowerInfo', ...)` to use `(tower) => this.showTowerInfo(tower)` ensuring `this.towerInfoPanel` is defined correctly.
+
+### GameScene Complexity Reduction (2025-04-17)
+- **Implemented Features**: Added a detailed, actionable task list to `docs/implementation-plan.md` under section 7, outlining the process for reducing complexity in `GameScene.js` by extracting complex logic into helper modules/classes and integrating them back into the scene.
+- **Encountered Errors**: No errors encountered during this documentation update step.
+- **How Errors Were Fixed**: N/A
