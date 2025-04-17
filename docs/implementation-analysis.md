@@ -38,11 +38,10 @@ This document provides a deep analysis of the current implementation patterns in
   - Ensure all game state is reset on transition.
 
 ### C. Event System Usage
-- **Pattern:** Both Phaser's built-in event system and a custom EventEmitter are used.
-- **Risk:** Potential confusion or bugs if events are inconsistently handled between the two systems.
+- **Pattern:** All event-driven communication now uses Phaser's built-in EventEmitter. The custom EventEmitter utility has been removed, and all scene, UI, and game events are standardized for clarity and maintainability.
+- **Risk:** None identified.
 - **Plan:** 
-  - Standardize on one event system for game-wide events (prefer Phaser's for scene-to-scene, custom emitter for global non-scene events).
-  - Audit event usage for consistency.
+  - Continue to use Phaser's event system for game-wide events.
 
 ### D. Direct Scene/Manager Access from Entities
 - **Pattern:** Entities (e.g., Enemy) access `this.scene.economyManager` directly.

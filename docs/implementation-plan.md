@@ -60,24 +60,24 @@ This plan outlines actionable steps to improve the Tower Defense project based o
 
 1. **Entities (Tower, Enemy, etc.)**
    - [x] showTowerInfo (already migrated)
-   - [ ] Any other events using the custom emitter? (search and refactor)
+   - [x] Any other events using the custom emitter? (search and refactor)
 
 2. **UIScene**
    - [x] Listen for showTowerInfo via Phaser events (done)
-   - [ ] Listen for all other events via Phaser events only
+   - [x] Listen for all other events via Phaser events only
 
 3. **GameScene, WaveManager, EconomyManager, etc.**
-   - [ ] Ensure all event emission/listening uses Phaser’s event system
+   - [x] Ensure all event emission/listening uses Phaser’s event system
 
 4. **Global/Custom Events**
-   - [ ] Identify if any events truly need to be global; if not, remove custom emitter
+   - [x] Identify if any events truly need to be global; if not, remove custom emitter
 
 5. **Remove Unused Code**
-   - [ ] Remove src/utils/EventEmitter.js if not needed
-   - [ ] Remove all imports/usages of the custom emitter
+   - [x] Remove src/utils/EventEmitter.js if not needed
+   - [x] Remove all imports/usages of the custom emitter
 
 6. **Testing**
-   - [ ] Test all event flows (UI, game, inter-scene) to ensure correct behavior
+   - [x] Test all event flows (UI, game, inter-scene) to ensure correct behavior
 
 ---
 
