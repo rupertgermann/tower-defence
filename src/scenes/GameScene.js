@@ -57,12 +57,11 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
-    // Load enemy assets
-    this.load.image('enemy_basic', 'assets/enemy_basic.png');
-    this.load.image('enemy_fast', 'assets/enemy_fast.png');
-    this.load.image('enemy_armored', 'assets/enemy_armored.png');
-    this.load.image('enemy_flying', 'assets/enemy_flying.png');
-    this.load.image('enemy_boss', 'assets/enemy_boss.png');
+    // Dynamically load enemy assets for all configured types
+    Object.keys(window.GAME_SETTINGS.ENEMIES).forEach(type => {
+      const key = type.toLowerCase();
+      this.load.image(`enemy_${key}`, `assets/enemy_${key}.png`);
+    });
 
     // Load projectile assets
     this.load.image('projectile_basic', 'assets/projectile_basic.png');

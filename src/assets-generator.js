@@ -109,6 +109,12 @@ createCircle(16, '#9C27B0', 'enemy_armored.png'); // Purple armored enemy
 createCircle(16, '#4CAF50', 'enemy_flying.png'); // Green flying enemy
 createCircle(32, '#E91E63', 'enemy_boss.png'); // Pink boss enemy
 
+// Create additional enemy assets
+createCircle(16, '#00FF00', 'enemy_healer.png'); // Light green healer enemy
+createCircle(16, '#B0BEC5', 'enemy_shield.png'); // Gray shield enemy
+createCircle(16, '#FF5722', 'enemy_split.png'); // Orange split enemy
+createCircle(16, '#E040FB', 'enemy_teleport.png'); // Magenta teleport enemy
+
 // Create projectile assets
 createCircle(8, '#2196F3', 'projectile_basic.png'); // Blue basic projectile
 createCircle(8, '#F44336', 'projectile_aoe.png'); // Red AOE projectile
