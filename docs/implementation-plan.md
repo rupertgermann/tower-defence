@@ -57,6 +57,24 @@ This plan outlines actionable steps to improve the Tower Defense project based o
    - Document the new helper modules/classes.
    - Add comments in `GameScene.js` indicating which logic was extracted and where it now resides.
 
+## Event System Standardization — Implementation Checklist
+
+1. **Audit for Custom EventEmitter Usage**
+   - Search for all imports/usages of `src/utils/EventEmitter.js` in the codebase.
+
+2. **Refactor to Phaser Events**
+   - Replace all `emitter.emit(...)` and `emitter.on(...)` calls with Phaser’s event system (e.g., `this.events.emit`, `this.scene.events.emit`, etc.).
+
+3. **Remove Custom EventEmitter Utility**
+   - Delete `src/utils/EventEmitter.js` if it is no longer needed.
+   - Remove all related imports/usages from files.
+
+4. **Code Documentation**
+   - Add comments in code to clarify the event pattern and discourage custom emitter usage for scene/game events.
+
+5. **Testing**
+   - Test all event flows (UI, game, inter-scene) to ensure correct behavior.
+
 ## Event System Standardization Plan
 
 ### Principle
