@@ -178,9 +178,10 @@ export default class GameScene extends Phaser.Scene {
       }
     }
 
-    // Create path tiles for all paths
-    for (const path of mapData.paths) {
-      for (const coord of path) {
+    // Create path tiles for all paths (use expanded path)
+    for (const pathCorners of mapData.paths) {
+      const expandedPath = this.expandPathCorners(pathCorners);
+      for (const coord of expandedPath) {
         const pathTile = this.add.image(
           coord.x * tileSize,
           coord.y * tileSize,
@@ -192,7 +193,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Set up path for enemies to follow (use first path for now)
-    const mainPath = mapData.paths[0];
+    const mainPath = this.expandPathCorners(mapData.paths[0]);
     this.pathManager.setPath(
       mainPath.map((coord) => ({
         x: coord.x * tileSize + tileSize / 2,
@@ -200,14 +201,33 @@ export default class GameScene extends Phaser.Scene {
       }))
     );
 
-    // Create tower placement tiles, pass placement restrictions and special tiles
+    // Create tower placement tiles, pass expanded paths
     this.createPlacementTiles(
       mapWidth,
       mapHeight,
       tileSize,
-      mapData.paths,
+      mapData.paths.map(this.expandPathCorners),
       mapData.placementRestrictions || []
     );
+  }
+
+  // --- Helper to expand path corners into all tile coordinates along the path ---
+  expandPathCorners(pathCorners) {
+    const tiles = [];
+    for (let i = 0; i < pathCorners.length - 1; i++) {
+      const a = pathCorners[i];
+      const b = pathCorners[i + 1];
+      const dx = Math.sign(b.x - a.x);
+      const dy = Math.sign(b.y - a.y);
+      let x = a.x, y = a.y;
+      tiles.push({ x, y });
+      while (x !== b.x || y !== b.y) {
+        if (x !== b.x) x += dx;
+        else if (y !== b.y) y += dy;
+        tiles.push({ x, y });
+      }
+    }
+    return tiles;
   }
 
   createPlacementTiles(
