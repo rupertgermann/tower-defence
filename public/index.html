@@ -9,12 +9,26 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
+            background: url('assets/images/fantasy.png') no-repeat center center fixed;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            transition: background-image 0.7s cubic-bezier(0.4,0,0.2,1);
+        }
+        body.in-game-bg {
+            background: url('assets/images/forest.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        body.desert-bg {
+            background: url('assets/images/desert.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        body.scify-bg {
+            background: url('assets/images/scify.png') no-repeat center center fixed;
+            background-size: cover;
         }
         #game-container {
             width: 100%;
@@ -30,5 +44,22 @@
 </head>
 <body>
     <div id="game-container"></div>
+    <script>
+      // Listen for custom events to change background
+      window.setGameBackground = function(mapKey) {
+        document.body.classList.remove('in-game-bg', 'desert-bg', 'scify-bg');
+        if(mapKey === 'forest') {
+          document.body.classList.add('in-game-bg');
+        } else if(mapKey === 'desert') {
+          document.body.classList.add('desert-bg');
+        } else if(mapKey === 'scify') {
+          document.body.classList.add('scify-bg');
+        }
+      }
+      // Reset to intro background
+      window.setIntroBackground = function() {
+        document.body.classList.remove('in-game-bg', 'desert-bg', 'scify-bg');
+      }
+    </script>
 </body>
 </html>

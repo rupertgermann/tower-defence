@@ -18,6 +18,9 @@ export default class MapSelectScene extends Phaser.Scene {
   create() {
     this.mapManager.createMaps(this.MAP_KEYS);
 
+    // Set intro background when entering map select
+    if (window.setIntroBackground) window.setIntroBackground();
+
     // Game Title
     this.add
       .text(640, 35, 'Tower Defense', {
@@ -209,6 +212,15 @@ export default class MapSelectScene extends Phaser.Scene {
 
     if (!this.registry.get('selectedDifficulty')) {
       this.registry.set('selectedDifficulty', this.selectedDifficulty);
+    }
+
+    // Set game background based on selected map
+    if (window.setGameBackground) {
+      const selectedMap = this.registry.get('selectedMap');
+      // Use 'forest', 'desert', or 'scify' (for mountain)
+      let bgKey = selectedMap;
+      if (selectedMap === 'mountain') bgKey = 'scify';
+      window.setGameBackground(bgKey);
     }
 
     this.scene.start('GameScene');
