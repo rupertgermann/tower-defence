@@ -8,6 +8,43 @@ This plan outlines actionable steps to improve the Tower Defense project based o
 - Replace manual arrays for towers, enemies, and projectiles with Phaser Groups.
 - Begin implementing object pooling for projectiles and enemies (using Groups or a custom pool).
 
+### Implementation Checklist
+
+- [ ] **Replace Manual Arrays with Phaser Groups**
+    - Identify all locations in the codebase where towers, enemies, and projectiles are managed using manual arrays (e.g., `this.towers = []`, `this.enemies = []`, `this.projectiles = []`).
+    - Refactor these arrays to use Phaser's `this.add.group()` or `this.physics.add.group()` as appropriate.
+    - Update all logic that adds/removes entities to/from these arrays to use Phaser Group methods (`add`, `remove`, `getChildren`, etc.).
+    - Ensure group-based iteration replaces any manual array looping for entity updates, collisions, or rendering.
+
+- [ ] **Implement Object Pooling for Projectiles and Enemies**
+    - Research and decide whether to use Phaser’s built-in Group pooling or a custom pooling implementation.
+    - Refactor projectile and enemy spawning to reuse inactive objects from the pool instead of always creating new instances.
+    - Ensure that when a projectile or enemy is “destroyed,” it is properly deactivated and returned to the pool (not fully destroyed).
+    - Update removal logic to handle pooling (e.g., use `setActive(false)` and `setVisible(false)` instead of `destroy()`).
+    - Test pooling to confirm that objects are recycled and that memory usage is stable over time.
+
+- [ ] **Update Entity Creation and Destruction Code**
+    - Refactor all code that creates towers, enemies, and projectiles to use the new group/pool-based approach.
+    - Ensure all entity cleanup (on death, off-screen, etc.) properly deactivates and recycles the entity.
+    - Remove any redundant or obsolete entity array logic.
+
+- [ ] **Refactor Collision and Update Logic**
+    - Update collision detection and update loops to work with Phaser Groups.
+    - Ensure that all collisions, interactions, and updates between entities (e.g., projectile-enemy, enemy-tower) are compatible with the new group/pool structure.
+
+- [ ] **Update Related Systems and Managers**
+    - Refactor any managers (e.g., `TowerManager`, `ProjectileManager`) to work with Phaser Groups and pooling.
+    - Ensure that any helper classes (e.g., `CollisionManager`, `EffectSpawner`) interact correctly with the new entity management system.
+
+- [ ] **Testing and Validation**
+    - Playtest the game to ensure that all entities spawn, update, and are removed/recycled correctly.
+    - Profile performance and memory usage to confirm that pooling is effective and there are no leaks.
+    - Check that all gameplay features (tower placement, shooting, enemy waves, etc.) still function as expected.
+
+- [ ] **Documentation and Code Cleanup**
+    - Update internal documentation/comments to explain the new entity management approach.
+    - Remove any obsolete code or comments related to the old array-based system.
+
 ## 2. Scene Transition Improvements
 - Replace all uses of `window.location.reload()` with proper scene transitions using `this.scene.start('TargetScene')`.
 - Ensure game state resets cleanly on scene change.
