@@ -521,7 +521,7 @@ export default class UIScene extends Phaser.Scene {
       .events.on('showMessage', this.showMessage, this);
 
     // Listen for tower info display
-    emitter.on('showTowerInfo', this.showTowerInfo, this);
+    emitter.on('showTowerInfo', (tower) => this.showTowerInfo(tower));
 
     // Hide tower info when clicking elsewhere (optional: could be improved)
     this.input.on('pointerdown', (pointer, currentlyOver) => {
