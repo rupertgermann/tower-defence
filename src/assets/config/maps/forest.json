@@ -17,10 +17,6 @@
       { "x": 19, "y": 5 }
     ]
   ],
-  "placementRestrictions": [
-    { "x": 3, "y": 3, "width": 2, "height": 2 }
-  ],
-  "specialTiles": [
-    { "x": 7, "y": 7, "type": "damage_boost" }
-  ]
+  "placementRestrictions": [{ "x": 3, "y": 3, "width": 2, "height": 2 }],
+  "specialTiles": [{ "x": 7, "y": 7, "type": "damage_boost" }]
 }

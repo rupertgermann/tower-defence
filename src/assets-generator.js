@@ -16,54 +16,54 @@ const __dirname = path.dirname(__filename);
 // Create assets directory if it doesn't exist
 const assetsDir = path.join(__dirname, '../public/assets');
 if (!fs.existsSync(assetsDir)) {
-    fs.mkdirSync(assetsDir, { recursive: true });
+  fs.mkdirSync(assetsDir, { recursive: true });
 }
 
 // Function to create a simple colored rectangle
 function createRectangle(width, height, color, filename) {
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-    
-    // Fill with color
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, width, height);
-    
-    // Add border
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, width - 2, height - 2);
-    
-    // Save to file
-    const buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(path.join(assetsDir, filename), buffer);
-    
-    console.log(`Created ${filename}`);
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // Fill with color
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, width, height);
+
+  // Add border
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, width - 2, height - 2);
+
+  // Save to file
+  const buffer = canvas.toBuffer('image/png');
+  fs.writeFileSync(path.join(assetsDir, filename), buffer);
+
+  console.log(`Created ${filename}`);
 }
 
 // Function to create a simple colored circle
 function createCircle(radius, color, filename) {
-    const size = radius * 2;
-    const canvas = createCanvas(size, size);
-    const ctx = canvas.getContext('2d');
-    
-    // Fill with color
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(radius, radius, radius - 1, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Add border
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(radius, radius, radius - 2, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    // Save to file
-    const buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(path.join(assetsDir, filename), buffer);
-    
-    console.log(`Created ${filename}`);
+  const size = radius * 2;
+  const canvas = createCanvas(size, size);
+  const ctx = canvas.getContext('2d');
+
+  // Fill with color
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(radius, radius, radius - 1, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Add border
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(radius, radius, radius - 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Save to file
+  const buffer = canvas.toBuffer('image/png');
+  fs.writeFileSync(path.join(assetsDir, filename), buffer);
+
+  console.log(`Created ${filename}`);
 }
 
 // Create map tiles

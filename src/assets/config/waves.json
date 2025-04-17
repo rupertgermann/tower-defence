@@ -1,12 +1,25 @@
 [
-  {"enemies": ["BASIC"], "count": 10, "interval": 1500},
-  {"enemies": ["BASIC", "FAST"], "count": 15, "interval": 1200},
-  {"enemies": ["BASIC", "FAST", "ARMORED"], "count": 20, "interval": 1000},
-  {"enemies": ["FAST", "ARMORED"], "count": 15, "interval": 900},
-  {"enemies": ["ARMORED", "FLYING"], "count": 15, "interval": 1000},
-  {"enemies": ["FAST", "FLYING"], "count": 20, "interval": 800},
-  {"enemies": ["BASIC", "FAST", "ARMORED", "FLYING"], "count": 25, "interval": 700},
-  {"enemies": ["ARMORED", "FLYING", "HEALER"], "count": 20, "interval": 600},
-  {"enemies": ["FAST", "ARMORED", "FLYING", "SHIELD", "SPLIT", "TELEPORT"], "count": 30, "interval": 500},
-  {"enemies": ["BOSS", "HEALER", "SHIELD", "SPLIT", "TELEPORT"], "count": 5, "interval": 800, "bossWave": true}
+  { "enemies": ["BASIC"], "count": 10, "interval": 1500 },
+  { "enemies": ["BASIC", "FAST"], "count": 15, "interval": 1200 },
+  { "enemies": ["BASIC", "FAST", "ARMORED"], "count": 20, "interval": 1000 },
+  { "enemies": ["FAST", "ARMORED"], "count": 15, "interval": 900 },
+  { "enemies": ["ARMORED", "FLYING"], "count": 15, "interval": 1000 },
+  { "enemies": ["FAST", "FLYING"], "count": 20, "interval": 800 },
+  {
+    "enemies": ["BASIC", "FAST", "ARMORED", "FLYING"],
+    "count": 25,
+    "interval": 700
+  },
+  { "enemies": ["ARMORED", "FLYING", "HEALER"], "count": 20, "interval": 600 },
+  {
+    "enemies": ["FAST", "ARMORED", "FLYING", "SHIELD", "SPLIT", "TELEPORT"],
+    "count": 30,
+    "interval": 500
+  },
+  {
+    "enemies": ["BOSS", "HEALER", "SHIELD", "SPLIT", "TELEPORT"],
+    "count": 5,
+    "interval": 800,
+    "bossWave": true
+  }
 ]

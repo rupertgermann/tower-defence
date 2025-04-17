@@ -2,366 +2,384 @@ import Phaser from 'phaser';
 import emitter from '../utils/EventEmitter.js';
 
 export default class Tower extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, type, data) {
-        super(scene, x, y);
-        
-        // Add to scene
-        scene.add.existing(this);
-        
-        // Store tower data
-        this.type = type;
-        this.data = data;
-        
-        // Tower state
-        this.level = 1;
-        this.target = null;
-        this.lastFireTime = 0;
-        this.isActive = true;
-        
-        // Create tower sprite
-        this.sprite = scene.add.image(0, 0, `tower_${type}`);
-        this.add(this.sprite);
-        
-        // Create range indicator (invisible by default)
-        this.rangeIndicator = scene.add.circle(0, 0, this.data.range, 0xffffff, 0.2);
-        this.rangeIndicator.setVisible(false);
-        this.add(this.rangeIndicator);
+  constructor(scene, x, y, type, data) {
+    super(scene, x, y);
 
-        // Create level badge (text above tower)
-        this.levelBadge = scene.add.text(0, -38, `Lv.${this.level}`, {
-            fontSize: '16px',
-            fill: '#ffff00',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 3
-        });
-        this.levelBadge.setOrigin(0.5, 0.5);
-        this.add(this.levelBadge);
-        
-        // Set up input handling
-        this.sprite.setInteractive();
-        this.setupInteractive();
+    // Add to scene
+    scene.add.existing(this);
+
+    // Store tower data
+    this.type = type;
+    this.data = data;
+
+    // Tower state
+    this.level = 1;
+    this.target = null;
+    this.lastFireTime = 0;
+    this.isActive = true;
+
+    // Create tower sprite
+    this.sprite = scene.add.image(0, 0, `tower_${type}`);
+    this.add(this.sprite);
+
+    // Create range indicator (invisible by default)
+    this.rangeIndicator = scene.add.circle(
+      0,
+      0,
+      this.data.range,
+      0xffffff,
+      0.2
+    );
+    this.rangeIndicator.setVisible(false);
+    this.add(this.rangeIndicator);
+
+    // Create level badge (text above tower)
+    this.levelBadge = scene.add.text(0, -38, `Lv.${this.level}`, {
+      fontSize: '16px',
+      fill: '#ffff00',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
+    });
+    this.levelBadge.setOrigin(0.5, 0.5);
+    this.add(this.levelBadge);
+
+    // Set up input handling
+    this.sprite.setInteractive();
+    this.setupInteractive();
+  }
+
+  /**
+   * Clean up all child objects and emitters when destroying the tower
+   */
+  destroy(fromScene) {
+    if (this.sprite && this.sprite.destroy) this.sprite.destroy();
+    if (this.rangeIndicator && this.rangeIndicator.destroy)
+      this.rangeIndicator.destroy();
+    if (this.levelBadge && this.levelBadge.destroy) this.levelBadge.destroy();
+    if (this.attackEmitter && this.attackEmitter.destroy)
+      this.attackEmitter.destroy();
+    if (this.upgradeEffect && this.upgradeEffect.destroy)
+      this.upgradeEffect.destroy();
+    // Do NOT destroy this.data (plain object, not a GameObject)
+    super.destroy(fromScene);
+  }
+
+  /**
+   * Set up interactive events for the tower
+   */
+  setupInteractive() {
+    this.sprite.on('pointerover', () => {
+      this.showRange();
+    });
+
+    this.sprite.on('pointerout', () => {
+      this.hideRange();
+    });
+
+    this.sprite.on('pointerdown', () => {
+      // Show tower info via global EventEmitter
+      emitter.emit('showTowerInfo', this);
+    });
+  }
+
+  /**
+   * Update method called each frame
+   * @param {number} time - Current time
+   * @param {number} delta - Time since last update
+   * @param {Array} enemies - Array of enemy objects
+   */
+  update(time, delta, enemies) {
+    if (!this.isActive) return;
+
+    // Find target if we don't have one or if current target is dead/out of range
+    if (!this.target || !this.isValidTarget(this.target)) {
+      this.findTarget(enemies);
     }
 
-    /**
-     * Clean up all child objects and emitters when destroying the tower
-     */
-    destroy(fromScene) {
-        if (this.sprite && this.sprite.destroy) this.sprite.destroy();
-        if (this.rangeIndicator && this.rangeIndicator.destroy) this.rangeIndicator.destroy();
-        if (this.levelBadge && this.levelBadge.destroy) this.levelBadge.destroy();
-        if (this.attackEmitter && this.attackEmitter.destroy) this.attackEmitter.destroy();
-        if (this.upgradeEffect && this.upgradeEffect.destroy) this.upgradeEffect.destroy();
-        // Do NOT destroy this.data (plain object, not a GameObject)
-        super.destroy(fromScene);
+    // Attack if we have a target and cooldown has elapsed
+    if (this.target && time > this.lastFireTime + this.data.fireRate) {
+      this.fireAtTarget(time);
+    }
+  }
+
+  /**
+   * Check if a target is valid (alive and in range)
+   * @param {Enemy} target - Target to check
+   * @returns {boolean} True if target is valid
+   */
+  isValidTarget(target) {
+    // Check if target exists and is alive
+    if (!target || target.isDead()) {
+      return false;
     }
 
-    /**
-     * Set up interactive events for the tower
-     */
-    setupInteractive() {
-        this.sprite.on('pointerover', () => {
-            this.showRange();
-        });
-        
-        this.sprite.on('pointerout', () => {
-            this.hideRange();
-        });
-        
-        this.sprite.on('pointerdown', () => {
-            // Show tower info via global EventEmitter
-            emitter.emit('showTowerInfo', this);
-        });
+    // Check if target is in range
+    const distance = Phaser.Math.Distance.Between(
+      this.x,
+      this.y,
+      target.x,
+      target.y
+    );
+
+    return distance <= this.data.range;
+  }
+
+  /**
+   * Find a new target from the enemies array
+   * @param {Array} enemies - Array of enemy objects
+   */
+  findTarget(enemies) {
+    // Reset current target
+    this.target = null;
+
+    // Find closest enemy in range
+    let closestDistance = Infinity;
+
+    for (const enemy of enemies) {
+      // Skip dead enemies
+      if (enemy.isDead()) continue;
+
+      // Skip flying enemies if tower can't target them
+      if (enemy.data.flying && !this.canTargetFlying()) {
+        continue;
+      }
+
+      // Calculate distance
+      const distance = Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        enemy.x,
+        enemy.y
+      );
+
+      // Check if in range and closer than current closest
+      if (distance <= this.data.range && distance < closestDistance) {
+        this.target = enemy;
+        closestDistance = distance;
+      }
+    }
+  }
+
+  /**
+   * Fire at the current target
+   * @param {number} time - Current time
+   */
+  fireAtTarget(time) {
+    // Update last fire time
+    this.lastFireTime = time;
+
+    // Create projectile
+    const projectileData = {
+      damage: this.data.damage,
+      type: this.type,
+      speed: this.data.projectileSpeed,
+      canHitFlying: this.canTargetFlying(),
+    };
+
+    // Add special properties based on tower type
+    if (this.type === 'aoe') {
+      projectileData.aoeRadius = this.data.aoeRadius;
+    } else if (this.type === 'slow') {
+      projectileData.slowFactor = this.data.slowFactor;
+      projectileData.slowDuration = this.data.slowDuration;
     }
 
-    /**
-     * Update method called each frame
-     * @param {number} time - Current time
-     * @param {number} delta - Time since last update
-     * @param {Array} enemies - Array of enemy objects
-     */
-    update(time, delta, enemies) {
-        if (!this.isActive) return;
-        
-        // Find target if we don't have one or if current target is dead/out of range
-        if (!this.target || !this.isValidTarget(this.target)) {
-            this.findTarget(enemies);
-        }
-        
-        // Attack if we have a target and cooldown has elapsed
-        if (this.target && time > this.lastFireTime + this.data.fireRate) {
-            this.fireAtTarget(time);
-        }
+    // Spawn projectile
+    this.scene.spawnProjectile(
+      this,
+      this.target,
+      `projectile_${this.type}`,
+      projectileData
+    );
+
+    // Visual feedback
+    this.playAttackAnimation();
+  }
+
+  /**
+   * Play attack animation and particle effect
+   */
+  playAttackAnimation() {
+    // Scale up and back down quickly
+    this.scene.tweens.add({
+      targets: this.sprite,
+      scaleX: 1.2,
+      scaleY: 1.2,
+      duration: 100,
+      yoyo: true,
+    });
+
+    // Particle effect: muzzle flash/spark at tower center
+    if (!this.attackEmitter) {
+      this.attackEmitter = this.scene.add.particles(0, 0, 'explosion', {
+        lifespan: 250,
+        speed: { min: 60, max: 120 },
+        scale: { start: 0.18, end: 0 },
+        quantity: 8,
+        angle: { min: 0, max: 360 },
+        blendMode: 'ADD',
+      });
+      this.add(this.attackEmitter);
+    }
+    this.attackEmitter.explode(8, 0, 0);
+  }
+
+  /**
+   * Show the tower's range indicator
+   */
+  showRange() {
+    this.rangeIndicator.setVisible(true);
+  }
+
+  /**
+   * Hide the tower's range indicator
+   */
+  hideRange() {
+    this.rangeIndicator.setVisible(false);
+  }
+
+  /**
+   * Check if this tower can target flying enemies
+   * @returns {boolean} True if tower can target flying enemies
+   */
+  canTargetFlying() {
+    // Basic towers can't hit flying enemies
+    // AOE and slow towers can
+    return this.type !== 'basic';
+  }
+
+  /**
+   * Calculate the upgrade cost for the next level
+   * @returns {number} Upgrade cost
+   */
+  calculateUpgradeCost() {
+    // Allow per-tower scaling, fallback to default
+    const baseCost = this.data.cost;
+    const upgradeScaling = this.data.upgradeCostScaling || 0.6; // default 60% of base per level
+    return Math.floor(baseCost * upgradeScaling * this.level);
+  }
+
+  /**
+   * Apply stat improvements for an upgrade
+   */
+  applyUpgradeEffects() {
+    // Allow per-tower scaling, fallback to defaults
+    const damageScale = this.data.upgradeDamageScale || 1.4;
+    const rangeScale = this.data.upgradeRangeScale || 1.15;
+    const fireRateScale = this.data.upgradeFireRateScale || 0.85;
+
+    this.data.damage = Math.round(this.data.damage * damageScale);
+    this.data.range = Math.round(this.data.range * rangeScale);
+    this.data.fireRate = Math.round(this.data.fireRate * fireRateScale);
+
+    // Update range indicator
+    this.rangeIndicator.setRadius(this.data.range);
+  }
+
+  /**
+   * Update the tower's appearance based on level
+   */
+  updateAppearance() {
+    // Tint for level, can be replaced with frame/sprite/particle
+    this.sprite.setTint(this.getUpgradeTint());
+
+    // Update level badge
+    if (this.levelBadge) {
+      this.levelBadge.setText(`Lv.${this.level}`);
+      this.levelBadge.setVisible(true);
     }
 
-    /**
-     * Check if a target is valid (alive and in range)
-     * @param {Enemy} target - Target to check
-     * @returns {boolean} True if target is valid
-     */
-    isValidTarget(target) {
-        // Check if target exists and is alive
-        if (!target || target.isDead()) {
-            return false;
-        }
-        
-        // Check if target is in range
-        const distance = Phaser.Math.Distance.Between(
-            this.x, this.y,
-            target.x, target.y
-        );
-        
-        return distance <= this.data.range;
+    // Optionally, add a visual effect for upgrades
+    if (!this.upgradeEffect) {
+      this.upgradeEffect = this.scene.add.particles(0, 0, 'explosion', {
+        lifespan: 400,
+        speed: { min: 20, max: 60 },
+        scale: { start: 0.2, end: 0 },
+        quantity: 6,
+        blendMode: 'ADD',
+      });
+      this.add(this.upgradeEffect);
+    }
+    this.upgradeEffect.explode(6, 0, 0);
+  }
+
+  /**
+   * Upgrade the tower to the next level
+   * @returns {boolean} True if upgrade was successful
+   */
+  upgrade() {
+    // Use maxLevel from data or default to 3
+    this.maxLevel = this.data.maxLevel || 3;
+    if (this.level >= this.maxLevel) {
+      return false; // Max level reached
     }
 
-    /**
-     * Find a new target from the enemies array
-     * @param {Array} enemies - Array of enemy objects
-     */
-    findTarget(enemies) {
-        // Reset current target
-        this.target = null;
-        
-        // Find closest enemy in range
-        let closestDistance = Infinity;
-        
-        for (const enemy of enemies) {
-            // Skip dead enemies
-            if (enemy.isDead()) continue;
-            
-            // Skip flying enemies if tower can't target them
-            if (enemy.data.flying && !this.canTargetFlying()) {
-                continue;
-            }
-            
-            // Calculate distance
-            const distance = Phaser.Math.Distance.Between(
-                this.x, this.y,
-                enemy.x, enemy.y
-            );
-            
-            // Check if in range and closer than current closest
-            if (distance <= this.data.range && distance < closestDistance) {
-                this.target = enemy;
-                closestDistance = distance;
-            }
-        }
+    const upgradeCost = this.calculateUpgradeCost();
+
+    // Check if player has enough money
+    if (this.scene.economyManager.getMoney() >= upgradeCost) {
+      // Deduct cost
+      this.scene.economyManager.spendMoney(upgradeCost);
+
+      // Increase level
+      this.level++;
+
+      // Improve stats
+      this.applyUpgradeEffects();
+
+      // Update visuals
+      this.updateAppearance();
+
+      // Show level badge if hidden
+      if (this.levelBadge) {
+        this.levelBadge.setVisible(true);
+      }
+
+      return true;
     }
 
-    /**
-     * Fire at the current target
-     * @param {number} time - Current time
-     */
-    fireAtTarget(time) {
-        // Update last fire time
-        this.lastFireTime = time;
-        
-        // Create projectile
-        const projectileData = {
-            damage: this.data.damage,
-            type: this.type,
-            speed: this.data.projectileSpeed,
-            canHitFlying: this.canTargetFlying()
-        };
-        
-        // Add special properties based on tower type
-        if (this.type === 'aoe') {
-            projectileData.aoeRadius = this.data.aoeRadius;
-        } else if (this.type === 'slow') {
-            projectileData.slowFactor = this.data.slowFactor;
-            projectileData.slowDuration = this.data.slowDuration;
-        }
-        
-        // Spawn projectile
-        this.scene.spawnProjectile(this, this.target, `projectile_${this.type}`, projectileData);
-        
-        // Visual feedback
-        this.playAttackAnimation();
+    return false;
+  }
+
+  /**
+   * Get the tint color based on tower level
+   * @returns {number} Color value
+   */
+  getUpgradeTint() {
+    switch (this.level) {
+      case 1:
+        return 0xffffff; // No tint
+      case 2:
+        return 0x00ffcc; // Cyan tint
+      case 3:
+        return 0xffff00; // Yellow tint
+      case 4:
+        return 0xff8800; // Orange tint
+      case 5:
+        return 0xff0000; // Red tint
+      default:
+        return 0xffffff;
     }
+  }
 
-    /**
-     * Play attack animation and particle effect
-     */
-    playAttackAnimation() {
-        // Scale up and back down quickly
-        this.scene.tweens.add({
-            targets: this.sprite,
-            scaleX: 1.2,
-            scaleY: 1.2,
-            duration: 100,
-            yoyo: true
-        });
+  /**
+   * Sell the tower
+   * @returns {number} Amount of money refunded
+   */
+  sell() {
+    // Calculate refund amount (60% of total investment)
+    const baseCost = this.data.cost;
+    const upgradeCost = Math.floor(baseCost * 0.5) * (this.level - 1);
+    const totalInvestment = baseCost + upgradeCost;
+    const refundAmount = Math.floor(totalInvestment * 0.6);
 
-        // Particle effect: muzzle flash/spark at tower center
-        if (!this.attackEmitter) {
-            this.attackEmitter = this.scene.add.particles(0, 0, 'explosion', {
-                lifespan: 250,
-                speed: { min: 60, max: 120 },
-                scale: { start: 0.18, end: 0 },
-                quantity: 8,
-                angle: { min: 0, max: 360 },
-                blendMode: 'ADD'
-            });
-            this.add(this.attackEmitter);
-        }
-        this.attackEmitter.explode(8, 0, 0);
-    }
+    // Add money to player
+    this.scene.economyManager.addMoney(refundAmount);
 
-    /**
-     * Show the tower's range indicator
-     */
-    showRange() {
-        this.rangeIndicator.setVisible(true);
-    }
+    // Remove tower
+    this.destroy();
 
-    /**
-     * Hide the tower's range indicator
-     */
-    hideRange() {
-        this.rangeIndicator.setVisible(false);
-    }
-
-    /**
-     * Check if this tower can target flying enemies
-     * @returns {boolean} True if tower can target flying enemies
-     */
-    canTargetFlying() {
-        // Basic towers can't hit flying enemies
-        // AOE and slow towers can
-        return this.type !== 'basic';
-    }
-
-    /**
-     * Calculate the upgrade cost for the next level
-     * @returns {number} Upgrade cost
-     */
-    calculateUpgradeCost() {
-        // Allow per-tower scaling, fallback to default
-        const baseCost = this.data.cost;
-        const upgradeScaling = this.data.upgradeCostScaling || 0.6; // default 60% of base per level
-        return Math.floor(baseCost * upgradeScaling * this.level);
-    }
-
-    /**
-     * Apply stat improvements for an upgrade
-     */
-    applyUpgradeEffects() {
-        // Allow per-tower scaling, fallback to defaults
-        const damageScale = this.data.upgradeDamageScale || 1.4;
-        const rangeScale = this.data.upgradeRangeScale || 1.15;
-        const fireRateScale = this.data.upgradeFireRateScale || 0.85;
-
-        this.data.damage = Math.round(this.data.damage * damageScale);
-        this.data.range = Math.round(this.data.range * rangeScale);
-        this.data.fireRate = Math.round(this.data.fireRate * fireRateScale);
-
-        // Update range indicator
-        this.rangeIndicator.setRadius(this.data.range);
-    }
-
-    /**
-     * Update the tower's appearance based on level
-     */
-    updateAppearance() {
-        // Tint for level, can be replaced with frame/sprite/particle
-        this.sprite.setTint(this.getUpgradeTint());
-
-        // Update level badge
-        if (this.levelBadge) {
-            this.levelBadge.setText(`Lv.${this.level}`);
-            this.levelBadge.setVisible(true);
-        }
-
-        // Optionally, add a visual effect for upgrades
-        if (!this.upgradeEffect) {
-            this.upgradeEffect = this.scene.add.particles(0, 0, 'explosion', {
-                lifespan: 400,
-                speed: { min: 20, max: 60 },
-                scale: { start: 0.2, end: 0 },
-                quantity: 6,
-                blendMode: 'ADD'
-            });
-            this.add(this.upgradeEffect);
-        }
-        this.upgradeEffect.explode(6, 0, 0);
-    }
-
-    /**
-     * Upgrade the tower to the next level
-     * @returns {boolean} True if upgrade was successful
-     */
-    upgrade() {
-        // Use maxLevel from data or default to 3
-        this.maxLevel = this.data.maxLevel || 3;
-        if (this.level >= this.maxLevel) {
-            return false; // Max level reached
-        }
-
-        const upgradeCost = this.calculateUpgradeCost();
-
-        // Check if player has enough money
-        if (this.scene.economyManager.getMoney() >= upgradeCost) {
-            // Deduct cost
-            this.scene.economyManager.spendMoney(upgradeCost);
-
-            // Increase level
-            this.level++;
-
-            // Improve stats
-            this.applyUpgradeEffects();
-
-            // Update visuals
-            this.updateAppearance();
-
-            // Show level badge if hidden
-            if (this.levelBadge) {
-                this.levelBadge.setVisible(true);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the tint color based on tower level
-     * @returns {number} Color value
-     */
-    getUpgradeTint() {
-        switch (this.level) {
-            case 1:
-                return 0xffffff; // No tint
-            case 2:
-                return 0x00ffcc; // Cyan tint
-            case 3:
-                return 0xffff00; // Yellow tint
-            case 4:
-                return 0xff8800; // Orange tint
-            case 5:
-                return 0xff0000; // Red tint
-            default:
-                return 0xffffff;
-        }
-    }
-
-    /**
-     * Sell the tower
-     * @returns {number} Amount of money refunded
-     */
-    sell() {
-        // Calculate refund amount (60% of total investment)
-        const baseCost = this.data.cost;
-        const upgradeCost = Math.floor(baseCost * 0.5) * (this.level - 1);
-        const totalInvestment = baseCost + upgradeCost;
-        const refundAmount = Math.floor(totalInvestment * 0.6);
-        
-        // Add money to player
-        this.scene.economyManager.addMoney(refundAmount);
-        
-        // Remove tower
-        this.destroy();
-        
-        return refundAmount;
-    }
+    return refundAmount;
+  }
 }

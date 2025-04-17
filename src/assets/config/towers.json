@@ -38,7 +38,7 @@
     "maxLevel": 3,
     "upgradeCostScaling": 0.55,
     "upgradeDamageScale": 1.3,
-    "upgradeRangeScale": 1.10,
+    "upgradeRangeScale": 1.1,
     "upgradeFireRateScale": 0.9
   },
   "SNIPER": {
@@ -51,7 +51,7 @@
     "maxLevel": 3,
     "upgradeCostScaling": 0.7,
     "upgradeDamageScale": 1.5,
-    "upgradeRangeScale": 1.10,
+    "upgradeRangeScale": 1.1,
     "upgradeFireRateScale": 0.85
   },
   "MULTISHOT": {
@@ -65,7 +65,7 @@
     "maxLevel": 3,
     "upgradeCostScaling": 0.65,
     "upgradeDamageScale": 1.35,
-    "upgradeRangeScale": 1.10,
+    "upgradeRangeScale": 1.1,
     "upgradeFireRateScale": 0.88
   },
   "SUPPORT": {
