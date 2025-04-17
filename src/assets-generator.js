@@ -123,4 +123,7 @@ createCircle(8, '#00BCD4', 'projectile_slow.png'); // Cyan slow projectile
 // Create effect assets
 createCircle(16, '#FFEB3B', 'explosion.png'); // Yellow explosion
 
+// Create favicon asset
+createCircle(8, '#2196F3', 'favicon.png'); // 16×16 blue circle favicon
+
 console.log('All assets generated successfully!');
