@@ -269,9 +269,8 @@ export default class Tower extends Phaser.GameObjects.Container {
    * Update the tower's appearance based on level
    */
   updateAppearance() {
-    // Update texture and tint for current level
+    // Update texture for current level
     this.sprite.setTexture(`tower_${this.type.toLowerCase()}_${this.level}`);
-    this.sprite.setTint(this.getUpgradeTint());
 
     // Optionally, add a visual effect for upgrades
     if (!this.upgradeEffect) {
@@ -318,27 +317,6 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     return false;
-  }
-
-  /**
-   * Get the tint color based on tower level
-   * @returns {number} Color value
-   */
-  getUpgradeTint() {
-    switch (this.level) {
-      case 1:
-        return 0xffffff; // No tint
-      case 2:
-        return 0x00ffcc; // Cyan tint
-      case 3:
-        return 0xffff00; // Yellow tint
-      case 4:
-        return 0xff8800; // Orange tint
-      case 5:
-        return 0xff0000; // Red tint
-      default:
-        return 0xffffff;
-    }
   }
 
   /**
