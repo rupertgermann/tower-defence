@@ -66,8 +66,8 @@ export default class Tower extends Phaser.GameObjects.Container {
     });
 
     this.sprite.on('pointerdown', () => {
-      // Show tower info via global EventEmitter
-      emitter.emit('showTowerInfo', this);
+      // Show tower info via Phaser EventEmitter
+      this.scene.events.emit('showTowerInfo', this);
     });
   }
 

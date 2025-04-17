@@ -219,6 +219,7 @@ export default class UIScene extends Phaser.Scene {
       fill: '#ffffff',
     });
     this.muteIcon.setOrigin(0.5, 0.5);
+
     this.uiContainer.add(this.muteButton);
     this.uiContainer.add(this.muteIcon);
 
@@ -522,7 +523,7 @@ export default class UIScene extends Phaser.Scene {
       .events.on('showMessage', this.showMessage, this);
 
     // Listen for tower info display
-    emitter.on('showTowerInfo', (tower) => this.showTowerInfo(tower));
+    this.scene.get('GameScene').events.on('showTowerInfo', this.showTowerInfo, this);
 
     // Hide tower info when clicking elsewhere (optional: could be improved)
     this.input.on('pointerdown', (pointer, currentlyOver) => {
