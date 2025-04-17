@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import emitter from '../utils/EventEmitter.js';
 
 export default class Tower extends Phaser.GameObjects.Container {
   constructor(scene, x, y, type, data) {
