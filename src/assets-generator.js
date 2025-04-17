@@ -19,8 +19,22 @@ if (!fs.existsSync(assetsDir)) {
   fs.mkdirSync(assetsDir, { recursive: true });
 }
 
+// Load tower definitions for dynamic asset generation
+const towersConfig = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'assets/config/towers.json'), 'utf-8')
+);
+// Base colors for tower types
+const towerColors = {
+  BASIC: '#2196F3',
+  AOE: '#F44336',
+  SLOW: '#00BCD4',
+  SNIPER: '#8E24AA',
+  MULTISHOT: '#FF9800',
+  SUPPORT: '#4CAF50',
+};
+
 // Function to create a simple colored rectangle
-function createRectangle(width, height, color, filename) {
+function createRectangle(width, height, color, filename, label) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
@@ -32,6 +46,14 @@ function createRectangle(width, height, color, filename) {
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, width - 2, height - 2);
+  // Draw label if provided
+  if (label) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, width / 2, height / 2);
+  }
 
   // Save to file
   const buffer = canvas.toBuffer('image/png');
@@ -71,10 +93,14 @@ createRectangle(64, 64, '#8BC34A', 'tile.png'); // Green grass
 createRectangle(64, 64, '#795548', 'path.png'); // Brown path
 createRectangle(64, 64, '#BBDEFB', 'placement.png'); // Light blue placement tile
 
-// Create tower assets
-createRectangle(32, 32, '#2196F3', 'tower_basic.png'); // Blue basic tower
-createRectangle(32, 32, '#F44336', 'tower_aoe.png'); // Red AOE tower
-createRectangle(32, 32, '#00BCD4', 'tower_slow.png'); // Cyan slow tower
+// Create tower assets for each type and upgrade level
+for (const [key, data] of Object.entries(towersConfig)) {
+  const baseColor = towerColors[key] || '#888888';
+  for (let lvl = 1; lvl <= data.maxLevel; lvl++) {
+    const filename = `tower_${key.toLowerCase()}_${lvl}.png`;
+    createRectangle(32, 32, baseColor, filename, `${lvl}`);
+  }
+}
 
 // Create enemy assets
 createCircle(16, '#FF9800', 'enemy_basic.png'); // Orange basic enemy

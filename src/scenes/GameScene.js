@@ -49,10 +49,13 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('path', 'assets/path.png');
     this.load.image('placement', 'assets/placement.png');
 
-    // Load tower assets
-    this.load.image('tower_basic', 'assets/tower_basic.png');
-    this.load.image('tower_aoe', 'assets/tower_aoe.png');
-    this.load.image('tower_slow', 'assets/tower_slow.png');
+    // Dynamically load tower assets per type and upgrade level
+    Object.entries(window.GAME_SETTINGS.TOWERS).forEach(([type, data]) => {
+      const key = type.toLowerCase();
+      for (let lvl = 1; lvl <= data.maxLevel; lvl++) {
+        this.load.image(`tower_${key}_${lvl}`, `assets/tower_${key}_${lvl}.png`);
+      }
+    });
 
     // Load enemy assets
     this.load.image('enemy_basic', 'assets/enemy_basic.png');

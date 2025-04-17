@@ -18,8 +18,8 @@ export default class Tower extends Phaser.GameObjects.Container {
     this.lastFireTime = 0;
     this.isActive = true;
 
-    // Create tower sprite
-    this.sprite = scene.add.image(0, 0, `tower_${type}`);
+    // Create tower sprite using level-specific asset
+    this.sprite = scene.add.image(0, 0, `tower_${type.toLowerCase()}_${this.level}`);
     this.add(this.sprite);
 
     // Create range indicator (invisible by default)
@@ -281,7 +281,8 @@ export default class Tower extends Phaser.GameObjects.Container {
    * Update the tower's appearance based on level
    */
   updateAppearance() {
-    // Tint for level, can be replaced with frame/sprite/particle
+    // Update texture and tint for current level
+    this.sprite.setTexture(`tower_${this.type.toLowerCase()}_${this.level}`);
     this.sprite.setTint(this.getUpgradeTint());
 
     // Update level badge
