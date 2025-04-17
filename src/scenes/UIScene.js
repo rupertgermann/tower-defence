@@ -357,13 +357,14 @@ export default class UIScene extends Phaser.Scene {
       button.setInteractive();
       button.towerType = type;
 
-      // Tower icon
-      const icon = this.add.circle(
+      // Tower icon using level-1 sprite
+      const icon = this.add.image(
         x + buttonWidth / 2,
         startY + 25,
-        15,
-        this.getTowerColor(type)
+        `tower_${type.toLowerCase()}_1`
       );
+      icon.setOrigin(0.5, 0.5);
+      icon.setDisplaySize(30, 30);
 
       // Tower name
       const nameText = this.add.text(
