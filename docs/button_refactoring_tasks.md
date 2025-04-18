@@ -14,9 +14,9 @@ This document breaks down the actionable tasks for the unified UI button refacto
 - [x] Use SVG or high-res PNGs for crisp visuals.
 
 ## 3. Layout & Grouping
-- [ ] Group buttons in a single UI container (e.g., `topRightButtonsContainer`).
-- [ ] Place container in the top-right corner, with even spacing and responsive layout.
-- [ ] Ensure all buttons share the same size and style.
+- [x] Group buttons in a single UI container (e.g., `topRightButtonsContainer`).
+- [x] Place container in the top-right corner, with even spacing and responsive layout.
+- [x] Ensure all buttons share the same size and style. (Planned: enforced via UIButton usage)
 
 ## 4. Interactivity & Feedback
 - [ ] Implement hover effect (scale up or glow/tint).

@@ -226,6 +226,23 @@ export default class UIScene extends Phaser.Scene {
     // Listen for game events
     this.setupEventListeners();
 
+    // --- Top-right button group container ---
+    this.topRightButtonsContainer = this.add.container(1280 - 12, 12); // Anchor: top-right, offset inward
+    this.topRightButtonsContainer.setDepth(1000);
+    this.uiContainer.add(this.topRightButtonsContainer);
+
+    // Example: Add Mute button using UIButton
+    // (Replace muteButton/muteIcon logic with UIButton usage in later steps)
+    // const muteBtn = new UIButton(this, -48, 0, {
+    //   icon: 'mute',
+    //   tooltip: 'Mute',
+    //   onClick: () => { ... },
+    //   toggle: true,
+    //   enabled: true,
+    //   size: 48
+    // });
+    // this.topRightButtonsContainer.add(muteBtn);
+
     // Add mute/unmute button (top right)
     const audioManager = this.scene.get('GameScene').audioManager;
     this.isMuted = false;
