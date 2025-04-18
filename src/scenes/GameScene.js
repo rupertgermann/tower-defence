@@ -215,9 +215,9 @@ export default class GameScene extends Phaser.Scene {
             case 'damage_boost':
               color = 0xffff00; alpha = 0.35; desc = 'Damage Boost: Towers here deal more damage.'; break;
             case 'range_boost':
-              color = 0x00ff00; alpha = 0.35; desc = 'Range Boost: Towers here have increased range.'; break;
+              color = 0xffff00; alpha = 0.35; desc = 'Range Boost: Towers here have increased range.'; break;
             case 'elevation_high':
-              color = 0x8888ff; alpha = 0.35; desc = 'High Elevation: Towers here gain bonus vision.'; break;
+              color = 0x4444ff; alpha = 0.35; desc = 'High Elevation: Towers here gain bonus vision.'; break;
             default:
               color = 0x00ffff; alpha = 0.3; desc = 'Special Tile';
           }

@@ -266,17 +266,17 @@ export default class UIScene extends Phaser.Scene {
     this.uiContainer.add(this.livesText);
 
     // Money display
-    const moneyIcon = this.add.circle(200, 40, 15, 0xffff00);
+    const moneyIcon = this.add.circle(210, 40, 15, 0xffff00);
     this.uiContainer.add(moneyIcon);
 
-    this.moneyText = this.add.text(225, 30, `Gold: ${this.money}`, {
+    this.moneyText = this.add.text(235, 30, `Gold: ${this.money}`, {
       fontSize: '24px',
       fill: '#ffffff',
     });
     this.uiContainer.add(this.moneyText);
 
     // Wave display
-    const waveIcon = this.add.circle(400, 40, 15, 0x00ffff);
+    const waveIcon = this.add.circle(410, 40, 15, 0x00ffff);
     this.uiContainer.add(waveIcon);
 
     // Get total waves from WaveManager if available, otherwise use base waves
@@ -284,7 +284,7 @@ export default class UIScene extends Phaser.Scene {
       ? this.scene.get('GameScene').waveManager.getTotalWaves()
       : window.GAME_SETTINGS.WAVES.length;
 
-    this.waveText = this.add.text(425, 30, `Wave: ${this.wave}/${totalWaves}`, {
+    this.waveText = this.add.text(435, 30, `Wave: ${this.wave}/${totalWaves}`, {
       fontSize: '24px',
       fill: '#ffffff',
     });
@@ -316,11 +316,11 @@ export default class UIScene extends Phaser.Scene {
         difficultyColor = '#ffffff';
     }
 
-    const difficultyIcon = this.add.circle(600, 40, 15, 0xffffff);
+    const difficultyIcon = this.add.circle(610, 40, 15, 0xffffff);
     this.uiContainer.add(difficultyIcon);
 
     this.difficultyText = this.add.text(
-      625,
+      635,
       30,
       `Difficulty: ${difficultyData.name}`,
       {
