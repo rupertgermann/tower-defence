@@ -183,6 +183,16 @@ export default class UIScene extends Phaser.Scene {
     this.uiContainer.add(this.towerInfoPanel);
   }
 
+  /**
+   * Remove tower info panel if present
+   */
+  hideTowerInfo() {
+    if (this.towerInfoPanel) {
+      this.towerInfoPanel.destroy(true);
+      this.towerInfoPanel = null;
+    }
+  }
+
   create() {
     // Get initial values
     this.lives = window.GAME_SETTINGS.PLAYER.lives;
@@ -237,14 +247,15 @@ export default class UIScene extends Phaser.Scene {
     });
 
     // Show lower bar on game start or if game is stopped
-    this.showLowerBar();
+    this.showLowerBar(true);
 
     // Pointer events for fade in/out on hover
     this.input.on('pointermove', (pointer) => {
+      if (!this.isWaveActive()) return; // Only apply hover effect during running waves
       const y = pointer.y;
       if (y >= 620 && !this.lowerBarVisible) {
         this.showLowerBar();
-      } else if (y < 620 && this.lowerBarVisible && !this.isGameStopped && this.isWaveActive()) {
+      } else if (y < 620 && this.lowerBarVisible) {
         this.hideLowerBar();
       }
     });
@@ -254,16 +265,6 @@ export default class UIScene extends Phaser.Scene {
         this.hideLowerBar();
       }
     });
-  }
-
-  /**
-   * Remove tower info panel if present
-   */
-  hideTowerInfo() {
-    if (this.towerInfoPanel) {
-      this.towerInfoPanel.destroy(true);
-      this.towerInfoPanel = null;
-    }
   }
 
   createUIBackground() {
@@ -561,7 +562,7 @@ export default class UIScene extends Phaser.Scene {
     // On game start, show lower bar
     this.scene.get('GameScene').events.on('gameStart', () => {
       this.isGameStopped = false;
-      this.showLowerBar();
+      this.showLowerBar(true);
     });
   }
 
@@ -672,7 +673,8 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveStarted(waveNumber) {
-    this.hideLowerBar();
+    // No force hide here; let pointermove handle fade logic
+    if (this.lowerBarVisible) this.hideLowerBar();
     // Update wave number
     this.wave = waveNumber;
     this.waveText.setText(
@@ -696,7 +698,7 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveCompleted(waveNumber) {
-    this.showLowerBar();
+    this.showLowerBar(true); // Always show after wave
     // Enable wave button for next wave
     this.setWaveButtonEnabled(true);
     this.waveButtonText.setText('Start Next Wave');
@@ -707,7 +709,7 @@ export default class UIScene extends Phaser.Scene {
 
   onGameOver(data) {
     this.isGameStopped = true;
-    this.showLowerBar();
+    this.showLowerBar(true); // Always show on game over
     // Show game over message only for defeat
     if (!data.victory) {
       this.showMessage('Game Over!\nYour base was destroyed!', 0);
@@ -784,8 +786,8 @@ export default class UIScene extends Phaser.Scene {
   }
 
   // --- Lower bar fade logic ---
-  showLowerBar() {
-    if (this.lowerBarVisible) return;
+  showLowerBar(force = false) {
+    if (this.lowerBarVisible && !force) return;
     this.lowerBarVisible = true;
     this.tweens.add({
       targets: this.lowerBarContainer,
@@ -794,8 +796,10 @@ export default class UIScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
   }
-  hideLowerBar() {
-    if (!this.lowerBarVisible) return;
+  hideLowerBar(force = false) {
+    // Only hide if a wave is running
+    if (!this.isWaveActive() && !force) return;
+    if (!this.lowerBarVisible && !force) return;
     this.lowerBarVisible = false;
     this.tweens.add({
       targets: this.lowerBarContainer,
