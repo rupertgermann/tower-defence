@@ -358,11 +358,11 @@ export default class UIScene extends Phaser.Scene {
   }
 
   createTowerButtons() {
-    const buttonWidth = 120;
-    const buttonHeight = 80;
-    const padding = 20;
-    const startX = 100;
-    const startY = 720 - 90;
+    const buttonWidth = 155;
+    const buttonHeight = 85;
+    const padding = 10;
+    const startX = 30;
+    const startY = 720 - 93;
 
     // Create buttons for each tower type
     const towerTypes = Object.keys(window.GAME_SETTINGS.TOWERS);
