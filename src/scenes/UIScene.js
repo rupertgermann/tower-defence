@@ -244,7 +244,13 @@ export default class UIScene extends Phaser.Scene {
       const y = pointer.y;
       if (y >= 620 && !this.lowerBarVisible) {
         this.showLowerBar();
-      } else if (y < 620 && this.lowerBarVisible && !this.isGameStopped) {
+      } else if (y < 620 && this.lowerBarVisible && !this.isGameStopped && this.isWaveActive()) {
+        this.hideLowerBar();
+      }
+    });
+    // Also fade out if mouse leaves the game canvas completely during an active wave
+    this.game.canvas.addEventListener('mouseleave', () => {
+      if (this.lowerBarVisible && this.isWaveActive()) {
         this.hideLowerBar();
       }
     });
@@ -679,6 +685,14 @@ export default class UIScene extends Phaser.Scene {
 
     // Show animated wave start banner
     this.showWaveBanner(`Wave ${this.wave} Start!`, '#00ff88');
+
+    // Ensure fade out on mouse out during wave
+    this.input.on('pointermove', (pointer) => {
+      const y = pointer.y;
+      if (y < 620 && this.lowerBarVisible && this.isWaveActive() === false) {
+        this.hideLowerBar();
+      }
+    });
   }
 
   onWaveCompleted(waveNumber) {
@@ -754,6 +768,19 @@ export default class UIScene extends Phaser.Scene {
       default:
         return 0xffffff;
     }
+  }
+
+  // Helper to determine if a wave is currently active (in progress)
+  isWaveActive() {
+    const gameScene = this.scene.get('GameScene');
+    return !this.isGameStopped && gameScene.waveManager && gameScene.waveManager.isWaveInProgress();
+  }
+
+  // Helper to determine if wave is paused or stopped
+  isWavePausedOrStopped() {
+    // Returns true if the game is paused, stopped, or between waves
+    const gameScene = this.scene.get('GameScene');
+    return this.isGameStopped || gameScene.isPaused || !gameScene.waveManager.isWaveInProgress();
   }
 
   // --- Lower bar fade logic ---
