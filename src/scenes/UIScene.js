@@ -215,8 +215,17 @@ export default class UIScene extends Phaser.Scene {
     // Create UI container
     this.uiContainer = this.add.container(0, 0);
 
+    // --- Top bar background ---
+    // (Ensure we keep a reference if needed for future depth management)
+    this.topBarBackground = this.add.rectangle(0, 0, 1280, 80, 0x222222);
+    this.topBarBackground.setOrigin(0, 0);
+    this.topBarBackground.setAlpha(0.8);
+    this.topBarBackground.setDepth(10); // Set base depth for top bar background
+    this.uiContainer.add(this.topBarBackground);
+
     // Create top-right buttons container
     this.topRightButtonsContainer = this.add.container(0, 0);
+    this.topRightButtonsContainer.setDepth(20); // Ensure it's above the top bar background
     this.uiContainer.add(this.topRightButtonsContainer);
 
     // --- Lower bar container for fade effect ---
@@ -268,12 +277,6 @@ export default class UIScene extends Phaser.Scene {
   }
 
   createUIBackground() {
-    // Top bar background
-    const topBar = this.add.rectangle(0, 0, 1280, 80, 0x222222);
-    topBar.setOrigin(0, 0);
-    topBar.setAlpha(0.8);
-    this.uiContainer.add(topBar);
-
     // Bottom bar background
     const bottomBar = this.add.rectangle(0, 720 - 100, 1280, 100, 0x222222);
     bottomBar.setOrigin(0, 0);
