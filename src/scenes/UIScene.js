@@ -673,7 +673,6 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveStarted(waveNumber) {
-    // No force hide here; let pointermove handle fade logic
     if (this.lowerBarVisible) this.hideLowerBar();
     // Update wave number
     this.wave = waveNumber;
@@ -687,14 +686,6 @@ export default class UIScene extends Phaser.Scene {
 
     // Show animated wave start banner
     this.showWaveBanner(`Wave ${this.wave} Start!`, '#00ff88');
-
-    // Ensure fade out on mouse out during wave
-    this.input.on('pointermove', (pointer) => {
-      const y = pointer.y;
-      if (y < 620 && this.lowerBarVisible && this.isWaveActive() === false) {
-        this.hideLowerBar();
-      }
-    });
   }
 
   onWaveCompleted(waveNumber) {
