@@ -156,8 +156,8 @@ export default class UIScene extends Phaser.Scene {
             });
         } else {
           this.showMessage(
-            'Cannot upgrade: insufficient funds or max level reached.',
-            1500
+            'Cannot upgrade: \ninsufficient funds\nor max level reached.',
+            2000
           );
         }
       });

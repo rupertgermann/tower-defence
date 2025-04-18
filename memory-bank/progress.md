@@ -187,6 +187,13 @@ pie title Implementation Progress
 - **Encountered Errors**: Uncaught TypeError: Cannot read properties of undefined (reading 'towerInfoPanel') when selecting a tower.
 - **Fixes Applied**: Updated `emitter.on('showTowerInfo', ...)` to use `(tower) => this.showTowerInfo(tower)` ensuring `this.towerInfoPanel` is defined correctly.
 
+### Upgrade Error Message Readability Improvement
+
+- **Implemented Features**: Broke the upgrade error message in `UIScene.js` into two lines for better readability. The message now displays as:
+  - 'Cannot upgrade: insufficient funds\nor max level reached.'
+- **Encountered Errors**: None.
+- **How Errors Were Fixed**: N/A
+
 ### GameScene Complexity Reduction (2025-04-17)
 - **Implemented Features**: Added a detailed, actionable task list to `docs/implementation-plan.md` under section 7, outlining the process for reducing complexity in `GameScene.js` by extracting complex logic into helper modules/classes and integrating them back into the scene.
 - **Encountered Errors**: No errors encountered during this documentation update step.
