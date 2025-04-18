@@ -69,3 +69,20 @@
 - Refactor mute button and add restart/main menu buttons using the new system.
 - Add and wire up confirmation dialogs.
 - Test thoroughly in all relevant game states.
+
+---
+
+### 10. Architectural & Code Quality Principles
+
+- **SOLID Principles:** All UI components and dialogs are designed for single responsibility, open/closed extensibility, and minimal coupling.
+- **Event-Driven Actions:** Button interactions emit events; game logic is decoupled from UI, improving maintainability and testability.
+- **Accessibility:** Buttons support keyboard navigation and screen readers, ensuring usability for all players.
+- **Testability:** All UI logic is modular and can be unit tested independently.
+- **Documentation:** Public APIs are documented; architecture diagrams may be included for clarity.
+
+---
+
+**Change Management Principles:**
+- Only change what is necessary.
+- Do not break existing code.
+- Double check all changes for safety and compatibility.
