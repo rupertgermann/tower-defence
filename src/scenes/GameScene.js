@@ -265,6 +265,12 @@ export default class GameScene extends Phaser.Scene {
           infoZone.on('pointerout', () => {
             this.specialTileTooltip.setVisible(false);
           });
+          infoZone.on('pointerdown', () => {
+            const tile = this.placementTiles.find(pt => pt.gridPosition.x === x && pt.gridPosition.y === y);
+            if (tile && !tile.hasTower) {
+              this.handleTilePlacement(tile);
+            }
+          });
         }
 
         // Create placement tiles (where towers can be placed)
