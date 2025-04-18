@@ -1,3 +1,26 @@
+## Implemented Unified UI Button System (2025-04-18)
+
+### Implemented Features
+- Created a reusable `UIButton` helper class in `src/helpers/UIButton.js` with support for tooltips, toggle functionality, and visual feedback
+- Created a `ConfirmationDialog` helper class in `src/helpers/ConfirmationDialog.js` for action confirmations
+- Refactored UIScene.js to use the new button system:
+  - Replaced emoji-based mute button with image-based implementation using the new assets
+  - Added restart button with confirmation dialog
+  - Added main menu button with confirmation dialog
+  - Implemented proper button state management based on game state
+  - Added cleanup logic to prevent memory leaks
+
+### Encountered Errors
+- Module resolution errors due to missing .js extensions in import statements
+- Asset path issues when loading button images
+
+### How Issues Were Fixed
+- Added .js extensions to imports for helper classes
+- Fixed asset paths to match the project's existing asset loading convention
+- Implemented proper cleanup in the shutdown method to prevent memory leaks
+
+---
+
 ## Entity Management Refactor Checklist Added (2025-04-17)
 
 ### Implemented Features

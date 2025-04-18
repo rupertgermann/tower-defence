@@ -5,13 +5,13 @@ This document outlines the specific tasks needed to implement the unified button
 
 ## 1. Create UIButton Helper Class
 
-- [ ] Create a new file `src/helpers/UIButton.js` with the following functionality:
-  - [ ] Constructor that accepts parameters for position, image/icon, callback, tooltip text, and toggle state
-  - [ ] Methods for enabling/disabling the button
-  - [ ] Methods for handling hover and press visual feedback
-  - [ ] Methods for showing/hiding tooltips
-  - [ ] Support for toggle buttons (like mute/unmute)
-  - [ ] Proper layering and z-index management
+- [x] Create a new file `src/helpers/UIButton.js` with the following functionality:
+  - [x] Constructor that accepts parameters for position, image/icon, callback, tooltip text, and toggle state
+  - [x] Methods for enabling/disabling the button
+  - [x] Methods for handling hover and press visual feedback
+  - [x] Methods for showing/hiding tooltips
+  - [x] Support for toggle buttons (like mute/unmute)
+  - [x] Proper layering and z-index management
 
 ```javascript
 // Example structure
@@ -29,12 +29,12 @@ export default class UIButton {
 
 ## 2. Create Confirmation Dialog Helper
 
-- [ ] Create a new file `src/helpers/ConfirmationDialog.js` with the following functionality:
-  - [ ] Semi-transparent overlay background
-  - [ ] Message text display
-  - [ ] "Yes" and "No" buttons
-  - [ ] Callback handling for both options
-  - [ ] Methods to show/hide the dialog
+- [x] Create a new file `src/helpers/ConfirmationDialog.js` with the following functionality:
+  - [x] Semi-transparent overlay background
+  - [x] Message text display
+  - [x] "Yes" and "No" buttons
+  - [x] Callback handling for both options
+  - [x] Methods to show/hide the dialog
 
 ```javascript
 // Example structure
@@ -51,12 +51,12 @@ export default class ConfirmationDialog {
 
 ## 3. Refactor UIScene.js
 
-- [ ] Add imports for the new helper classes
-- [ ] Create a button container in the top-right corner
-- [ ] Replace the current mute button implementation with the new UIButton class
-- [ ] Add restart and main menu buttons using the UIButton class
-- [ ] Implement confirmation dialogs for restart and main menu actions
-- [ ] Update event listeners and game state awareness
+- [x] Add imports for the new helper classes
+- [x] Create a button container in the top-right corner
+- [x] Replace the current mute button implementation with the new UIButton class
+- [x] Add restart and main menu buttons using the UIButton class
+- [x] Implement confirmation dialogs for restart and main menu actions
+- [x] Update event listeners and game state awareness
 
 ```javascript
 // Example button container setup
@@ -67,34 +67,34 @@ this.uiContainer.add(this.topRightButtonsContainer);
 ## 4. Button-Specific Implementation Tasks
 
 ### Mute Button
-- [ ] Replace current emoji-based mute button with image-based button using `mute.png` and `unmute.png`
-- [ ] Implement toggle functionality to switch between muted and unmuted states
-- [ ] Add tooltip displaying "Mute" or "Unmute" based on current state
-- [ ] Ensure proper visual feedback on hover and press
-- [ ] Connect to existing audio manager functionality
+- [x] Replace current emoji-based mute button with image-based button using `mute.png` and `unmute.png`
+- [x] Implement toggle functionality to switch between muted and unmuted states
+- [x] Add tooltip displaying "Mute" or "Unmute" based on current state
+- [x] Ensure proper visual feedback on hover and press
+- [x] Connect to existing audio manager functionality
 
 ### Restart Button
-- [ ] Create restart button using `restart.png`
-- [ ] Add tooltip displaying "Restart Game"
-- [ ] Implement confirmation dialog when clicked
-- [ ] Connect to game restart functionality
-- [ ] Add visual feedback on hover and press
+- [x] Create restart button using `restart.png`
+- [x] Add tooltip displaying "Restart Game"
+- [x] Implement confirmation dialog when clicked
+- [x] Connect to game restart functionality
+- [x] Add visual feedback on hover and press
 
 ### Main Menu Button
-- [ ] Create main menu button using `mainmenu.png`
-- [ ] Add tooltip displaying "Quit to Main Menu"
-- [ ] Implement confirmation dialog when clicked
-- [ ] Connect to scene transition back to MapSelectScene
-- [ ] Add visual feedback on hover and press
+- [x] Create main menu button using `mainmenu.png`
+- [x] Add tooltip displaying "Quit to Main Menu"
+- [x] Implement confirmation dialog when clicked
+- [x] Connect to scene transition back to MapSelectScene
+- [x] Add visual feedback on hover and press
 
 ## 5. Game State Integration
 
-- [ ] Ensure buttons are properly hidden or disabled during:
-  - [ ] Victory/defeat screens
-  - [ ] Scene transitions
-  - [ ] When confirmation dialogs are open
-- [ ] Update button visibility based on game state changes
-- [ ] Implement proper cleanup when scenes change
+- [x] Ensure buttons are properly hidden or disabled during:
+  - [x] Victory/defeat screens
+  - [x] Scene transitions
+  - [x] When confirmation dialogs are open
+- [x] Update button visibility based on game state changes
+- [x] Implement proper cleanup when scenes change
 
 ## 6. Testing Checklist
 
@@ -110,10 +110,10 @@ this.uiContainer.add(this.topRightButtonsContainer);
 
 ## 7. Code Quality and Documentation
 
-- [ ] Add JSDoc comments to all new classes and methods
-- [ ] Ensure code follows project style and conventions
-- [ ] Remove any redundant or deprecated code
-- [ ] Update any related documentation
+- [x] Add JSDoc comments to all new classes and methods
+- [x] Ensure code follows project style and conventions
+- [x] Remove any redundant or deprecated code
+- [x] Update any related documentation
 
 ## Implementation Order
 
