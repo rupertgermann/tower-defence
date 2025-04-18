@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import UIButton from '../ui/UIButton.js';
+import ConfirmationDialog from '../ui/ConfirmationDialog.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -226,44 +228,94 @@ export default class UIScene extends Phaser.Scene {
     // Listen for game events
     this.setupEventListeners();
 
-    // Add mute/unmute button (top right)
-    const audioManager = this.scene.get('GameScene').audioManager;
+    // --- Unified Top-Right Button Group ---
+    this.topRightButtonsContainer = this.add.container(0, 0);
+    this.topRightButtonsContainer.setDepth(10000); // Ensure it's above the board/tower buttons
+    this.uiContainer.add(this.topRightButtonsContainer);
+    const buttonSize = 48;
+    const buttonSpacing = 18;
+    let buttonX = 1280 - buttonSize/2 - 20;
+    const buttonY = 40;
+    // Mute Button (toggle)
     this.isMuted = false;
-    this.muteButton = this.add.rectangle(1240, 20, 32, 32, 0x444444);
-    this.muteButton.setOrigin(0, 0);
-    this.muteButton.setInteractive();
-    this.muteIcon = this.add.text(1256, 36, '🔊', {
-      fontSize: '20px',
-      fill: '#ffffff',
-    });
-    this.muteIcon.setOrigin(0.5, 0.5);
-    this.uiContainer.add(this.muteButton);
-    this.uiContainer.add(this.muteIcon);
-    this.muteButton.on('pointerdown', () => {
-      this.isMuted = !this.isMuted;
-      if (audioManager) audioManager.mute(this.isMuted);
-      this.muteIcon.setText(this.isMuted ? '🔇' : '🔊');
-      if (audioManager) audioManager.playSound('ui_click');
-    });
-
-    // Show lower bar on game start or if game is stopped
-    this.showLowerBar(true);
-
-    // Pointer events for fade in/out on hover
-    this.input.on('pointermove', (pointer) => {
-      if (!this.isWaveActive()) return; // Only apply hover effect during running waves
-      const y = pointer.y;
-      if (y >= 620 && !this.lowerBarVisible) {
-        this.showLowerBar();
-      } else if (y < 620 && this.lowerBarVisible) {
-        this.hideLowerBar();
+    this.muteUIButton = new UIButton(this, buttonX, buttonY, {
+      iconKey: this.isMuted ? 'unmute' : 'mute',
+      icons: {on: 'mute', off: 'unmute'},
+      tooltip: 'Mute',
+      toggle: true,
+      initialState: this.isMuted,
+      size: buttonSize,
+      onClick: (state) => {
+        this.isMuted = state;
+        const audioManager = this.scene.get('GameScene').audioManager;
+        if (audioManager) audioManager.mute(this.isMuted);
+        if (audioManager) audioManager.playSound('ui_click');
+        this.muteUIButton.setTooltip(this.isMuted ? 'Unmute' : 'Mute');
       }
     });
-    // Also fade out if mouse leaves the game canvas completely during an active wave
-    this.game.canvas.addEventListener('mouseleave', () => {
-      if (this.lowerBarVisible && this.isWaveActive()) {
-        this.hideLowerBar();
+    this.topRightButtonsContainer.add(this.muteUIButton);
+    buttonX -= buttonSize + buttonSpacing;
+    // Restart Button
+    this.restartUIButton = new UIButton(this, buttonX, buttonY, {
+      iconKey: 'restart',
+      tooltip: 'Restart Game',
+      size: buttonSize,
+      onClick: () => {
+        if (this.confirmDialog) return;
+        this.confirmDialog = new ConfirmationDialog(this, 'Restart the game?\nYour progress will be lost.', () => {
+          this.confirmDialog = null;
+          this.scene.get('GameScene').restartGame();
+        }, () => {
+          this.confirmDialog = null;
+        });
+        this.uiContainer.add(this.confirmDialog);
       }
+    });
+    this.topRightButtonsContainer.add(this.restartUIButton);
+    buttonX -= buttonSize + buttonSpacing;
+    // Main Menu Button
+    this.menuUIButton = new UIButton(this, buttonX, buttonY, {
+      iconKey: 'mainmenu',
+      tooltip: 'Quit to Main Menu',
+      size: buttonSize,
+      onClick: () => {
+        if (this.confirmDialog) return;
+        this.confirmDialog = new ConfirmationDialog(this, 'Return to the main menu?\nYour game will end.', () => {
+          this.confirmDialog = null;
+          this.scene.stop('GameScene');
+          this.scene.start('MapSelectScene');
+        }, () => {
+          this.confirmDialog = null;
+        });
+        this.uiContainer.add(this.confirmDialog);
+      }
+    });
+    this.topRightButtonsContainer.add(this.menuUIButton);
+    // Responsive layout: update on resize
+    this.scale.on('resize', () => {
+      const width = this.scale.width;
+      let bx = width - buttonSize/2 - 20;
+      [this.muteUIButton, this.restartUIButton, this.menuUIButton].forEach(btn => {
+        btn.x = bx;
+        bx -= buttonSize + buttonSpacing;
+      });
+    });
+    // Hide/disable buttons on end/gameover/dialog
+    this.events.on('gameOver', () => {
+      this.setTopRightButtonsEnabled(false);
+    });
+    this.events.on('showDialog', () => {
+      this.setTopRightButtonsEnabled(false);
+    });
+    this.events.on('hideDialog', () => {
+      this.setTopRightButtonsEnabled(true);
+    });
+    this.setTopRightButtonsEnabled(true);
+  }
+
+  setTopRightButtonsEnabled(enabled) {
+    [this.muteUIButton, this.restartUIButton, this.menuUIButton].forEach(btn => {
+      if (btn) enabled ? btn.enable() : btn.disable();
     });
   }
 

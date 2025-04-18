@@ -1,0 +1,1 @@
+This folder should contain all UI button icons (mute.png, unmute.png, restart.png, mainmenu.png, etc.) as described in the button_refactoring_plan.md. Place high-res PNG or SVG assets here for use by UIButton.
