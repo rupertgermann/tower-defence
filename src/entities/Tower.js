@@ -6,6 +6,7 @@ export default class Tower extends Phaser.GameObjects.Container {
 
     // Add to scene
     scene.add.existing(this);
+    this.setDepth(20);
 
     // Store tower data
     this.type = type;
