@@ -46,23 +46,33 @@ export default class UIButton extends Phaser.GameObjects.Container {
     // Interactivity
     this.icon.on('pointerover', () => {
       if (!this.enabled) return;
-      this.icon.setScale(1.1);
+      this.icon.setScale(1.12);
+      this.icon.setTint(0xffff88); // subtle glow
       this.tooltip.setAlpha(1);
     });
     this.icon.on('pointerout', () => {
       this.icon.setScale(1);
+      this.icon.setTint(0xffffff);
       this.tooltip.setAlpha(0);
     });
     this.icon.on('pointerdown', () => {
       if (!this.enabled) return;
-      this.icon.setScale(0.95);
+      this.icon.setScale(0.93);
+      this.icon.setTint(0xaaaaaa); // pressed effect
     });
     this.icon.on('pointerup', () => {
       if (!this.enabled) return;
-      this.icon.setScale(1.1);
+      this.icon.setScale(1.12);
+      this.icon.setTint(0xffff88);
       if (this.toggle) this.setToggled(!this.toggled);
       this.onClick(this.toggled);
     });
+
+    // Accessibility: ensure minimum size and contrast
+    if (this.size < 40) {
+      this.icon.setDisplaySize(40, 40);
+    }
+    this.icon.setPipeline('Light2D'); // for extra contrast if enabled
 
     // Set layering
     this.setDepth(this.layer);

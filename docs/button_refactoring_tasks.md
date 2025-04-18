@@ -19,10 +19,10 @@ This document breaks down the actionable tasks for the unified UI button refacto
 - [x] Ensure all buttons share the same size and style. (Planned: enforced via UIButton usage)
 
 ## 4. Interactivity & Feedback
-- [ ] Implement hover effect (scale up or glow/tint).
-- [ ] Implement pressed effect (scale down or darken).
-- [ ] Add tooltips for each button (e.g., "Mute", "Restart Game", "Quit to Main Menu").
-- [ ] Ensure accessibility: large enough, high-contrast icons.
+- [x] Implement hover effect (scale up or glow/tint).
+- [x] Implement pressed effect (scale down or darken).
+- [x] Add tooltips for each button (e.g., "Mute", "Restart Game", "Quit to Main Menu").
+- [x] Ensure accessibility: large enough, high-contrast icons.
 
 ## 5. Functional Integration
 - [ ] Mute Button: Toggle mute state and icon, play UI sound, use helper for logic.
