@@ -16,6 +16,9 @@ export default class UIScene extends Phaser.Scene {
     this.waveText = null;
     this.messageText = null;
     this.towerButtons = [];
+    this.lowerBarContainer = null;
+    this.lowerBarVisible = false;
+    this.isGameStopped = true;
   }
 
   /**
@@ -189,6 +192,12 @@ export default class UIScene extends Phaser.Scene {
     // Create UI container
     this.uiContainer = this.add.container(0, 0);
 
+    // --- Lower bar container for fade effect ---
+    this.lowerBarContainer = this.add.container(0, 0);
+    this.lowerBarContainer.setAlpha(0); // Start hidden
+    this.lowerBarVisible = false;
+    this.uiContainer.add(this.lowerBarContainer);
+
     // Create UI background
     this.createUIBackground();
 
@@ -218,15 +227,26 @@ export default class UIScene extends Phaser.Scene {
       fill: '#ffffff',
     });
     this.muteIcon.setOrigin(0.5, 0.5);
-
     this.uiContainer.add(this.muteButton);
     this.uiContainer.add(this.muteIcon);
-
     this.muteButton.on('pointerdown', () => {
       this.isMuted = !this.isMuted;
       if (audioManager) audioManager.mute(this.isMuted);
       this.muteIcon.setText(this.isMuted ? '🔇' : '🔊');
       if (audioManager) audioManager.playSound('ui_click');
+    });
+
+    // Show lower bar on game start or if game is stopped
+    this.showLowerBar();
+
+    // Pointer events for fade in/out on hover
+    this.input.on('pointermove', (pointer) => {
+      const y = pointer.y;
+      if (y >= 620 && !this.lowerBarVisible) {
+        this.showLowerBar();
+      } else if (y < 620 && this.lowerBarVisible && !this.isGameStopped) {
+        this.hideLowerBar();
+      }
     });
   }
 
@@ -251,7 +271,7 @@ export default class UIScene extends Phaser.Scene {
     const bottomBar = this.add.rectangle(0, 720 - 100, 1280, 100, 0x222222);
     bottomBar.setOrigin(0, 0);
     bottomBar.setAlpha(0.8);
-    this.uiContainer.add(bottomBar);
+    this.lowerBarContainer.add(bottomBar);
   }
 
   createStatusDisplays() {
@@ -390,11 +410,11 @@ export default class UIScene extends Phaser.Scene {
       );
       costText.setOrigin(0.5, 0);
 
-      // Add to container
-      this.uiContainer.add(button);
-      this.uiContainer.add(icon);
-      this.uiContainer.add(nameText);
-      this.uiContainer.add(costText);
+      // Add to lower bar container
+      this.lowerBarContainer.add(button);
+      this.lowerBarContainer.add(icon);
+      this.lowerBarContainer.add(nameText);
+      this.lowerBarContainer.add(costText);
 
       // Store button reference
       this.towerButtons.push({
@@ -458,9 +478,9 @@ export default class UIScene extends Phaser.Scene {
     );
     this.waveButtonText.setOrigin(0.5, 0.5);
 
-    // Add to container
-    this.uiContainer.add(this.waveButton);
-    this.uiContainer.add(this.waveButtonText);
+    // Add to lower bar container
+    this.lowerBarContainer.add(this.waveButton);
+    this.lowerBarContainer.add(this.waveButtonText);
 
     // Set up event handlers
     this.waveButton.on('pointerover', () => {
@@ -530,6 +550,12 @@ export default class UIScene extends Phaser.Scene {
       if (!currentlyOver.some((obj) => obj === this.towerInfoPanel)) {
         this.hideTowerInfo();
       }
+    });
+
+    // On game start, show lower bar
+    this.scene.get('GameScene').events.on('gameStart', () => {
+      this.isGameStopped = false;
+      this.showLowerBar();
     });
   }
 
@@ -640,6 +666,7 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveStarted(waveNumber) {
+    this.hideLowerBar();
     // Update wave number
     this.wave = waveNumber;
     this.waveText.setText(
@@ -655,6 +682,7 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveCompleted(waveNumber) {
+    this.showLowerBar();
     // Enable wave button for next wave
     this.setWaveButtonEnabled(true);
     this.waveButtonText.setText('Start Next Wave');
@@ -664,6 +692,8 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onGameOver(data) {
+    this.isGameStopped = true;
+    this.showLowerBar();
     // Show game over message only for defeat
     if (!data.victory) {
       this.showMessage('Game Over!\nYour base was destroyed!', 0);
@@ -725,5 +755,26 @@ export default class UIScene extends Phaser.Scene {
         return 0xffffff;
     }
   }
+
+  // --- Lower bar fade logic ---
+  showLowerBar() {
+    if (this.lowerBarVisible) return;
+    this.lowerBarVisible = true;
+    this.tweens.add({
+      targets: this.lowerBarContainer,
+      alpha: 1,
+      duration: 250,
+      ease: 'Sine.easeInOut',
+    });
+  }
+  hideLowerBar() {
+    if (!this.lowerBarVisible) return;
+    this.lowerBarVisible = false;
+    this.tweens.add({
+      targets: this.lowerBarContainer,
+      alpha: 0,
+      duration: 250,
+      ease: 'Sine.easeInOut',
+    });
+  }
 }
-console.log('Debugging wave start');
