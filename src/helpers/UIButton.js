@@ -24,6 +24,8 @@ export default class UIButton {
    * @param {number} [config.scale=1] - Scale of the button
    * @param {number} [config.hoverScale=1.1] - Scale of the button when hovered
    * @param {number} [config.pressedScale=0.9] - Scale of the button when pressed
+   * @param {number} [config.width=40] - Width of the button in pixels
+   * @param {number} [config.height=40] - Height of the button in pixels
    */
   constructor(scene, x, y, config) {
     this.scene = scene;
@@ -38,7 +40,9 @@ export default class UIButton {
       initialState: config.initialState || false,
       scale: config.scale || 1,
       hoverScale: config.hoverScale || 1.1,
-      pressedScale: config.pressedScale || 0.9
+      pressedScale: config.pressedScale || 0.9,
+      width: config.width || 40,
+      height: config.height || 40
     };
 
     // State
@@ -55,7 +59,13 @@ export default class UIButton {
       0, 0, 
       this.isToggled && this.config.toggleImage ? this.config.toggleImage : this.config.image
     );
-    this.buttonImage.setScale(this.config.scale);
+    
+    // Set the display size to the specified width and height
+    this.buttonImage.setDisplaySize(this.config.width, this.config.height);
+    
+    // Don't apply additional scale after setting display size
+    // this.buttonImage.setScale(this.config.scale);
+    
     this.buttonImage.setInteractive({ useHandCursor: true });
     this.container.add(this.buttonImage);
 
@@ -91,7 +101,11 @@ export default class UIButton {
       if (!this.isEnabled) return;
       
       this.isHovered = true;
-      this.buttonImage.setScale(this.config.scale * this.config.hoverScale);
+      // Scale relative to the display size
+      this.buttonImage.setDisplaySize(
+        this.config.width * this.config.hoverScale,
+        this.config.height * this.config.hoverScale
+      );
       this.showTooltip();
     });
 
@@ -101,7 +115,8 @@ export default class UIButton {
       
       this.isHovered = false;
       this.isPressed = false;
-      this.buttonImage.setScale(this.config.scale);
+      // Reset to original display size
+      this.buttonImage.setDisplaySize(this.config.width, this.config.height);
       this.hideTooltip();
     });
 
@@ -110,7 +125,11 @@ export default class UIButton {
       if (!this.isEnabled) return;
       
       this.isPressed = true;
-      this.buttonImage.setScale(this.config.scale * this.config.pressedScale);
+      // Scale down relative to the display size
+      this.buttonImage.setDisplaySize(
+        this.config.width * this.config.pressedScale,
+        this.config.height * this.config.pressedScale
+      );
       
       // Play UI click sound if available
       const audioManager = this.scene.scene.get('GameScene').audioManager;
@@ -125,11 +144,14 @@ export default class UIButton {
       
       this.isPressed = false;
       
-      // Return to hover scale if still hovered
+      // Return to hover scale if still hovered, otherwise reset
       if (this.isHovered) {
-        this.buttonImage.setScale(this.config.scale * this.config.hoverScale);
+        this.buttonImage.setDisplaySize(
+          this.config.width * this.config.hoverScale,
+          this.config.height * this.config.hoverScale
+        );
       } else {
-        this.buttonImage.setScale(this.config.scale);
+        this.buttonImage.setDisplaySize(this.config.width, this.config.height);
       }
       
       // Handle toggle state for toggle buttons
@@ -154,6 +176,20 @@ export default class UIButton {
       this.buttonImage.setTexture(
         this.isToggled ? this.config.toggleImage : this.config.image
       );
+      // Maintain the display size when changing textures
+      if (this.isHovered) {
+        this.buttonImage.setDisplaySize(
+          this.config.width * this.config.hoverScale,
+          this.config.height * this.config.hoverScale
+        );
+      } else if (this.isPressed) {
+        this.buttonImage.setDisplaySize(
+          this.config.width * this.config.pressedScale,
+          this.config.height * this.config.pressedScale
+        );
+      } else {
+        this.buttonImage.setDisplaySize(this.config.width, this.config.height);
+      }
     }
   }
 
@@ -221,6 +257,31 @@ export default class UIButton {
     
     // Adjust tooltip background width based on new text width
     this.tooltipBackground.width = this.tooltipText.width + 20;
+  }
+
+  /**
+   * Set the display size of the button
+   * @param {number} width - New width in pixels
+   * @param {number} height - New height in pixels
+   */
+  setSize(width, height) {
+    this.config.width = width;
+    this.config.height = height;
+    
+    // Update the display size based on current state
+    if (this.isHovered) {
+      this.buttonImage.setDisplaySize(
+        width * this.config.hoverScale,
+        height * this.config.hoverScale
+      );
+    } else if (this.isPressed) {
+      this.buttonImage.setDisplaySize(
+        width * this.config.pressedScale,
+        height * this.config.pressedScale
+      );
+    } else {
+      this.buttonImage.setDisplaySize(width, height);
+    }
   }
 
   /**

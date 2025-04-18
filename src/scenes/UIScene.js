@@ -823,6 +823,8 @@ export default class UIScene extends Phaser.Scene {
       isToggle: true,
       initialState: this.isMuted,
       tooltip: 'Mute',
+      width: buttonSize,
+      height: buttonSize,
       callback: (isToggled) => {
         this.isMuted = isToggled;
         if (audioManager) audioManager.mute(this.isMuted);
@@ -838,6 +840,8 @@ export default class UIScene extends Phaser.Scene {
     this.restartButton = new UIButton(this, startX - (buttonSize + buttonPadding), 20, {
       image: 'restart',
       tooltip: 'Restart Game',
+      width: buttonSize,
+      height: buttonSize,
       callback: () => {
         // Create confirmation dialog
         if (!this.restartDialog) {
@@ -862,6 +866,8 @@ export default class UIScene extends Phaser.Scene {
     this.mainMenuButton = new UIButton(this, startX - 2 * (buttonSize + buttonPadding), 20, {
       image: 'mainmenu',
       tooltip: 'Quit to Main Menu',
+      width: buttonSize,
+      height: buttonSize,
       callback: () => {
         // Create confirmation dialog
         if (!this.mainMenuDialog) {

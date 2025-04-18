@@ -1,3 +1,22 @@
+## Fixed Button Sizing in UI Button System (2025-04-18)
+
+### Implemented Features
+- Fixed button sizing issue in the UIButton helper class to properly resize large button images
+- Improved hover and press effects to use consistent sizing approach with setDisplaySize()
+- Enhanced the toggle state handling to maintain proper button size when switching images
+- Updated the setSize() method to respect the current button state (hover/pressed)
+
+### Encountered Errors
+- Button images were not being properly resized despite setting display size
+- Mixing scale and display size approaches was causing conflicts
+
+### How Issues Were Fixed
+- Removed redundant scale application after setting display size
+- Changed all hover/press effects to use setDisplaySize() instead of setScale()
+- Ensured proper size maintenance when toggling between different button states
+
+---
+
 ## Implemented Unified UI Button System (2025-04-18)
 
 ### Implemented Features
