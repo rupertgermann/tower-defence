@@ -210,16 +210,16 @@ export default class GameScene extends Phaser.Scene {
 
         // Overlay/icon for special tiles
         if (specialTiles[`${x},${y}`]) {
-          let color = 0x00ffff, alpha = 0.3, icon = null;
+          let color = 0x00ffff, alpha = 0.3, icon = null, desc = '';
           switch (specialTiles[`${x},${y}`]) {
             case 'damage_boost':
-              color = 0xffff00; alpha = 0.35; break;
+              color = 0xffff00; alpha = 0.35; desc = 'Damage Boost: Towers here deal more damage.'; break;
             case 'range_boost':
-              color = 0x00ff00; alpha = 0.35; break;
+              color = 0x00ff00; alpha = 0.35; desc = 'Range Boost: Towers here have increased range.'; break;
             case 'elevation_high':
-              color = 0x8888ff; alpha = 0.35; break;
+              color = 0x8888ff; alpha = 0.35; desc = 'High Elevation: Towers here gain bonus vision.'; break;
             default:
-              color = 0x00ffff; alpha = 0.3;
+              color = 0x00ffff; alpha = 0.3; desc = 'Special Tile';
           }
           const stOverlay = this.add.rectangle(
             x * tileSize + tileSize / 2,
@@ -230,6 +230,76 @@ export default class GameScene extends Phaser.Scene {
           stOverlay.setOrigin(0.5, 0.5);
           stOverlay.setDepth(3);
           this.map.add(stOverlay);
+
+          // Tooltip logic
+          const infoZone = this.add.zone(
+            x * tileSize,
+            y * tileSize,
+            tileSize, tileSize
+          ).setOrigin(0, 0).setInteractive();
+          infoZone.setDepth(10);
+
+          // Lazy tooltip creation
+          if (!this.specialTileTooltip) {
+            this.specialTileTooltip = this.add.text(0, 0, '', {
+              fontSize: '18px',
+              fill: '#fff',
+              backgroundColor: '#222a',
+              padding: { left: 8, right: 8, top: 4, bottom: 4 },
+              align: 'center',
+              wordWrap: { width: tileSize * 2 },
+              fontStyle: 'bold',
+            });
+            this.specialTileTooltip.setDepth(100);
+            this.specialTileTooltip.setVisible(false);
+          }
+
+          infoZone.on('pointerover', (pointer) => {
+            this.specialTileTooltip.setText(desc);
+            this.specialTileTooltip.setPosition(
+              x * tileSize + tileSize / 2 - this.specialTileTooltip.width / 2,
+              y * tileSize - this.specialTileTooltip.height - 6
+            );
+            this.specialTileTooltip.setVisible(true);
+          });
+          infoZone.on('pointerout', () => {
+            this.specialTileTooltip.setVisible(false);
+          });
+        }
+
+        // Create placement tiles (where towers can be placed)
+        if (!restricted.has(`${x},${y}`)) {
+          const placementTile = this.add.image(
+            x * tileSize,
+            y * tileSize,
+            'placement'
+          );
+          placementTile.setOrigin(0, 0);
+          placementTile.setAlpha(0.3);
+          placementTile.setInteractive();
+
+          // Store grid position
+          placementTile.gridPosition = { x, y };
+
+          // Add to placement tiles array
+          this.placementTiles.push(placementTile);
+
+          // Set up event handlers
+          placementTile.on('pointerover', () => {
+            if (!placementTile.hasTower) {
+              placementTile.setAlpha(0.6);
+            }
+          });
+
+          placementTile.on('pointerout', () => {
+            if (!placementTile.hasTower) {
+              placementTile.setAlpha(0.3);
+            }
+          });
+
+          placementTile.on('pointerdown', () => {
+            this.handleTilePlacement(placementTile);
+          });
         }
       }
     }
@@ -255,116 +325,6 @@ export default class GameScene extends Phaser.Scene {
         y: coord.y * tileSize + tileSize / 2,
       }))
     );
-
-    // Pass placement restrictions and special tiles to createPlacementTiles
-    this.createPlacementTiles(
-      mapWidth,
-      mapHeight,
-      tileSize,
-      mapData.paths,
-      mapData.placementRestrictions || [],
-      mapData.specialTiles || []
-    );
-  }
-
-  createPlacementTiles(
-    mapWidth,
-    mapHeight,
-    tileSize,
-    paths,
-    placementRestrictions,
-    specialTilesArr = []
-  ) {
-    // Flatten all path coordinates for easy lookup
-    const pathCoords = new Set();
-    for (const path of paths) {
-      for (const coord of path) {
-        pathCoords.add(`${coord.x},${coord.y}`);
-      }
-    }
-
-    // Build a set of restricted tiles
-    const restricted = new Set();
-    for (const area of placementRestrictions) {
-      for (let dx = 0; dx < area.width; dx++) {
-        for (let dy = 0; dy < area.height; dy++) {
-          restricted.add(`${area.x + dx},${area.y + dy}`);
-        }
-      }
-    }
-
-    // Build a map of special tiles
-    const specialTiles = {};
-    for (const tile of specialTilesArr) {
-      specialTiles[`${tile.x},${tile.y}`] = tile.type;
-    }
-
-    // Create placement tiles (where towers can be placed)
-    for (let y = 0; y < mapHeight; y++) {
-      for (let x = 0; x < mapWidth; x++) {
-        // Skip if this is a path tile or restricted area
-        if (pathCoords.has(`${x},${y}`) || restricted.has(`${x},${y}`)) {
-          // Optionally, draw a faint overlay for restricted tiles (already handled in createMap)
-          continue;
-        }
-
-        // Create placement tile
-        const placementTile = this.add.image(
-          x * tileSize,
-          y * tileSize,
-          'placement'
-        );
-        placementTile.setOrigin(0, 0);
-        placementTile.setAlpha(0.3);
-        placementTile.setInteractive();
-
-        // Overlay or icon for special tiles (on top of placement tile)
-        if (specialTiles[`${x},${y}`]) {
-          let color = 0x00ffff, alpha = 0.3;
-          switch (specialTiles[`${x},${y}`]) {
-            case 'damage_boost':
-              color = 0xffff00; alpha = 0.35; break;
-            case 'range_boost':
-              color = 0x00ff00; alpha = 0.35; break;
-            case 'elevation_high':
-              color = 0x8888ff; alpha = 0.35; break;
-            default:
-              color = 0x00ffff; alpha = 0.3;
-          }
-          const stOverlay = this.add.rectangle(
-            x * tileSize + tileSize / 2,
-            y * tileSize + tileSize / 2,
-            tileSize * 0.5, tileSize * 0.5,
-            color, alpha
-          );
-          stOverlay.setOrigin(0.5, 0.5);
-          stOverlay.setDepth(4);
-        }
-
-        // Store grid position
-        placementTile.gridPosition = { x, y };
-
-        // Add to placement tiles array
-        this.placementTiles.push(placementTile);
-
-        // Set up event handlers
-        placementTile.on('pointerover', () => {
-          if (!placementTile.hasTower) {
-            placementTile.setAlpha(0.6);
-          }
-        });
-
-        placementTile.on('pointerout', () => {
-          if (!placementTile.hasTower) {
-            placementTile.setAlpha(0.3);
-          }
-        });
-
-        placementTile.on('pointerdown', () => {
-          this.handleTilePlacement(placementTile);
-        });
-      }
-    }
   }
 
   handleTilePlacement(tile) {
