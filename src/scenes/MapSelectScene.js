@@ -60,7 +60,7 @@ export default class MapSelectScene extends Phaser.Scene {
       this.add
         .text(700, y, mapData ? `Theme: ${mapData.theme}` : '', {
           fontSize: '22px',
-          fill: '#aaa',
+          fill: '#ddd',
         })
         .setOrigin(0, 0.5);
 
@@ -75,7 +75,9 @@ export default class MapSelectScene extends Phaser.Scene {
           fill: '#fff',
         })
         .setOrigin(0.5);
-
+      if (key == 'forest') {
+        btn.setStrokeStyle(2, 0xffffff);
+      }
       btn.on('pointerdown', () => {
         this.selectMap(key);
       });
@@ -139,7 +141,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
       // Highlight selected difficulty
       if (key === this.selectedDifficulty) {
-        btn.setStrokeStyle(4, 0xffffff);
+        btn.setStrokeStyle(2, 0xffffff);
       }
 
       btn.on('pointerdown', () => {
@@ -184,8 +186,10 @@ export default class MapSelectScene extends Phaser.Scene {
     this.mapButtons.forEach((btn, idx) => {
       if (this.MAP_KEYS[idx] === mapKey) {
         btn.setFillStyle(0x00aa00, 0.9);
+        btn.setStrokeStyle(2, 0xffffff);
       } else {
         btn.setFillStyle(0x008800, 0.7);
+        btn.setStrokeStyle(0);
       }
     });
   }
@@ -197,7 +201,7 @@ export default class MapSelectScene extends Phaser.Scene {
     // Update button appearances
     this.difficultyButtons.forEach((item) => {
       if (item.key === difficultyKey) {
-        item.button.setStrokeStyle(4, 0xffffff);
+        item.button.setStrokeStyle(2, 0xffffff);
       } else {
         item.button.setStrokeStyle(0);
       }
