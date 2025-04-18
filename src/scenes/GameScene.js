@@ -201,7 +201,7 @@ export default class GameScene extends Phaser.Scene {
             x * tileSize + tileSize / 2,
             y * tileSize + tileSize / 2,
             tileSize, tileSize,
-            0xff4444, 0.35
+            0x000000, 0.15
           );
           overlay.setOrigin(0.5, 0.5);
           overlay.setDepth(2);
@@ -242,13 +242,13 @@ export default class GameScene extends Phaser.Scene {
           // Lazy tooltip creation
           if (!this.specialTileTooltip) {
             this.specialTileTooltip = this.add.text(0, 0, '', {
-              fontSize: '18px',
+              fontSize: '14px',
               fill: '#fff',
               backgroundColor: '#222a',
               padding: { left: 8, right: 8, top: 4, bottom: 4 },
               align: 'center',
               wordWrap: { width: tileSize * 2 },
-              fontStyle: 'bold',
+              fontStyle: 'normal',
             });
             this.specialTileTooltip.setDepth(100);
             this.specialTileTooltip.setVisible(false);
