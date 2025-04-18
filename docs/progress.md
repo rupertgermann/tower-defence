@@ -1,3 +1,19 @@
+## Improved Button Positioning and Visibility (2025-04-18)
+
+### Implemented Features
+- Adjusted UI buttons to have a higher z-index (depth: 100) to ensure they appear above all other UI elements
+- Moved buttons down slightly (from Y:20 to Y:30) to improve visibility and prevent overlap with the top bar background
+- Improved code organization with a dedicated buttonY variable for easier future adjustments
+
+### Encountered Errors
+- Buttons were appearing behind the top bar background, making them difficult to see and interact with
+
+### How Issues Were Fixed
+- Set a higher depth value for the button container to control rendering order
+- Adjusted vertical positioning to ensure buttons are properly visible
+
+---
+
 ## Fixed Button Sizing in UI Button System (2025-04-18)
 
 ### Implemented Features

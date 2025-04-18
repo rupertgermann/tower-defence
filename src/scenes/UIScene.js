@@ -815,9 +815,13 @@ export default class UIScene extends Phaser.Scene {
     const buttonSize = 40;
     const buttonPadding = 10;
     const startX = 1280 - buttonSize - 10;
+    const buttonY = 30; // Move buttons down slightly
+    
+    // Create top-right buttons container with higher depth
+    this.topRightButtonsContainer.setDepth(100); // Ensure buttons appear above other UI elements
     
     // Create mute button
-    this.muteButton = new UIButton(this, startX, 20, {
+    this.muteButton = new UIButton(this, startX, buttonY, {
       image: 'mute',
       toggleImage: 'unmute',
       isToggle: true,
@@ -837,7 +841,7 @@ export default class UIScene extends Phaser.Scene {
     this.topRightButtonsContainer.add(this.muteButton.container);
 
     // Create restart button
-    this.restartButton = new UIButton(this, startX - (buttonSize + buttonPadding), 20, {
+    this.restartButton = new UIButton(this, startX - (buttonSize + buttonPadding), buttonY, {
       image: 'restart',
       tooltip: 'Restart Game',
       width: buttonSize,
@@ -863,7 +867,7 @@ export default class UIScene extends Phaser.Scene {
     this.topRightButtonsContainer.add(this.restartButton.container);
 
     // Create main menu button
-    this.mainMenuButton = new UIButton(this, startX - 2 * (buttonSize + buttonPadding), 20, {
+    this.mainMenuButton = new UIButton(this, startX - 2 * (buttonSize + buttonPadding), buttonY, {
       image: 'mainmenu',
       tooltip: 'Quit to Main Menu',
       width: buttonSize,
