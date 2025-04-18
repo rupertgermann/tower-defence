@@ -23,7 +23,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
     // Game Title
     this.add
-      .text(640, 35, 'Tower Defense', {
+      .text(640, 65, 'Tower Defense', {
         fontSize: '80px',
         fill: '#fff',
         fontStyle: 'bold',
@@ -32,7 +32,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
     // Title
     this.add
-      .text(640, 90, 'Select a Map', {
+      .text(640, 160, 'Select a Map', {
         fontSize: '22px',
         fill: '#fff',
         fontStyle: 'bold',
@@ -40,7 +40,7 @@ export default class MapSelectScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     // Map selection
-    const mapStartY = 150;
+    const mapStartY = 210;
     const mapSpacing = 70;
     this.mapButtons = [];
 
@@ -50,7 +50,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
       // Map name
       this.add
-        .text(400, y, mapData ? mapData.name : key, {
+        .text(200, y, mapData ? mapData.name : key, {
           fontSize: '22px',
           fill: '#fff',
         })
@@ -58,7 +58,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
       // Simple preview (theme)
       this.add
-        .text(700, y, mapData ? `Theme: ${mapData.theme}` : '', {
+        .text(600, y, mapData ? `Theme: ${mapData.theme}` : '', {
           fontSize: '22px',
           fill: '#ddd',
         })
@@ -87,7 +87,7 @@ export default class MapSelectScene extends Phaser.Scene {
 
     // Difficulty selection title
     this.add
-      .text(640, 400, 'Select Difficulty', {
+      .text(640, 440, 'Select Difficulty', {
         fontSize: '22px',
         fill: '#fff',
         fontStyle: 'bold',
@@ -127,13 +127,13 @@ export default class MapSelectScene extends Phaser.Scene {
 
       // Difficulty button
       const btn = this.add
-        .rectangle(x, 470, 160, 60, btnColor, 0.7)
+      .rectangle(x, 510, 160, 60, btnColor, 0.7)
         .setInteractive()
         .setOrigin(0.5);
 
       // Difficulty name
       this.add
-        .text(x, 470, difficultyData.name, {
+        .text(x, 510, difficultyData.name, {
           fontSize: '24px',
           fill: '#fff',
         })
@@ -153,12 +153,12 @@ export default class MapSelectScene extends Phaser.Scene {
 
     // Start game button
     this.startButton = this.add
-      .rectangle(640, 580, 240, 80, 0x008800, 0.8)
+      .rectangle(640, 630, 240, 80, 0x008800, 0.8)
       .setInteractive()
       .setOrigin(0.5);
 
     this.add
-      .text(640, 580, 'Start Game', {
+      .text(640, 630, 'Start Game', {
         fontSize: '32px',
         fill: '#fff',
       })
