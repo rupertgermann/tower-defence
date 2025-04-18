@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import UIButton from '../helpers/UIButton.js';
+import ConfirmationDialog from '../helpers/ConfirmationDialog.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -19,6 +21,17 @@ export default class UIScene extends Phaser.Scene {
     this.lowerBarContainer = null;
     this.lowerBarVisible = false;
     this.isGameStopped = true;
+  }
+
+  /**
+   * Preload UI assets
+   */
+  preload() {
+    // Load UI button images
+    this.load.image('mute', 'assets/ui/mute.png');
+    this.load.image('unmute', 'assets/ui/unmute.png');
+    this.load.image('restart', 'assets/ui/restart.png');
+    this.load.image('mainmenu', 'assets/ui/mainmenu.png');
   }
 
   /**
@@ -202,6 +215,10 @@ export default class UIScene extends Phaser.Scene {
     // Create UI container
     this.uiContainer = this.add.container(0, 0);
 
+    // Create top-right buttons container
+    this.topRightButtonsContainer = this.add.container(0, 0);
+    this.uiContainer.add(this.topRightButtonsContainer);
+
     // --- Lower bar container for fade effect ---
     this.lowerBarContainer = this.add.container(0, 0);
     this.lowerBarContainer.setAlpha(0); // Start hidden
@@ -223,28 +240,11 @@ export default class UIScene extends Phaser.Scene {
     // Create message display
     this.createMessageDisplay();
 
+    // Create UI buttons (mute, restart, main menu)
+    this.createUIButtons();
+
     // Listen for game events
     this.setupEventListeners();
-
-    // Add mute/unmute button (top right)
-    const audioManager = this.scene.get('GameScene').audioManager;
-    this.isMuted = false;
-    this.muteButton = this.add.rectangle(1240, 20, 32, 32, 0x444444);
-    this.muteButton.setOrigin(0, 0);
-    this.muteButton.setInteractive();
-    this.muteIcon = this.add.text(1256, 36, '🔊', {
-      fontSize: '20px',
-      fill: '#ffffff',
-    });
-    this.muteIcon.setOrigin(0.5, 0.5);
-    this.uiContainer.add(this.muteButton);
-    this.uiContainer.add(this.muteIcon);
-    this.muteButton.on('pointerdown', () => {
-      this.isMuted = !this.isMuted;
-      if (audioManager) audioManager.mute(this.isMuted);
-      this.muteIcon.setText(this.isMuted ? '🔇' : '🔊');
-      if (audioManager) audioManager.playSound('ui_click');
-    });
 
     // Show lower bar on game start or if game is stopped
     this.showLowerBar(true);
@@ -701,6 +701,7 @@ export default class UIScene extends Phaser.Scene {
   onGameOver(data) {
     this.isGameStopped = true;
     this.showLowerBar(true); // Always show on game over
+    
     // Show game over message only for defeat
     if (!data.victory) {
       this.showMessage('Game Over!\nYour base was destroyed!', 0);
@@ -709,6 +710,9 @@ export default class UIScene extends Phaser.Scene {
     // Disable wave button
     this.setWaveButtonEnabled(false);
     this.waveButtonText.setText(data.victory ? 'Victory!' : 'Game Over');
+    
+    // Update UI button states for game over
+    this.updateUIButtonStates(true);
 
     console.log(`UIScene.onGameOver called with victory=${data.victory}`);
   }
@@ -798,5 +802,139 @@ export default class UIScene extends Phaser.Scene {
       duration: 250,
       ease: 'Sine.easeInOut',
     });
+  }
+
+  /**
+   * Create UI buttons (mute, restart, main menu)
+   */
+  createUIButtons() {
+    const audioManager = this.scene.get('GameScene').audioManager;
+    this.isMuted = false;
+
+    // Button spacing
+    const buttonSize = 40;
+    const buttonPadding = 10;
+    const startX = 1280 - buttonSize - 10;
+    
+    // Create mute button
+    this.muteButton = new UIButton(this, startX, 20, {
+      image: 'mute',
+      toggleImage: 'unmute',
+      isToggle: true,
+      initialState: this.isMuted,
+      tooltip: 'Mute',
+      callback: (isToggled) => {
+        this.isMuted = isToggled;
+        if (audioManager) audioManager.mute(this.isMuted);
+        
+        // Update tooltip text based on state
+        this.muteButton.setTooltip(this.isMuted ? 'Unmute' : 'Mute');
+      }
+    });
+    
+    this.topRightButtonsContainer.add(this.muteButton.container);
+
+    // Create restart button
+    this.restartButton = new UIButton(this, startX - (buttonSize + buttonPadding), 20, {
+      image: 'restart',
+      tooltip: 'Restart Game',
+      callback: () => {
+        // Create confirmation dialog
+        if (!this.restartDialog) {
+          this.restartDialog = new ConfirmationDialog(this, {
+            message: 'Are you sure you want to\nrestart the game?\n\nAll progress will be lost.',
+            onConfirm: () => {
+              // Restart the current game
+              const gameScene = this.scene.get('GameScene');
+              gameScene.scene.restart();
+              this.scene.restart();
+            }
+          });
+        }
+        
+        this.restartDialog.show();
+      }
+    });
+    
+    this.topRightButtonsContainer.add(this.restartButton.container);
+
+    // Create main menu button
+    this.mainMenuButton = new UIButton(this, startX - 2 * (buttonSize + buttonPadding), 20, {
+      image: 'mainmenu',
+      tooltip: 'Quit to Main Menu',
+      callback: () => {
+        // Create confirmation dialog
+        if (!this.mainMenuDialog) {
+          this.mainMenuDialog = new ConfirmationDialog(this, {
+            message: 'Are you sure you want to\nquit to the main menu?\n\nAll progress will be lost.',
+            onConfirm: () => {
+              // Return to map select scene
+              this.scene.stop('GameScene');
+              this.scene.stop('UIScene');
+              this.scene.start('MapSelectScene');
+            }
+          });
+        }
+        
+        this.mainMenuDialog.show();
+      }
+    });
+    
+    this.topRightButtonsContainer.add(this.mainMenuButton.container);
+    
+    // Set initial button states
+    this.updateUIButtonStates(false);
+  }
+  
+  /**
+   * Update UI button states based on game state
+   * @param {boolean} isGameOver - Whether the game is in an end state
+   */
+  updateUIButtonStates(isGameOver) {
+    // Mute button is always enabled
+    
+    // Restart and main menu buttons are always visible but may be disabled in certain states
+    if (isGameOver) {
+      // During victory/defeat, enable restart and main menu buttons after a short delay
+      // to prevent accidental clicks
+      this.time.delayedCall(1000, () => {
+        if (this.restartButton) this.restartButton.setEnabled(true);
+        if (this.mainMenuButton) this.mainMenuButton.setEnabled(true);
+      });
+    } else {
+      // During normal gameplay, enable restart and main menu buttons
+      if (this.restartButton) this.restartButton.setEnabled(true);
+      if (this.mainMenuButton) this.mainMenuButton.setEnabled(true);
+    }
+  }
+
+  /**
+   * Clean up resources when scene is shut down
+   */
+  shutdown() {
+    // Clean up UI buttons
+    if (this.muteButton) this.muteButton.destroy();
+    if (this.restartButton) this.restartButton.destroy();
+    if (this.mainMenuButton) this.mainMenuButton.destroy();
+    
+    // Clean up dialogs
+    if (this.restartDialog) this.restartDialog.destroy();
+    if (this.mainMenuDialog) this.mainMenuDialog.destroy();
+    
+    // Clean up event listeners
+    this.scene.get('GameScene').events.off('updateUI', this.updateUI, this);
+    this.scene.get('GameScene').events.off('waveStarted', this.onWaveStarted, this);
+    this.scene.get('GameScene').events.off('waveCompleted', this.onWaveCompleted, this);
+    this.scene.get('GameScene').events.off('gameOver', this.onGameOver, this);
+    this.scene.get('GameScene').events.off('showMessage', this.showMessage, this);
+    this.scene.get('GameScene').events.off('showTowerInfo', this.showTowerInfo, this);
+    this.scene.get('GameScene').events.off('gameStart');
+    
+    // Remove pointer event listeners
+    this.input.off('pointerdown');
+    this.input.off('pointermove');
+    
+    // Remove canvas event listener
+    this.game.canvas.removeEventListener('mouseleave', this.hideLowerBar);
   }
 }
