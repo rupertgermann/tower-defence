@@ -171,6 +171,20 @@ export default class GameScene extends Phaser.Scene {
     const mapHeight = mapData.height;
     const tileSize = mapData.tileSize;
 
+    // Prepare sets for restrictions and special tiles
+    const restricted = new Set();
+    (mapData.placementRestrictions || []).forEach(area => {
+      for (let dx = 0; dx < area.width; dx++) {
+        for (let dy = 0; dy < area.height; dy++) {
+          restricted.add(`${area.x + dx},${area.y + dy}`);
+        }
+      }
+    });
+    const specialTiles = {};
+    (mapData.specialTiles || []).forEach(tile => {
+      specialTiles[`${tile.x},${tile.y}`] = tile.type;
+    });
+
     // Create background tiles
     let tileKey = 'tile';
     if (mapData.theme === 'desert') tileKey = 'tile_desert';
@@ -180,6 +194,43 @@ export default class GameScene extends Phaser.Scene {
         const tile = this.add.image(x * tileSize, y * tileSize, tileKey);
         tile.setOrigin(0, 0);
         this.map.add(tile);
+
+        // Overlay for placement restrictions
+        if (restricted.has(`${x},${y}`)) {
+          const overlay = this.add.rectangle(
+            x * tileSize + tileSize / 2,
+            y * tileSize + tileSize / 2,
+            tileSize, tileSize,
+            0xff4444, 0.35
+          );
+          overlay.setOrigin(0.5, 0.5);
+          overlay.setDepth(2);
+          this.map.add(overlay);
+        }
+
+        // Overlay/icon for special tiles
+        if (specialTiles[`${x},${y}`]) {
+          let color = 0x00ffff, alpha = 0.3, icon = null;
+          switch (specialTiles[`${x},${y}`]) {
+            case 'damage_boost':
+              color = 0xffff00; alpha = 0.35; break;
+            case 'range_boost':
+              color = 0x00ff00; alpha = 0.35; break;
+            case 'elevation_high':
+              color = 0x8888ff; alpha = 0.35; break;
+            default:
+              color = 0x00ffff; alpha = 0.3;
+          }
+          const stOverlay = this.add.rectangle(
+            x * tileSize + tileSize / 2,
+            y * tileSize + tileSize / 2,
+            tileSize * 0.7, tileSize * 0.7,
+            color, alpha
+          );
+          stOverlay.setOrigin(0.5, 0.5);
+          stOverlay.setDepth(3);
+          this.map.add(stOverlay);
+        }
       }
     }
 
@@ -205,13 +256,14 @@ export default class GameScene extends Phaser.Scene {
       }))
     );
 
-    // Create tower placement tiles, pass placement restrictions and special tiles
+    // Pass placement restrictions and special tiles to createPlacementTiles
     this.createPlacementTiles(
       mapWidth,
       mapHeight,
       tileSize,
       mapData.paths,
-      mapData.placementRestrictions || []
+      mapData.placementRestrictions || [],
+      mapData.specialTiles || []
     );
   }
 
@@ -220,7 +272,8 @@ export default class GameScene extends Phaser.Scene {
     mapHeight,
     tileSize,
     paths,
-    placementRestrictions
+    placementRestrictions,
+    specialTilesArr = []
   ) {
     // Flatten all path coordinates for easy lookup
     const pathCoords = new Set();
@@ -240,11 +293,18 @@ export default class GameScene extends Phaser.Scene {
       }
     }
 
+    // Build a map of special tiles
+    const specialTiles = {};
+    for (const tile of specialTilesArr) {
+      specialTiles[`${tile.x},${tile.y}`] = tile.type;
+    }
+
     // Create placement tiles (where towers can be placed)
     for (let y = 0; y < mapHeight; y++) {
       for (let x = 0; x < mapWidth; x++) {
         // Skip if this is a path tile or restricted area
         if (pathCoords.has(`${x},${y}`) || restricted.has(`${x},${y}`)) {
+          // Optionally, draw a faint overlay for restricted tiles (already handled in createMap)
           continue;
         }
 
@@ -257,6 +317,29 @@ export default class GameScene extends Phaser.Scene {
         placementTile.setOrigin(0, 0);
         placementTile.setAlpha(0.3);
         placementTile.setInteractive();
+
+        // Overlay or icon for special tiles (on top of placement tile)
+        if (specialTiles[`${x},${y}`]) {
+          let color = 0x00ffff, alpha = 0.3;
+          switch (specialTiles[`${x},${y}`]) {
+            case 'damage_boost':
+              color = 0xffff00; alpha = 0.35; break;
+            case 'range_boost':
+              color = 0x00ff00; alpha = 0.35; break;
+            case 'elevation_high':
+              color = 0x8888ff; alpha = 0.35; break;
+            default:
+              color = 0x00ffff; alpha = 0.3;
+          }
+          const stOverlay = this.add.rectangle(
+            x * tileSize + tileSize / 2,
+            y * tileSize + tileSize / 2,
+            tileSize * 0.5, tileSize * 0.5,
+            color, alpha
+          );
+          stOverlay.setOrigin(0.5, 0.5);
+          stOverlay.setDepth(4);
+        }
 
         // Store grid position
         placementTile.gridPosition = { x, y };
