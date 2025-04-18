@@ -55,6 +55,8 @@ export default class GameScene extends Phaser.Scene {
 
     // Load map tiles
     this.load.image('tile', 'assets/tile.png');
+    this.load.image('tile_desert', 'assets/tile_desert.png');
+    this.load.image('tile_mountain', 'assets/tile_mountain.png');
     this.load.image('path', 'assets/path.png');
     this.load.image('placement', 'assets/placement.png');
 
@@ -170,9 +172,12 @@ export default class GameScene extends Phaser.Scene {
     const tileSize = mapData.tileSize;
 
     // Create background tiles
+    let tileKey = 'tile';
+    if (mapData.theme === 'desert') tileKey = 'tile_desert';
+    else if (mapData.theme === 'mountain') tileKey = 'tile_mountain';
     for (let y = 0; y < mapHeight; y++) {
       for (let x = 0; x < mapWidth; x++) {
-        const tile = this.add.image(x * tileSize, y * tileSize, 'tile');
+        const tile = this.add.image(x * tileSize, y * tileSize, tileKey);
         tile.setOrigin(0, 0);
         this.map.add(tile);
       }

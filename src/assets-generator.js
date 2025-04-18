@@ -90,6 +90,8 @@ function createCircle(radius, color, filename) {
 
 // Create map tiles
 createRectangle(64, 64, '#8BC34A', 'tile.png'); // Green grass
+createRectangle(64, 64, '#FFB74D', 'tile_desert.png'); // Orange desert tile
+createRectangle(64, 64, '#64B5F6', 'tile_mountain.png'); // Blue mountain tile
 createRectangle(64, 64, '#795548', 'path.png'); // Brown path
 createRectangle(64, 64, '#BBDEFB', 'placement.png'); // Light blue placement tile
 
