@@ -26,8 +26,8 @@
             background: url('assets/images/desert.png') no-repeat center center fixed;
             background-size: cover;
         }
-        body.scify-bg {
-            background: url('assets/images/scify.png') no-repeat center center fixed;
+        body.mountain-bg {
+            background: url('assets/images/mountain.png') no-repeat center center fixed;
             background-size: cover;
         }
         #game-container {
@@ -47,18 +47,18 @@
     <script>
       // Listen for custom events to change background
       window.setGameBackground = function(mapKey) {
-        document.body.classList.remove('in-game-bg', 'desert-bg', 'scify-bg');
+        document.body.classList.remove('in-game-bg', 'desert-bg', 'mountain-bg');
         if(mapKey === 'forest') {
           document.body.classList.add('in-game-bg');
         } else if(mapKey === 'desert') {
           document.body.classList.add('desert-bg');
-        } else if(mapKey === 'scify') {
-          document.body.classList.add('scify-bg');
+        } else if(mapKey === 'mountain') {
+          document.body.classList.add('mountain-bg');
         }
       }
       // Reset to intro background
       window.setIntroBackground = function() {
-        document.body.classList.remove('in-game-bg', 'desert-bg', 'scify-bg');
+        document.body.classList.remove('in-game-bg', 'desert-bg', 'mountain-bg');
       }
     </script>
 </body>

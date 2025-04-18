@@ -217,9 +217,8 @@ export default class MapSelectScene extends Phaser.Scene {
     // Set game background based on selected map
     if (window.setGameBackground) {
       const selectedMap = this.registry.get('selectedMap');
-      // Use 'forest', 'desert', or 'scify' (for mountain)
+      // Use 'forest', 'desert', or 'mountain'
       let bgKey = selectedMap;
-      if (selectedMap === 'mountain') bgKey = 'scify';
       window.setGameBackground(bgKey);
     }
 
