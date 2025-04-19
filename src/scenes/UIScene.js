@@ -45,7 +45,7 @@ export default class UIScene extends Phaser.Scene {
     this.messageText = null;
     this.towerButtons = [];
     this.lowerBarContainer = null;
-    this.lowerBarVisible = false;
+    this.lowerBarVisible = true;
     this.isGameStopped = true;
   }
 
@@ -263,8 +263,7 @@ export default class UIScene extends Phaser.Scene {
 
     // --- Lower bar container for fade effect ---
     this.lowerBarContainer = this.add.container(0, 0);
-    this.lowerBarContainer.setAlpha(0);
-    this.lowerBarVisible = false;
+    this.lowerBarContainer.setAlpha(1);
     this.uiContainer.add(this.lowerBarContainer);
 
     // Create UI background
@@ -281,25 +280,26 @@ export default class UIScene extends Phaser.Scene {
     this.createUIButtons();
     // Listen for game events
     this.setupEventListeners();
-    // Show lower bar on game start or if game is stopped
-    this.showLowerBar(true);
+    // Always show lower bar
+    this.lowerBarVisible = true;
+    if (this.lowerBarContainer) this.lowerBarContainer.setAlpha(1);
 
     // Pointer events for fade in/out on hover
-    this.input.on('pointermove', (pointer) => {
-      if (!this.isWaveActive()) return;
-      const y = pointer.y;
-      if (y >= 620 && !this.lowerBarVisible) {
-        this.showLowerBar();
-      } else if (y < 620 && this.lowerBarVisible) {
-        this.hideLowerBar();
-      }
-    });
+    // this.input.on('pointermove', (pointer) => {
+    //   if (!this.isWaveActive()) return;
+    //   const y = pointer.y;
+    //   if (y >= 620 && !this.lowerBarVisible) {
+    //     this.showLowerBar();
+    //   } else if (y < 620 && this.lowerBarVisible) {
+    //     this.hideLowerBar();
+    //   }
+    // });
     // Fade out if mouse leaves the game canvas completely during an active wave
-    this.game.canvas.addEventListener('mouseleave', () => {
-      if (this.lowerBarVisible && this.isWaveActive()) {
-        this.hideLowerBar();
-      }
-    });
+    // this.game.canvas.addEventListener('mouseleave', () => {
+    //   if (this.lowerBarVisible && this.isWaveActive()) {
+    //     this.hideLowerBar();
+    //   }
+    // });
   }
 
   createUIBackground() {
@@ -591,7 +591,6 @@ export default class UIScene extends Phaser.Scene {
     // On game start, show lower bar
     this.scene.get('GameScene').events.on('gameStart', () => {
       this.isGameStopped = false;
-      this.showLowerBar(true);
     });
   }
 
@@ -711,7 +710,6 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveStarted(waveNumber) {
-    if (this.lowerBarVisible) this.hideLowerBar();
     // Update wave number
     this.wave = waveNumber;
     this.waveText.setText(
@@ -727,7 +725,6 @@ export default class UIScene extends Phaser.Scene {
   }
 
   onWaveCompleted(waveNumber) {
-    this.showLowerBar(true); // Always show after wave
     // Enable wave button for next wave
     this.setWaveButtonEnabled(true);
     this.waveButtonText.setText('Start Next Wave');
@@ -738,8 +735,6 @@ export default class UIScene extends Phaser.Scene {
 
   onGameOver(data) {
     this.isGameStopped = true;
-    this.showLowerBar(true); // Always show on game over
-    
     // Show game over message only for defeat
     if (!data.victory) {
       this.showMessage('Game Over!\nYour base was destroyed!', 0);
@@ -820,26 +815,11 @@ export default class UIScene extends Phaser.Scene {
 
   // --- Lower bar fade logic ---
   showLowerBar(force = false) {
-    if (this.lowerBarVisible && !force) return;
-    this.lowerBarVisible = true;
-    this.tweens.add({
-      targets: this.lowerBarContainer,
-      alpha: 1,
-      duration: 250,
-      ease: 'Sine.easeInOut',
-    });
+    // Deprecated: Lower bar is always visible now
   }
+
   hideLowerBar(force = false) {
-    // Only hide if a wave is running
-    if (!this.isWaveActive() && !force) return;
-    if (!this.lowerBarVisible && !force) return;
-    this.lowerBarVisible = false;
-    this.tweens.add({
-      targets: this.lowerBarContainer,
-      alpha: 0,
-      duration: 250,
-      ease: 'Sine.easeInOut',
-    });
+    // Deprecated: Lower bar is always visible now
   }
 
   /**
@@ -1014,8 +994,6 @@ export default class UIScene extends Phaser.Scene {
 
     // Remove pointer event listeners
     this.input.off('pointerdown');
-    this.input.off('pointermove');
-
     // Remove canvas event listener
     this.game.canvas.removeEventListener('mouseleave', this.hideLowerBar);
   }
