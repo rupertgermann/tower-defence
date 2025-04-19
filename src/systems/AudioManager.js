@@ -11,7 +11,6 @@ export default class AudioManager {
     this.music = null;
     this.volume = 0.5;
     this.musicVolume = 0.3;
-    this.muted = false;
     this.loadSounds();
   }
 
@@ -36,7 +35,6 @@ export default class AudioManager {
     this.music = this.scene.sound.add('bgm', {
       volume: this.musicVolume,
       loop: true
-      // To make global: add { global: true }
     });
   }
 
@@ -46,7 +44,7 @@ export default class AudioManager {
    * @param {object} config - Optional config overrides
    */
   playSound(key, config = {}) {
-    if (this.muted || !this.sfx[key]) return;
+    if (!this.sfx[key]) return;
     this.sfx[key].play({ volume: this.volume, ...config });
   }
 
@@ -66,19 +64,11 @@ export default class AudioManager {
   }
 
   muteAll() {
-    this.muted = true;
-    if (this.music) this.music.setMute(true);
-    for (const key in this.sfx) {
-      if (this.sfx[key]) this.sfx[key].setMute(true);
-    }
+    // No-op for backward compatibility
   }
 
   unmuteAll() {
-    this.muted = false;
-    if (this.music) this.music.setMute(false);
-    for (const key in this.sfx) {
-      if (this.sfx[key]) this.sfx[key].setMute(false);
-    }
+    // No-op for backward compatibility
   }
 
   /**

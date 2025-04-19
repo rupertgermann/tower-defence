@@ -872,8 +872,8 @@ export default class UIScene extends Phaser.Scene {
    * Create UI buttons (mute, restart, main menu)
    */
   createUIButtons() {
-    const audioManager = this.scene.get('GameScene').audioManager;
-    this.isMuted = false;
+    // Use Phaser's global sound mute for robust, best-practice muting
+    this.isMuted = this.sound.mute;
 
     // Button spacing
     const buttonSize = 40;
@@ -895,14 +895,7 @@ export default class UIScene extends Phaser.Scene {
       height: buttonSize,
       callback: (isToggled) => {
         this.isMuted = isToggled;
-        if (audioManager) {
-          if (this.isMuted) {
-            audioManager.muteAll();
-          } else {
-            audioManager.unmuteAll();
-          }
-        }
-        // Update tooltip text based on state
+        this.sound.mute = this.isMuted; // Phaser best practice: mute all audio globally
         this.muteButton.setTooltip(this.isMuted ? 'Unmute' : 'Mute');
       }
     });
