@@ -19,6 +19,10 @@ import TowerManager from '../systems/TowerManager.js';
 import EnemyManager from '../systems/EnemyManager.js';
 import ProjectileManager from '../systems/ProjectileManager.js';
 
+// --- UI bar boundaries (keep in sync with UIScene) ---
+const TOP_BAR_HEIGHT = 80;
+const BOTTOM_BAR_HEIGHT = 100;
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -337,6 +341,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   handleTilePlacement(tile) {
+    // Prevent placement in UI bar regions
+    const canvasHeight = this.sys.game.scale.height;
+    // Use tile.displayHeight if available, else default to 64 (tile size)
+    const tileHeight = tile.displayHeight || 64;
+    if (tile.y < TOP_BAR_HEIGHT || tile.y > (canvasHeight - BOTTOM_BAR_HEIGHT - tileHeight)) {
+      // Use smaller font and line break for message
+      this.events.emit('showMessage', 'Cannot place towers\non UI bars!', 1800, { fontSize: '16px', fontFamily: 'courier' });
+      return;
+    }
     if (tile.hasTower) return;
 
     // Get the currently selected tower type from UI
