@@ -595,6 +595,15 @@ export default class UIScene extends Phaser.Scene {
   updateTowerButtonStates() {
     // Update tower buttons based on whether player can afford them
     for (const towerButton of this.towerButtons) {
+      // Defensive: Check for destroyed/null buttons and texts
+      if (!towerButton || !towerButton.button || !towerButton.costText) {
+        console.warn('[updateTowerButtonStates] Skipping invalid towerButton:', towerButton);
+        continue;
+      }
+      if (towerButton.button.destroyed || towerButton.costText.destroyed) {
+        console.warn('[updateTowerButtonStates] Skipping destroyed button or costText:', towerButton);
+        continue;
+      }
       const towerCost = window.GAME_SETTINGS.TOWERS[towerButton.type].cost;
 
       // Check if player can afford this tower
@@ -928,6 +937,16 @@ export default class UIScene extends Phaser.Scene {
     // Destroy dialogs if they exist
     if (this.restartDialog) this.restartDialog.destroy();
     if (this.mainMenuDialog) this.mainMenuDialog.destroy();
+
+    // Destroy all tower buttons and their text objects
+    if (this.towerButtons && Array.isArray(this.towerButtons)) {
+      for (const towerButton of this.towerButtons) {
+        if (towerButton.button && towerButton.button.destroy) towerButton.button.destroy();
+        if (towerButton.costText && towerButton.costText.destroy) towerButton.costText.destroy();
+        if (towerButton.nameText && towerButton.nameText.destroy) towerButton.nameText.destroy();
+      }
+      this.towerButtons = [];
+    }
 
     // Remove event listeners from GameScene
     const gameScene = this.scene.get('GameScene');
