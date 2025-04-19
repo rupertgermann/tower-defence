@@ -23,6 +23,7 @@ export default class TowerManager {
   }
 
   clear() {
+    console.log('[TowerManager.clear] called. this.towerGroup:', this.towerGroup);
     this.towerGroup.clear(true, true);
   }
 }

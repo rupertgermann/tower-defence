@@ -138,6 +138,9 @@ export default class GameScene extends Phaser.Scene {
     this.towerManager = new TowerManager(this);
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
+
+    // Hook cleanup to the 'transitionout' event, which happens BEFORE shutdown
+    this.events.on('transitionout', this.cleanup, this);
   }
 
   update(time, delta) {
@@ -696,5 +699,48 @@ export default class GameScene extends Phaser.Scene {
     this.time.delayedCall(420, () => {
       emitter.destroy();
     });
+  }
+
+  // --- Add cleanup method for robust restart ---
+  cleanup() {
+    console.log('[GameScene.cleanup] called. this.towerManager:', this.towerManager);
+    if (this.towerManager) {
+      console.log('[GameScene.cleanup] this.towerManager.towerGroup:', this.towerManager.towerGroup);
+    }
+    if (this.enemyManager) {
+      console.log('[GameScene.cleanup] this.enemyManager.enemyGroup:', this.enemyManager.enemyGroup);
+    }
+    if (this.projectileManager) {
+      console.log('[GameScene.cleanup] this.projectileManager.projectileGroup:', this.projectileManager.projectileGroup);
+    }
+    // Clear all managers (defensive: check for group existence)
+    if (this.towerManager && this.towerManager.towerGroup) {
+      this.towerManager.clear();
+    }
+    if (this.enemyManager && this.enemyManager.enemyGroup) {
+      this.enemyManager.clear();
+    }
+    if (this.projectileManager && this.projectileManager.projectileGroup) {
+      this.projectileManager.clear();
+    }
+    // Remove placement tiles
+    if (this.placementTiles) {
+      this.placementTiles.forEach(tile => tile && tile.destroy && tile.destroy());
+      this.placementTiles = [];
+    }
+    // Remove map overlays/group
+    if (this.map && this.map.clear) {
+      this.map.clear(true, true);
+      this.map = null;
+    }
+    // Stop all audio
+    this.audioManager?.stopAll && this.audioManager.stopAll();
+    // Reset economy
+    this.economyManager?.reset && this.economyManager.reset();
+    // Remove any tooltips or custom overlays
+    if (this.specialTileTooltip) {
+      this.specialTileTooltip.destroy();
+      this.specialTileTooltip = null;
+    }
   }
 }

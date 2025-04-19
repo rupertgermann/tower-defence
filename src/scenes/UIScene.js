@@ -39,6 +39,11 @@ export default class UIScene extends Phaser.Scene {
    * @param {Tower} tower - The selected tower instance
    */
   showTowerInfo(tower) {
+    // Defensive: skip if tower or tower.towerData is null
+    if (!tower || !tower.towerData) {
+      console.warn('[UIScene] showTowerInfo called with null/invalid tower:', tower);
+      return;
+    }
     // Remove existing panel if present
     if (this.towerInfoPanel) {
       this.towerInfoPanel.destroy(true);
@@ -66,7 +71,7 @@ export default class UIScene extends Phaser.Scene {
     const nameText = this.add.text(
       20,
       15,
-      `Tower: ${tower.data.name || tower.type}`,
+      `Tower: ${tower.towerData.name || tower.type}`,
       {
         fontSize: '20px',
         fill: '#ffffff',
@@ -90,9 +95,9 @@ export default class UIScene extends Phaser.Scene {
     const statsText = this.add.text(
       20,
       80,
-      `Damage: ${Math.round(tower.data.damage)}\nRange: ${Math.round(
-        tower.data.range
-      )}\nFire Rate: ${Math.round(tower.data.fireRate)}ms`,
+      `Damage: ${Math.round(tower.towerData.damage)}\nRange: ${Math.round(
+        tower.towerData.range
+      )}\nFire Rate: ${Math.round(tower.towerData.fireRate)}ms`,
       { fontSize: '16px', fill: '#ffffff' }
     );
     this.towerInfoPanel.add(statsText);
@@ -107,7 +112,7 @@ export default class UIScene extends Phaser.Scene {
       if (typeof tower.calculateUpgradeCost === 'function') {
         upgradeCost = tower.calculateUpgradeCost();
       } else {
-        upgradeCost = Math.floor(tower.data.cost * 0.5);
+        upgradeCost = Math.floor(tower.towerData.cost * 0.5);
       }
     }
 
