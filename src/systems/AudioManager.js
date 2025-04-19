@@ -1,3 +1,4 @@
+// Phaser Sound & Scene Lifecycle Best Practices Refactor
 import Phaser from 'phaser';
 
 export default class AudioManager {
@@ -6,20 +7,21 @@ export default class AudioManager {
    */
   constructor(scene) {
     this.scene = scene;
-    this.sounds = {};
+    this.sfx = {};
     this.music = null;
     this.volume = 0.5;
     this.musicVolume = 0.3;
     this.muted = false;
-
     this.loadSounds();
   }
 
   /**
-   * Load and store sound references
+   * Load and store sound references (scene-scoped)
+   * Always creates new sound objects for the current scene
    */
   loadSounds() {
-    const soundKeys = [
+    // SFX (scene-scoped)
+    const sfxKeys = [
       'attack',
       'enemy_death',
       'upgrade',
@@ -27,18 +29,15 @@ export default class AudioManager {
       'wave_end',
       'ui_click',
     ];
-    for (const key of soundKeys) {
-      if (this.scene.sound && !this.scene.sound.get(key)) {
-        this.sounds[key] = this.scene.sound.add(key, { volume: this.volume });
-      }
+    for (const key of sfxKeys) {
+      this.sfx[key] = this.scene.sound.add(key, { volume: this.volume });
     }
-    // Background music
-    if (this.scene.sound && !this.scene.sound.get('bgm')) {
-      this.sounds['bgm'] = this.scene.sound.add('bgm', {
-        volume: this.musicVolume,
-        loop: true,
-      });
-    }
+    // Background music (scene-scoped by default)
+    this.music = this.scene.sound.add('bgm', {
+      volume: this.musicVolume,
+      loop: true
+      // To make global: add { global: true }
+    });
   }
 
   /**
@@ -47,84 +46,38 @@ export default class AudioManager {
    * @param {object} config - Optional config overrides
    */
   playSound(key, config = {}) {
-    if (this.muted || !this.sounds[key]) return;
-    this.sounds[key].play({ volume: this.volume, ...config });
+    if (this.muted || !this.sfx[key]) return;
+    this.sfx[key].play({ volume: this.volume, ...config });
   }
 
   /**
-   * Play background music by key
-   * @param {string} key - Music key
+   * Play background music (scene-scoped by default)
    */
-  playMusic(key = 'bgm') {
-    if (this.music) this.music.stop();
-    if (this.sounds[key]) {
-      this.music = this.sounds[key];
+  playMusic() {
+    if (this.music) {
       this.music.play({ volume: this.musicVolume, loop: true });
     }
   }
 
-  /**
-   * Set global sound effect volume
-   * @param {number} volume - 0.0 to 1.0
-   */
-  setVolume(volume) {
-    this.volume = volume;
-    for (const key in this.sounds) {
-      if (key !== 'bgm' && this.sounds[key]) {
-        this.sounds[key].setVolume(volume);
-      }
-    }
-  }
-
-  /**
-   * Set background music volume
-   * @param {number} volume - 0.0 to 1.0
-   */
-  setMusicVolume(volume) {
-    this.musicVolume = volume;
+  stopMusic() {
     if (this.music) {
-      this.music.setVolume(volume);
+      this.music.stop();
     }
   }
 
-  /**
-   * Mute or unmute all sounds
-   * @param {boolean} muted
-   */
-  mute(muted) {
-    this.muted = muted;
-    for (const key in this.sounds) {
-      if (this.sounds[key]) {
-        this.sounds[key].setMute(muted);
-      }
+  muteAll() {
+    this.muted = true;
+    if (this.music) this.music.setMute(true);
+    for (const key in this.sfx) {
+      if (this.sfx[key]) this.sfx[key].setMute(true);
     }
   }
 
-  /**
-   * Stop all currently playing sounds and music
-   */
-  stopAll() {
-    if (this.scene.sound) {
-      this.scene.sound.stopAll();
+  unmuteAll() {
+    this.muted = false;
+    if (this.music) this.music.setMute(false);
+    for (const key in this.sfx) {
+      if (this.sfx[key]) this.sfx[key].setMute(false);
     }
-  }
-
-  /**
-   * Destroy all sound objects and clear references
-   */
-  destroyAll() {
-    console.log('[AudioManager.destroyAll] Destroying all sounds...');
-    for (const key in this.sounds) {
-      if (this.sounds[key]) {
-        this.sounds[key].destroy();
-        this.sounds[key] = null;
-      }
-    }
-    if (this.music) {
-      this.music.destroy();
-      this.music = null;
-    }
-    this.sounds = {};
-    this.scene = null;
   }
 }
