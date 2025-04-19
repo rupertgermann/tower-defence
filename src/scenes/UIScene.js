@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import UIButton from '../helpers/UIButton.js';
 import ConfirmationDialog from '../helpers/ConfirmationDialog.js';
+import UIHelpers, { getPriceColor, setButtonAffordability } from '../helpers/UIHelpers.js';
 
 // General dialog style config for confirmation dialogs
 const DIALOG_STYLE = {
@@ -60,6 +61,10 @@ export default class UIScene extends Phaser.Scene {
     this.lowerBarContainer = null;
     this.lowerBarVisible = true;
     this.isGameStopped = true;
+
+    // Store the current tower for live updates in the upgrade panel
+    this.currentTowerForUpgradePanel = null;
+    this._boundUpgradePanelGoldListener = null;
   }
 
   /**
@@ -87,6 +92,9 @@ export default class UIScene extends Phaser.Scene {
     if (this.towerInfoPanel) {
       this.towerInfoPanel.destroy(true);
     }
+
+    // Store the current tower for live updates
+    this.currentTowerForUpgradePanel = tower;
 
     // Panel background
     const panelWidth = 320;
@@ -155,11 +163,12 @@ export default class UIScene extends Phaser.Scene {
       }
     }
 
+    const canAffordUpgrade = this.money >= upgradeCost;
     const upgradeText = this.add.text(
       20,
       140,
       canUpgrade ? `Upgrade Cost: ${upgradeCost}g` : `Max Level Reached`,
-      { fontSize: '16px', fill: canUpgrade ? '#00ff00' : '#ff4444' }
+      { fontSize: '16px', fill: getPriceColor(canUpgrade && canAffordUpgrade) }
     );
     this.towerInfoPanel.add(upgradeText);
 
@@ -173,7 +182,7 @@ export default class UIScene extends Phaser.Scene {
         0x00aa00
       );
       upgradeBtn.setOrigin(0, 0);
-      upgradeBtn.setInteractive();
+      setButtonAffordability(upgradeBtn, canAffordUpgrade, 0x00aa00, 0x888888);
 
       const btnText = this.add.text(
         panelWidth - 70,
@@ -184,40 +193,45 @@ export default class UIScene extends Phaser.Scene {
           fill: '#ffffff',
         }
       );
-      btnText.setOrigin(0.5, 0.5);
-
+      btnText.setOrigin(0.5);
       this.towerInfoPanel.add(upgradeBtn);
       this.towerInfoPanel.add(btnText);
 
-      upgradeBtn.on('pointerover', () => {
-        upgradeBtn.setFillStyle(0x00cc00);
-      });
-      upgradeBtn.on('pointerout', () => {
-        upgradeBtn.setFillStyle(0x00aa00);
-      });
-      upgradeBtn.on('pointerdown', () => {
-        const audioManager = this.scene.get('GameScene').audioManager;
-        if (audioManager) audioManager.playSound('ui_click');
-        if (tower.upgrade()) {
-          // Play upgrade sound if available
-          if (audioManager && typeof audioManager.playSound === 'function') {
-            audioManager.playSound('upgrade');
+      if (canAffordUpgrade) {
+        upgradeBtn.on('pointerover', () => {
+          upgradeBtn.setFillStyle(0x00cc00);
+        });
+        upgradeBtn.on('pointerout', () => {
+          upgradeBtn.setFillStyle(0x00aa00);
+        });
+        upgradeBtn.on('pointerdown', () => {
+          const audioManager = this.scene.get('GameScene').audioManager;
+          if (audioManager) audioManager.playSound('ui_click');
+          if (tower.upgrade()) {
+            // Play upgrade sound if available
+            if (audioManager && typeof audioManager.playSound === 'function') {
+              audioManager.playSound('upgrade');
+            }
+            // Refresh panel with new stats
+            this.showTowerInfo(tower);
+            // Update UI money
+            this.scene
+              .get('GameScene')
+              .events.emit('updateUI', {
+                money: this.scene.get('GameScene').economyManager.getMoney(),
+              });
+          } else {
+            this.showMessage(
+              'Cannot upgrade: \ninsufficient funds\nor max level reached.',
+              3000
+            );
           }
-          // Refresh panel with new stats
-          this.showTowerInfo(tower);
-          // Update UI money
-          this.scene
-            .get('GameScene')
-            .events.emit('updateUI', {
-              money: this.scene.get('GameScene').economyManager.getMoney(),
-            });
-        } else {
-          this.showMessage(
-            'Cannot upgrade: \ninsufficient funds\nor max level reached.',
-            3000
-          );
-        }
-      });
+        });
+      }
+      // Optionally store references if you want to update on gold change
+      this.upgradeBtn = upgradeBtn;
+      this.upgradeText = upgradeText;
+      this.upgradeCost = upgradeCost;
     }
 
     // Close button
@@ -238,6 +252,13 @@ export default class UIScene extends Phaser.Scene {
     });
 
     this.uiContainer.add(this.towerInfoPanel);
+
+    // --- Listen for gold changes to update upgrade button state live ---
+    const gameScene = this.scene.get('GameScene');
+    if (!this._boundUpgradePanelGoldListener) {
+      this._boundUpgradePanelGoldListener = this._onUpgradePanelGoldChanged.bind(this);
+    }
+    gameScene.events.on('updateUI', this._boundUpgradePanelGoldListener);
   }
 
   /**
@@ -248,6 +269,38 @@ export default class UIScene extends Phaser.Scene {
       this.towerInfoPanel.destroy(true);
       this.towerInfoPanel = null;
     }
+    // Remove gold change listener for upgrade panel
+    const gameScene = this.scene.get('GameScene');
+    if (this._boundUpgradePanelGoldListener) {
+      gameScene.events.off('updateUI', this._boundUpgradePanelGoldListener);
+    }
+    this.currentTowerForUpgradePanel = null;
+  }
+
+  /**
+   * Live-update the upgrade button and price color if the panel is open and money changes
+   */
+  _onUpgradePanelGoldChanged(data) {
+    if (!this.towerInfoPanel || !this.upgradeBtn || !this.upgradeText || !this.currentTowerForUpgradePanel) return;
+    if (data.money === undefined) return;
+
+    // Recalculate upgrade cost and affordability
+    const tower = this.currentTowerForUpgradePanel;
+    let canUpgrade = typeof tower.upgrade === 'function' && (!tower.maxLevel || tower.level < tower.maxLevel);
+    let upgradeCost = 0;
+    if (canUpgrade) {
+      if (typeof tower.calculateUpgradeCost === 'function') {
+        upgradeCost = tower.calculateUpgradeCost();
+      } else {
+        upgradeCost = Math.floor(tower.towerData.cost * 0.5);
+      }
+    }
+    const canAffordUpgrade = data.money >= upgradeCost;
+
+    // Update price color
+    this.upgradeText.setFill(getPriceColor(canUpgrade && canAffordUpgrade));
+    // Update button state
+    setButtonAffordability(this.upgradeBtn, canAffordUpgrade, 0x00aa00, 0x888888);
   }
 
   create() {
@@ -701,19 +754,9 @@ export default class UIScene extends Phaser.Scene {
         continue;
       }
       const towerCost = window.GAME_SETTINGS.TOWERS[towerButton.type].cost;
-
-      // Check if player can afford this tower
-      if (this.money >= towerCost) {
-        towerButton.costText.setFill('#ffff00');
-        towerButton.button.setInteractive();
-      } else {
-        towerButton.costText.setFill('#ff0000');
-
-        // Keep button interactive but show feedback when clicked
-        if (!towerButton.button.input) {
-          towerButton.button.setInteractive();
-        }
-      }
+      const canAfford = this.money >= towerCost;
+      towerButton.costText.setFill(getPriceColor(canAfford));
+      setButtonAffordability(towerButton.button, canAfford, 0x444444, 0x888888);
     }
   }
 
