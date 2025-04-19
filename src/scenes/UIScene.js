@@ -569,9 +569,9 @@ export default class UIScene extends Phaser.Scene {
   }
 
   createWaveButton() {
-    const buttonWidth = 200;
+    const buttonWidth = 220;
     const buttonHeight = 60;
-    const x = 1280 - buttonWidth - 50;
+    const x = 1280 - buttonWidth - 30;
     const y = 720 - 80;
 
     // Button background
@@ -591,8 +591,15 @@ export default class UIScene extends Phaser.Scene {
       y + buttonHeight / 2,
       'Start Wave',
       {
-        fontSize: '20px',
-        fill: '#ffffff',
+        fontSize: '20px', 
+        fontFamily: 'courier', 
+        fontStyle: 'normal',
+        fill: '#fffbe7', 
+        align: 'center',
+        padding: { left: 24, right: 24, top: 20, bottom: 8 },
+        fixedWidth: buttonWidth + 60, 
+        fixedHeight: buttonHeight,
+        backgroundColor: null, 
       }
     );
     this.waveButtonText.setOrigin(0.5, 0.5);
