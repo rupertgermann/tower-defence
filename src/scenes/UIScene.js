@@ -2,6 +2,32 @@ import Phaser from 'phaser';
 import UIButton from '../helpers/UIButton.js';
 import ConfirmationDialog from '../helpers/ConfirmationDialog.js';
 
+// General dialog style config for confirmation dialogs
+const DIALOG_STYLE = {
+  width: 420,
+  height: 210,
+  backgroundColor: 0x222244,
+  backgroundAlpha: 0.92,
+  borderColor: 0xffd700,
+  borderThickness: 4,
+  borderRadius: 16,
+  padding: 32,
+  fontFamily: 'Verdana',
+  fontSize: 22,
+  fontColor: '#fffbe7',
+  buttonStyle: {
+    backgroundColor: 0x4444aa,
+    backgroundAlpha: 1,
+    borderColor: 0xffffff,
+    borderThickness: 2,
+    borderRadius: 10,
+    fontFamily: 'Verdana',
+    fontSize: 20,
+    fontColor: '#fffbe7',
+    hoverColor: 0x8888ff
+  }
+};
+
 export default class UIScene extends Phaser.Scene {
   constructor() {
     super('UIScene');
@@ -873,7 +899,8 @@ export default class UIScene extends Phaser.Scene {
               const gameScene = this.scene.get('GameScene');
               gameScene.scene.restart();
               this.scene.restart();
-            }
+            },
+            ...DIALOG_STYLE
           });
         }
         
@@ -899,7 +926,8 @@ export default class UIScene extends Phaser.Scene {
               this.scene.stop('GameScene');
               this.scene.stop('UIScene');
               this.scene.start('MapSelectScene');
-            }
+            },
+            ...DIALOG_STYLE
           });
         }
         
