@@ -70,17 +70,26 @@ export default class UIButton {
     this.container.add(this.buttonImage);
 
     // Create tooltip (hidden by default)
-    // Use text height to vertically center the background exactly with the text
-    this.tooltipText = scene.add.text(0, 55, this.config.tooltip, {
+    // Move tooltip up by 20px from the previous y position
+    const tooltipY = 35;
+    this.tooltipText = scene.add.text(0, tooltipY, this.config.tooltip, {
+      fontFamily: 'courier',
       fontSize: '14px',
-      fill: '#ffffff'
+      fill: '#fffbe7' // match dialog font color
     });
     this.tooltipText.setOrigin(0.5, 0.5);
     this.tooltipText.setVisible(false);
     
     // Now that tooltipText is created, use its height for background centering
     const tooltipBgHeight = this.tooltipText.height + 8; // 4px padding top/bottom
-    this.tooltipBackground = scene.add.rectangle(0, 55, this.tooltipText.width + 20, tooltipBgHeight, 0x000000, 0.8);
+    this.tooltipBackground = scene.add.rectangle(
+      0,
+      tooltipY,
+      this.tooltipText.width + 20,
+      tooltipBgHeight,
+      0x000000,
+      0.6 // match dialog background alpha
+    );
     this.tooltipBackground.setOrigin(0.5, 0.5);
     this.tooltipBackground.setVisible(false);
     
