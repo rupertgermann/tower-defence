@@ -70,10 +70,7 @@ export default class UIButton {
     this.container.add(this.buttonImage);
 
     // Create tooltip (hidden by default)
-    this.tooltipBackground = scene.add.rectangle(0, 40, 0, 30, 0x000000, 0.8);
-    this.tooltipBackground.setOrigin(0.5, 0);
-    this.tooltipBackground.setVisible(false);
-    
+    // Use text height to vertically center the background exactly with the text
     this.tooltipText = scene.add.text(0, 55, this.config.tooltip, {
       fontSize: '14px',
       fill: '#ffffff'
@@ -81,8 +78,11 @@ export default class UIButton {
     this.tooltipText.setOrigin(0.5, 0.5);
     this.tooltipText.setVisible(false);
     
-    // Adjust tooltip background width based on text width
-    this.tooltipBackground.width = this.tooltipText.width + 20;
+    // Now that tooltipText is created, use its height for background centering
+    const tooltipBgHeight = this.tooltipText.height + 8; // 4px padding top/bottom
+    this.tooltipBackground = scene.add.rectangle(0, 55, this.tooltipText.width + 20, tooltipBgHeight, 0x000000, 0.8);
+    this.tooltipBackground.setOrigin(0.5, 0.5);
+    this.tooltipBackground.setVisible(false);
     
     this.container.add(this.tooltipBackground);
     this.container.add(this.tooltipText);
