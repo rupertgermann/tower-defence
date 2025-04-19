@@ -288,7 +288,33 @@ export default class UIButton {
    * Clean up and destroy the button
    */
   destroy() {
+    // Remove all pointer listeners from the button image
     this.buttonImage.removeAllListeners();
-    this.container.destroy(true);
+    // Remove tooltip listeners if any
+    if (this.buttonImage.off) {
+      this.buttonImage.off('pointerover');
+      this.buttonImage.off('pointerout');
+      this.buttonImage.off('pointerdown');
+      this.buttonImage.off('pointerup');
+    }
+    // Destroy tooltip if present
+    if (this.tooltipBackground && this.tooltipBackground.destroy) {
+      this.tooltipBackground.destroy();
+      this.tooltipBackground = null;
+    }
+    if (this.tooltipText && this.tooltipText.destroy) {
+      this.tooltipText.destroy();
+      this.tooltipText = null;
+    }
+    // Destroy the container and all children
+    if (this.container && this.container.destroy) {
+      this.container.destroy(true);
+      this.container = null;
+    }
+    // Null all references
+    this.buttonImage = null;
+    this.scene = null;
+    this.config = null;
+    this.callback = null;
   }
 }

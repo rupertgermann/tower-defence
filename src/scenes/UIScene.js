@@ -930,19 +930,34 @@ export default class UIScene extends Phaser.Scene {
     }
   }
 
-  /**
-   * Clean up resources when scene is shut down
-   */
   shutdown() {
     // Destroy UI buttons if they exist
-    if (this.muteButton) this.muteButton.destroy();
-    if (this.restartButton) this.restartButton.destroy();
-    if (this.mainMenuButton) this.mainMenuButton.destroy();
-
+    if (this.muteButton) {
+      this.muteButton.destroy();
+      this.muteButton = null;
+    }
+    if (this.restartButton) {
+      this.restartButton.destroy();
+      this.restartButton = null;
+    }
+    if (this.mainMenuButton) {
+      this.mainMenuButton.destroy();
+      this.mainMenuButton = null;
+    }
+    // Destroy top-right buttons container
+    if (this.topRightButtonsContainer) {
+      this.topRightButtonsContainer.destroy(true);
+      this.topRightButtonsContainer = null;
+    }
     // Destroy dialogs if they exist
-    if (this.restartDialog) this.restartDialog.destroy();
-    if (this.mainMenuDialog) this.mainMenuDialog.destroy();
-
+    if (this.restartDialog) {
+      this.restartDialog.destroy();
+      this.restartDialog = null;
+    }
+    if (this.mainMenuDialog) {
+      this.mainMenuDialog.destroy();
+      this.mainMenuDialog = null;
+    }
     // Destroy all tower buttons and their text objects
     if (this.towerButtons && Array.isArray(this.towerButtons)) {
       for (const towerButton of this.towerButtons) {
@@ -952,7 +967,6 @@ export default class UIScene extends Phaser.Scene {
       }
       this.towerButtons = [];
     }
-
     // Remove event listeners from GameScene
     const gameScene = this.scene.get('GameScene');
     if (gameScene && gameScene.events) {
