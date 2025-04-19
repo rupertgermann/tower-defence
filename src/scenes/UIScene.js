@@ -28,6 +28,19 @@ const DIALOG_STYLE = {
   }
 };
 
+// Centralized style config for all in-game messages (edit here for global changes)
+const MESSAGE_STYLE = {
+  fontSize: '22px',
+  fontFamily: 'courier',
+  color: '#fffbe7',
+  backgroundColor: 0x000000,
+  backgroundAlpha: 0.6,
+  borderRadius: 8,
+  padding: 16,
+  width: 400,
+  height: 100,
+};
+
 export default class UIScene extends Phaser.Scene {
   constructor() {
     super('UIScene');
@@ -201,7 +214,7 @@ export default class UIScene extends Phaser.Scene {
         } else {
           this.showMessage(
             'Cannot upgrade: \ninsufficient funds\nor max level reached.',
-            2000
+            3000
           );
         }
       });
@@ -539,18 +552,8 @@ export default class UIScene extends Phaser.Scene {
   }
 
   createMessageDisplay() {
-    // Default config (can be overridden)
-    this.messageConfig = {
-      fontSize: '17px',
-      fontFamily: 'courier',
-      color: '#fffbe7',
-      backgroundColor: 0x000000,
-      backgroundAlpha: 0.5,
-      borderRadius: 8,
-      padding: 16,
-      width: 400,
-      height: 100,
-    };
+    // Use centralized MESSAGE_STYLE config
+    this.messageConfig = { ...MESSAGE_STYLE };
     // Message background
     this.messageBackground = this.add.graphics();
     this.messageBackground.setDepth(100);
@@ -573,7 +576,9 @@ export default class UIScene extends Phaser.Scene {
 
   // --- Show message with custom style ---
   showMessage(message, duration = 2000, options = {}) {
-    const cfg = { ...this.messageConfig, ...options };
+    // Always merge MESSAGE_STYLE as the base config
+    const cfg = { ...MESSAGE_STYLE, ...options };
+    this.messageConfig = { ...cfg }; // Keep current config in sync
     // Set text and style
     this.messageText.setText(message);
     this.messageText.setStyle({
