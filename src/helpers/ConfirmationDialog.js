@@ -28,7 +28,7 @@ export default class ConfirmationDialog {
    * @param {number} [config.fontSize=24] - Font size of the dialog text
    * @param {string} [config.fontColor='#ffffff'] - Font color of the dialog text
    * @param {Object} [config.buttonStyle] - Style configuration for the buttons
-   * @param {number} [config.buttonStyle.backgroundColor=0x4444aa] - Background color of the buttons
+   * @param {number} [config.buttonStyle.backgroundColor=0x009900] - Background color of the buttons
    * @param {number} [config.buttonStyle.backgroundAlpha=1] - Background alpha of the buttons
    * @param {number} [config.buttonStyle.borderColor=0xffffff] - Border color of the buttons
    * @param {number} [config.buttonStyle.borderThickness=2] - Border thickness of the buttons
@@ -36,7 +36,7 @@ export default class ConfirmationDialog {
    * @param {string} [config.buttonStyle.fontFamily='Arial'] - Font family of the button text
    * @param {number} [config.buttonStyle.fontSize=20] - Font size of the button text
    * @param {string} [config.buttonStyle.fontColor='#ffffff'] - Font color of the button text
-   * @param {number} [config.buttonStyle.hoverColor=0x8888ff] - Hover color of the buttons
+   * @param {number} [config.buttonStyle.hoverColor=0x00aa00] - Hover color of the buttons
    */
   constructor(scene, config) {
     this.scene = scene;
@@ -56,7 +56,7 @@ export default class ConfirmationDialog {
       fontSize: config.fontSize || 24,
       fontColor: config.fontColor || '#ffffff',
       buttonStyle: {
-        backgroundColor: config.buttonStyle?.backgroundColor || 0x4444aa,
+        backgroundColor: config.buttonStyle?.backgroundColor || 0x009900,
         backgroundAlpha: typeof config.buttonStyle?.backgroundAlpha === 'number' ? config.buttonStyle.backgroundAlpha : 1,
         borderColor: config.buttonStyle?.borderColor || 0xffffff,
         borderThickness: typeof config.buttonStyle?.borderThickness === 'number' ? config.buttonStyle.borderThickness : 2,
@@ -64,7 +64,7 @@ export default class ConfirmationDialog {
         fontFamily: config.buttonStyle?.fontFamily || 'Arial',
         fontSize: config.buttonStyle?.fontSize || 20,
         fontColor: config.buttonStyle?.fontColor || '#ffffff',
-        hoverColor: config.buttonStyle?.hoverColor || 0x8888ff
+        hoverColor: typeof config.buttonStyle?.hoverColor === 'number' ? config.buttonStyle.hoverColor : 0x00aa00
       }
     };
 
@@ -127,9 +127,10 @@ export default class ConfirmationDialog {
     this.container.add(this.messageText);
 
     // Create 'Yes' button with styling
-    this.yesButton = scene.add.rectangle(-80, 50, 100, 40, style.buttonStyle.backgroundColor, style.buttonStyle.backgroundAlpha);
+    this.yesButton = scene.add.rectangle(-80, 50, 100, 40);
     this.yesButton.setOrigin(0.5, 0.5);
     this.yesButton.setInteractive({ useHandCursor: true });
+    this.yesButton.setFillStyle(style.buttonStyle.backgroundColor, style.buttonStyle.backgroundAlpha);
     this.container.add(this.yesButton);
 
     this.yesText = scene.add.text(-80, 50, 'Yes', {
@@ -141,9 +142,10 @@ export default class ConfirmationDialog {
     this.container.add(this.yesText);
 
     // Create 'No' button with styling
-    this.noButton = scene.add.rectangle(80, 50, 100, 40, style.buttonStyle.backgroundColor, style.buttonStyle.backgroundAlpha);
+    this.noButton = scene.add.rectangle(80, 50, 100, 40);
     this.noButton.setOrigin(0.5, 0.5);
     this.noButton.setInteractive({ useHandCursor: true });
+    this.noButton.setFillStyle(style.buttonStyle.backgroundColor, style.buttonStyle.backgroundAlpha);
     this.container.add(this.noButton);
 
     this.noText = scene.add.text(80, 50, 'No', {

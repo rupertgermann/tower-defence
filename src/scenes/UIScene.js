@@ -17,7 +17,7 @@ const DIALOG_STYLE = {
   fontSize: 17,
   fontColor: '#fffbe7',
   buttonStyle: {
-    backgroundColor: 0x4444aa,
+    backgroundColor: 0x009900, // MATCH Start Wave button
     backgroundAlpha: 1,
     borderColor: 0xffffff,
     borderThickness: 0,
@@ -25,7 +25,7 @@ const DIALOG_STYLE = {
     fontFamily: 'courier',
     fontSize: 20,
     fontColor: '#fffbe7',
-    hoverColor: 0x8888ff
+    hoverColor: 0x00aa00 // Lighter green for hover, matches pointerover in wave button
   }
 };
 
@@ -580,7 +580,7 @@ export default class UIScene extends Phaser.Scene {
       y,
       buttonWidth,
       buttonHeight,
-      0x00aa00
+      0x009900
     );
     this.waveButton.setOrigin(0, 0);
     this.waveButton.setInteractive();
@@ -603,11 +603,11 @@ export default class UIScene extends Phaser.Scene {
 
     // Set up event handlers
     this.waveButton.on('pointerover', () => {
-      this.waveButton.setFillStyle(0x00cc00);
+      this.waveButton.setFillStyle(0x00aa00);
     });
 
     this.waveButton.on('pointerout', () => {
-      this.waveButton.setFillStyle(0x00aa00);
+      this.waveButton.setFillStyle(0x009900);
     });
 
     this.waveButton.on('pointerdown', () => {
