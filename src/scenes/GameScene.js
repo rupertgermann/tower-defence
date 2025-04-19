@@ -96,8 +96,8 @@ export default class GameScene extends Phaser.Scene {
     // Initialize audio manager
     this.audioManager = new AudioManager(this);
 
-    // Play background music
-    this.audioManager.playMusic('bgm');
+    // Play global background music (singleton)
+    AudioManager.playGlobalMusic(this, 'bgm', 0.3);
 
     // Initialize MapManager and load maps
     if (!this.mapManager) {

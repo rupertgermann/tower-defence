@@ -16,6 +16,11 @@ export default class MapSelectScene extends Phaser.Scene {
   }
 
   create() {
+    // Stop global background music if playing when entering map select/home
+    import('../systems/AudioManager.js').then(({ default: AudioManager }) => {
+      AudioManager.stopGlobalMusic(this, 'bgm');
+    });
+
     this.mapManager.createMaps(this.MAP_KEYS);
 
     // Set intro background when entering map select

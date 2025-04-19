@@ -80,4 +80,28 @@ export default class AudioManager {
       if (this.sfx[key]) this.sfx[key].setMute(false);
     }
   }
+
+  /**
+   * Play global background music (singleton, global)
+   */
+  static playGlobalMusic(scene, key = 'bgm', volume = 0.3) {
+    let bgm = scene.sound.get(key);
+    if (!bgm) {
+      bgm = scene.sound.add(key, { global: true, loop: true, volume });
+    }
+    if (!bgm.isPlaying) {
+      bgm.play();
+    }
+    return bgm;
+  }
+
+  /**
+   * Stop global background music
+   */
+  static stopGlobalMusic(scene, key = 'bgm') {
+    const bgm = scene.sound.get(key);
+    if (bgm && bgm.isPlaying) {
+      bgm.stop();
+    }
+  }
 }
