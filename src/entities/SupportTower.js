@@ -63,8 +63,8 @@ export default class SupportTower extends Tower {
     if (!tower._supportBuffs) tower._supportBuffs = {};
     if (!tower._supportBuffs[this]) {
       // Only apply if not already buffed by this support tower
-      if (this.buffType === 'fireRate' && tower.data.fireRate > 0) {
-        tower.data.fireRate *= 1 - this.buffAmount;
+      if (this.buffType === 'fireRate' && tower.towerData.fireRate > 0) {
+        tower.towerData.fireRate *= 1 - this.buffAmount;
         tower._supportBuffs[this] = true;
       }
     }
@@ -75,8 +75,8 @@ export default class SupportTower extends Tower {
    */
   removeBuff(tower) {
     if (tower._supportBuffs && tower._supportBuffs[this]) {
-      if (this.buffType === 'fireRate' && tower.data.fireRate > 0) {
-        tower.data.fireRate /= 1 - this.buffAmount;
+      if (this.buffType === 'fireRate' && tower.towerData.fireRate > 0) {
+        tower.towerData.fireRate /= 1 - this.buffAmount;
       }
       delete tower._supportBuffs[this];
     }

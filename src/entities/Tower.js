@@ -10,7 +10,10 @@ export default class Tower extends Phaser.GameObjects.Container {
 
     // Store tower data
     this.type = type;
-    this.data = data;
+    this.towerData = data;
+
+    // Log the type and value of this.towerData for debugging
+    console.log('[Tower] Constructed. this.towerData:', this.towerData, 'typeof:', typeof this.towerData);
 
     // Tower state
     this.level = 1;
@@ -26,7 +29,7 @@ export default class Tower extends Phaser.GameObjects.Container {
     this.rangeIndicator = scene.add.circle(
       0,
       0,
-      this.data.range,
+      this.towerData.range,
       0xffffff,
       0.2
     );
@@ -42,6 +45,8 @@ export default class Tower extends Phaser.GameObjects.Container {
    * Clean up all child objects and emitters when destroying the tower
    */
   destroy(fromScene) {
+    // Log the type and value of this.towerData for debugging
+    console.log('[Tower.destroy] this.towerData:', this.towerData, 'typeof:', typeof this.towerData);
     if (this.sprite && this.sprite.destroy) this.sprite.destroy();
     if (this.rangeIndicator && this.rangeIndicator.destroy)
       this.rangeIndicator.destroy();
@@ -49,7 +54,6 @@ export default class Tower extends Phaser.GameObjects.Container {
       this.attackEmitter.destroy();
     if (this.upgradeEffect && this.upgradeEffect.destroy)
       this.upgradeEffect.destroy();
-    // Do NOT destroy this.data (plain object, not a GameObject)
     super.destroy(fromScene);
   }
 
@@ -86,7 +90,7 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     // Attack if we have a target and cooldown has elapsed
-    if (this.target && time > this.lastFireTime + this.data.fireRate) {
+    if (this.target && time > this.lastFireTime + this.towerData.fireRate) {
       this.fireAtTarget(time);
     }
   }
@@ -110,7 +114,7 @@ export default class Tower extends Phaser.GameObjects.Container {
       target.y
     );
 
-    return distance <= this.data.range;
+    return distance <= this.towerData.range;
   }
 
   /**
@@ -142,7 +146,7 @@ export default class Tower extends Phaser.GameObjects.Container {
       );
 
       // Check if in range and closer than current closest
-      if (distance <= this.data.range && distance < closestDistance) {
+      if (distance <= this.towerData.range && distance < closestDistance) {
         this.target = enemy;
         closestDistance = distance;
       }
@@ -159,18 +163,18 @@ export default class Tower extends Phaser.GameObjects.Container {
 
     // Create projectile
     const projectileData = {
-      damage: this.data.damage,
+      damage: this.towerData.damage,
       type: this.type,
-      speed: this.data.projectileSpeed,
+      speed: this.towerData.projectileSpeed,
       canHitFlying: this.canTargetFlying(),
     };
 
     // Add special properties based on tower type
     if (this.type === 'aoe') {
-      projectileData.aoeRadius = this.data.aoeRadius;
+      projectileData.aoeRadius = this.towerData.aoeRadius;
     } else if (this.type === 'slow') {
-      projectileData.slowFactor = this.data.slowFactor;
-      projectileData.slowDuration = this.data.slowDuration;
+      projectileData.slowFactor = this.towerData.slowFactor;
+      projectileData.slowDuration = this.towerData.slowDuration;
     }
 
     // Spawn projectile
@@ -243,8 +247,8 @@ export default class Tower extends Phaser.GameObjects.Container {
    */
   calculateUpgradeCost() {
     // Allow per-tower scaling, fallback to default
-    const baseCost = this.data.cost;
-    const upgradeScaling = this.data.upgradeCostScaling || 0.6; // default 60% of base per level
+    const baseCost = this.towerData.cost;
+    const upgradeScaling = this.towerData.upgradeCostScaling || 0.6; // default 60% of base per level
     return Math.floor(baseCost * upgradeScaling * this.level);
   }
 
@@ -253,16 +257,16 @@ export default class Tower extends Phaser.GameObjects.Container {
    */
   applyUpgradeEffects() {
     // Allow per-tower scaling, fallback to defaults
-    const damageScale = this.data.upgradeDamageScale || 1.4;
-    const rangeScale = this.data.upgradeRangeScale || 1.15;
-    const fireRateScale = this.data.upgradeFireRateScale || 0.85;
+    const damageScale = this.towerData.upgradeDamageScale || 1.4;
+    const rangeScale = this.towerData.upgradeRangeScale || 1.15;
+    const fireRateScale = this.towerData.upgradeFireRateScale || 0.85;
 
-    this.data.damage = Math.round(this.data.damage * damageScale);
-    this.data.range = Math.round(this.data.range * rangeScale);
-    this.data.fireRate = Math.round(this.data.fireRate * fireRateScale);
+    this.towerData.damage = Math.round(this.towerData.damage * damageScale);
+    this.towerData.range = Math.round(this.towerData.range * rangeScale);
+    this.towerData.fireRate = Math.round(this.towerData.fireRate * fireRateScale);
 
     // Update range indicator
-    this.rangeIndicator.setRadius(this.data.range);
+    this.rangeIndicator.setRadius(this.towerData.range);
   }
 
   /**
@@ -292,7 +296,7 @@ export default class Tower extends Phaser.GameObjects.Container {
    */
   upgrade() {
     // Use maxLevel from data or default to 3
-    this.maxLevel = this.data.maxLevel || 3;
+    this.maxLevel = this.towerData.maxLevel || 3;
     if (this.level >= this.maxLevel) {
       return false; // Max level reached
     }
@@ -325,7 +329,7 @@ export default class Tower extends Phaser.GameObjects.Container {
    */
   sell() {
     // Calculate refund amount (60% of total investment)
-    const baseCost = this.data.cost;
+    const baseCost = this.towerData.cost;
     const upgradeCost = Math.floor(baseCost * 0.5) * (this.level - 1);
     const totalInvestment = baseCost + upgradeCost;
     const refundAmount = Math.floor(totalInvestment * 0.6);

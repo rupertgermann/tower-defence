@@ -207,6 +207,9 @@ export default class UIScene extends Phaser.Scene {
   }
 
   create() {
+    // Register shutdown handler for cleanup
+    this.events.on('shutdown', this.shutdown, this);
+
     // Get initial values
     this.lives = window.GAME_SETTINGS.PLAYER.lives;
     this.money = window.GAME_SETTINGS.PLAYER.money;
@@ -216,51 +219,43 @@ export default class UIScene extends Phaser.Scene {
     this.uiContainer = this.add.container(0, 0);
 
     // --- Top bar background ---
-    // (Ensure we keep a reference if needed for future depth management)
     this.topBarBackground = this.add.rectangle(0, 0, 1280, 80, 0x222222);
     this.topBarBackground.setOrigin(0, 0);
     this.topBarBackground.setAlpha(0.8);
-    this.topBarBackground.setDepth(10); // Set base depth for top bar background
+    this.topBarBackground.setDepth(10);
     this.uiContainer.add(this.topBarBackground);
 
     // Create top-right buttons container
     this.topRightButtonsContainer = this.add.container(0, 0);
-    this.topRightButtonsContainer.setDepth(20); // Ensure it's above the top bar background
+    this.topRightButtonsContainer.setDepth(20);
     this.uiContainer.add(this.topRightButtonsContainer);
 
     // --- Lower bar container for fade effect ---
     this.lowerBarContainer = this.add.container(0, 0);
-    this.lowerBarContainer.setAlpha(0); // Start hidden
+    this.lowerBarContainer.setAlpha(0);
     this.lowerBarVisible = false;
     this.uiContainer.add(this.lowerBarContainer);
 
     // Create UI background
     this.createUIBackground();
-
     // Create status displays
     this.createStatusDisplays();
-
     // Create tower selection buttons
     this.createTowerButtons();
-
     // Create wave control button
     this.createWaveButton();
-
     // Create message display
     this.createMessageDisplay();
-
     // Create UI buttons (mute, restart, main menu)
     this.createUIButtons();
-
     // Listen for game events
     this.setupEventListeners();
-
     // Show lower bar on game start or if game is stopped
     this.showLowerBar(true);
 
     // Pointer events for fade in/out on hover
     this.input.on('pointermove', (pointer) => {
-      if (!this.isWaveActive()) return; // Only apply hover effect during running waves
+      if (!this.isWaveActive()) return;
       const y = pointer.y;
       if (y >= 620 && !this.lowerBarVisible) {
         this.showLowerBar();
@@ -268,7 +263,7 @@ export default class UIScene extends Phaser.Scene {
         this.hideLowerBar();
       }
     });
-    // Also fade out if mouse leaves the game canvas completely during an active wave
+    // Fade out if mouse leaves the game canvas completely during an active wave
     this.game.canvas.addEventListener('mouseleave', () => {
       if (this.lowerBarVisible && this.isWaveActive()) {
         this.hideLowerBar();
@@ -925,28 +920,31 @@ export default class UIScene extends Phaser.Scene {
    * Clean up resources when scene is shut down
    */
   shutdown() {
-    // Clean up UI buttons
+    // Destroy UI buttons if they exist
     if (this.muteButton) this.muteButton.destroy();
     if (this.restartButton) this.restartButton.destroy();
     if (this.mainMenuButton) this.mainMenuButton.destroy();
-    
-    // Clean up dialogs
+
+    // Destroy dialogs if they exist
     if (this.restartDialog) this.restartDialog.destroy();
     if (this.mainMenuDialog) this.mainMenuDialog.destroy();
-    
-    // Clean up event listeners
-    this.scene.get('GameScene').events.off('updateUI', this.updateUI, this);
-    this.scene.get('GameScene').events.off('waveStarted', this.onWaveStarted, this);
-    this.scene.get('GameScene').events.off('waveCompleted', this.onWaveCompleted, this);
-    this.scene.get('GameScene').events.off('gameOver', this.onGameOver, this);
-    this.scene.get('GameScene').events.off('showMessage', this.showMessage, this);
-    this.scene.get('GameScene').events.off('showTowerInfo', this.showTowerInfo, this);
-    this.scene.get('GameScene').events.off('gameStart');
-    
+
+    // Remove event listeners from GameScene
+    const gameScene = this.scene.get('GameScene');
+    if (gameScene && gameScene.events) {
+      gameScene.events.off('updateUI', this.updateUI, this);
+      gameScene.events.off('waveStarted', this.onWaveStarted, this);
+      gameScene.events.off('waveCompleted', this.onWaveCompleted, this);
+      gameScene.events.off('gameOver', this.onGameOver, this);
+      gameScene.events.off('showMessage', this.showMessage, this);
+      gameScene.events.off('showTowerInfo', this.showTowerInfo, this);
+      gameScene.events.off('gameStart');
+    }
+
     // Remove pointer event listeners
     this.input.off('pointerdown');
     this.input.off('pointermove');
-    
+
     // Remove canvas event listener
     this.game.canvas.removeEventListener('mouseleave', this.hideLowerBar);
   }

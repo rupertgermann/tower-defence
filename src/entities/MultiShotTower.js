@@ -34,9 +34,9 @@ export default class MultiShotTower extends Tower {
     this.lastFireTime = time;
     for (const target of targets) {
       this.scene.spawnProjectile(this, target, `projectile_${this.type}`, {
-        damage: this.data.damage,
+        damage: this.towerData.damage,
         type: this.type,
-        speed: this.data.projectileSpeed,
+        speed: this.towerData.projectileSpeed,
         canHitFlying: this.canTargetFlying(),
       });
     }
@@ -49,7 +49,7 @@ export default class MultiShotTower extends Tower {
   update(time, delta, enemies) {
     if (!this.isActive) return;
     const targets = this.findTargets(enemies);
-    if (targets.length > 0 && time > this.lastFireTime + this.data.fireRate) {
+    if (targets.length > 0 && time > this.lastFireTime + this.towerData.fireRate) {
       this.fireAtTargets(time, targets);
     }
   }

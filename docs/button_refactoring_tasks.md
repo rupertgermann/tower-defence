@@ -1,4 +1,16 @@
-# Button Refactoring Tasks
+## Step: Centralize UIScene Cleanup (2025-04-19)
+
+**Implemented features:**
+- Registered the shutdown handler at the start of UIScene's create() method.
+- Moved all cleanup logic (UI button/dialog destruction, event listener removal) into the shutdown() method.
+- Removed redundant cleanup code to ensure all teardown is handled in one place.
+- Ensured the approach is simple, avoids unnecessary complexity, and follows Phaser best practices for scene lifecycle management.
+
+**Encountered errors:**
+- No errors encountered during this step.
+
+**How we fixed issues:**
+- N/A; the implementation was straightforward and did not require error correction.# Button Refactoring Tasks
 
 ## Overview
 This document outlines the specific tasks needed to implement the unified button system as described in the button refactoring plan. The goal is to create a consistent, maintainable, and scalable UI button system for the tower defense game.
