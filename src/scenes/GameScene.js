@@ -733,8 +733,11 @@ export default class GameScene extends Phaser.Scene {
       this.map.clear(true, true);
       this.map = null;
     }
-    // Stop all audio
-    this.audioManager?.stopAll && this.audioManager.stopAll();
+    // Destroy all audio objects and clear references
+    if (this.audioManager) {
+      this.audioManager.destroyAll();
+      this.audioManager = null;
+    }
     // Reset economy
     this.economyManager?.reset && this.economyManager.reset();
     // Remove any tooltips or custom overlays

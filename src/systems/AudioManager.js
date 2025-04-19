@@ -108,4 +108,23 @@ export default class AudioManager {
       this.scene.sound.stopAll();
     }
   }
+
+  /**
+   * Destroy all sound objects and clear references
+   */
+  destroyAll() {
+    console.log('[AudioManager.destroyAll] Destroying all sounds...');
+    for (const key in this.sounds) {
+      if (this.sounds[key]) {
+        this.sounds[key].destroy();
+        this.sounds[key] = null;
+      }
+    }
+    if (this.music) {
+      this.music.destroy();
+      this.music = null;
+    }
+    this.sounds = {};
+    this.scene = null;
+  }
 }

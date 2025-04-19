@@ -4,3 +4,4 @@
 - prevent placing towers on the enemy path and use the correct tiles for the path
 
 - exclude top bar and bottom bar from clickable area (e.g. tower placement)
+- different explosions for different tower types
