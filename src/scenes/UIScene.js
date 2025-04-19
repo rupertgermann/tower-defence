@@ -6,14 +6,14 @@ import ConfirmationDialog from '../helpers/ConfirmationDialog.js';
 const DIALOG_STYLE = {
   width: 420,
   height: 210,
-  backgroundColor: 0x333333,
-  backgroundAlpha: 0.8,
+  backgroundColor: 0x000000,
+  backgroundAlpha: 0.6,
   borderColor: 0xffd700,
   borderThickness: 0,
   borderRadius: 16,
   padding: 32,
-  fontFamily: 'Verdana',
-  fontSize: 22,
+  fontFamily: 'courier',
+  fontSize: 17,
   fontColor: '#fffbe7',
   buttonStyle: {
     backgroundColor: 0x4444aa,
@@ -21,7 +21,7 @@ const DIALOG_STYLE = {
     borderColor: 0xffffff,
     borderThickness: 0,
     borderRadius: 10,
-    fontFamily: 'Verdana',
+    fontFamily: 'courier',
     fontSize: 20,
     fontColor: '#fffbe7',
     hoverColor: 0x8888ff
