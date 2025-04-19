@@ -230,7 +230,7 @@ export default class UIScene extends Phaser.Scene {
     this.topBarBackground.setDepth(10);
     this.uiContainer.add(this.topBarBackground);
 
-    // Create top-right buttons container
+    // Create top-right buttons container (always new)
     this.topRightButtonsContainer = this.add.container(0, 0);
     this.topRightButtonsContainer.setDepth(20);
     this.uiContainer.add(this.topRightButtonsContainer);
@@ -949,7 +949,7 @@ export default class UIScene extends Phaser.Scene {
       this.mainMenuButton.destroy();
       this.mainMenuButton = null;
     }
-    // Destroy top-right buttons container
+    // Destroy top-right buttons container (always)
     if (this.topRightButtonsContainer) {
       this.topRightButtonsContainer.destroy(true);
       this.topRightButtonsContainer = null;
