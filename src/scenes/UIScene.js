@@ -197,14 +197,22 @@ export default class UIScene extends Phaser.Scene {
       this.towerInfoPanel.add(upgradeBtn);
       this.towerInfoPanel.add(btnText);
 
-      if (canAffordUpgrade) {
-        upgradeBtn.on('pointerover', () => {
-          upgradeBtn.setFillStyle(0x00cc00);
-        });
-        upgradeBtn.on('pointerout', () => {
-          upgradeBtn.setFillStyle(0x00aa00);
-        });
-        upgradeBtn.on('pointerdown', () => {
+      // --- Always attach handler, check state inside ---
+      upgradeBtn.on('pointerdown', () => {
+        // Defensive: recalc canUpgrade/canAfford
+        let canUpgradeNow = typeof tower.upgrade === 'function' && (!tower.maxLevel || tower.level < tower.maxLevel);
+        let upgradeCostNow = 0;
+        if (canUpgradeNow) {
+          if (typeof tower.calculateUpgradeCost === 'function') {
+            upgradeCostNow = tower.calculateUpgradeCost();
+          } else {
+            upgradeCostNow = Math.floor(tower.towerData.cost * 0.5);
+          }
+        }
+        const currentMoney = this.money;
+        const canAffordNow = currentMoney >= upgradeCostNow;
+        if (canUpgradeNow && canAffordNow && !upgradeBtn.input?.enabled) return; // Defensive: skip if not enabled
+        if (canUpgradeNow && canAffordNow) {
           const audioManager = this.scene.get('GameScene').audioManager;
           if (audioManager) audioManager.playSound('ui_click');
           if (tower.upgrade()) {
@@ -226,8 +234,11 @@ export default class UIScene extends Phaser.Scene {
               3000
             );
           }
-        });
-      }
+        } else {
+          // Optionally: feedback if clicked when not affordable
+          this.showMessage('Not enough gold to upgrade!', 1800);
+        }
+      });
       // Optionally store references if you want to update on gold change
       this.upgradeBtn = upgradeBtn;
       this.upgradeText = upgradeText;
@@ -273,6 +284,11 @@ export default class UIScene extends Phaser.Scene {
     const gameScene = this.scene.get('GameScene');
     if (this._boundUpgradePanelGoldListener) {
       gameScene.events.off('updateUI', this._boundUpgradePanelGoldListener);
+    }
+    // Remove all pointer events from upgradeBtn if present
+    if (this.upgradeBtn) {
+      this.upgradeBtn.removeAllListeners && this.upgradeBtn.removeAllListeners();
+      this.upgradeBtn = null;
     }
     this.currentTowerForUpgradePanel = null;
   }
