@@ -843,8 +843,13 @@ export default class UIScene extends Phaser.Scene {
       height: buttonSize,
       callback: (isToggled) => {
         this.isMuted = isToggled;
-        if (audioManager) audioManager.mute(this.isMuted);
-        
+        if (audioManager) {
+          if (this.isMuted) {
+            audioManager.muteAll();
+          } else {
+            audioManager.unmuteAll();
+          }
+        }
         // Update tooltip text based on state
         this.muteButton.setTooltip(this.isMuted ? 'Unmute' : 'Mute');
       }
