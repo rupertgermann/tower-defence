@@ -85,17 +85,20 @@ export default class ConfirmationDialog {
     };
     this.style = style;
 
-    // Create container for all dialog elements
-    this.container = scene.add.container(640, 360); // Center of screen (assuming 1280x720)
-    this.container.setDepth(1000); // Ensure it's above other UI elements
-    this.container.setVisible(false); // Start hidden
+    // Get canvas size dynamically from the scene's scale manager
+    const canvasWidth = scene.sys.game.scale.width;
+    const canvasHeight = scene.sys.game.scale.height;
 
     // Create semi-transparent background overlay (covers entire screen)
-    this.overlay = scene.add.rectangle(0, 0, 1280, 720, 0x000000, 0.7);
+    this.overlay = scene.add.rectangle(canvasWidth / 2, canvasHeight / 2, canvasWidth, canvasHeight, 0x000000, 0.7);
     this.overlay.setOrigin(0.5, 0.5);
-    this.overlay.x = -640; // Adjust for container position
-    this.overlay.y = -360; // Adjust for container position
-    this.container.add(this.overlay);
+    this.overlay.setDepth(999); // Just below the dialog container
+    this.overlay.setVisible(false); // Initially hidden
+
+    // Create container for all dialog elements, centered
+    this.container = scene.add.container(canvasWidth / 2, canvasHeight / 2);
+    this.container.setDepth(1000); // Ensure it's above the overlay and other UI elements
+    this.container.setVisible(false); // Start hidden
 
     // Create dialog background with styling
     this.background = scene.add.rectangle(
@@ -153,6 +156,35 @@ export default class ConfirmationDialog {
 
     // Set up event handlers
     this.setupEventHandlers();
+
+    // Override show/hide to also show/hide the overlay
+    this.show = () => {
+      this.overlay.setVisible(true);
+      this.container.setVisible(true);
+      // Add a small animation for better UX
+      this.scene.tweens.add({
+        targets: this.container,
+        scale: { from: 0.8, to: 1 },
+        duration: 200,
+        ease: 'Back.easeOut'
+      });
+    };
+    this.hide = () => {
+      // Animate out
+      this.scene.tweens.add({
+        targets: this.container,
+        scale: { from: 1, to: 0.8 },
+        alpha: { from: 1, to: 0 },
+        duration: 200,
+        ease: 'Back.easeIn',
+        onComplete: () => {
+          this.overlay.setVisible(false);
+          this.container.setVisible(false);
+          this.container.setScale(1);
+          this.container.setAlpha(1);
+        }
+      });
+    };
   }
 
   /**
@@ -209,40 +241,6 @@ export default class ConfirmationDialog {
     this.overlay.on('pointerdown', (pointer) => {
       // Stop event propagation
       pointer.event.stopPropagation();
-    });
-  }
-
-  /**
-   * Show the dialog
-   */
-  show() {
-    this.container.setVisible(true);
-    
-    // Add a small animation for better UX
-    this.scene.tweens.add({
-      targets: this.container,
-      scale: { from: 0.8, to: 1 },
-      duration: 200,
-      ease: 'Back.easeOut'
-    });
-  }
-
-  /**
-   * Hide the dialog
-   */
-  hide() {
-    // Animate out
-    this.scene.tweens.add({
-      targets: this.container,
-      scale: { from: 1, to: 0.8 },
-      alpha: { from: 1, to: 0 },
-      duration: 200,
-      ease: 'Back.easeIn',
-      onComplete: () => {
-        this.container.setVisible(false);
-        this.container.setScale(1);
-        this.container.setAlpha(1);
-      }
     });
   }
 
