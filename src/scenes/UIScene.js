@@ -101,9 +101,7 @@ export default class UIScene extends Phaser.Scene {
     const panelHeight = 220;
     const panelX = 1280 - panelWidth - 30;
     const panelY = 100;
-    this.towerInfoPanel = this.add.container(panelX, panelY);
-
-    const bg = this.add.rectangle(
+    const panelBg = this.add.rectangle(
       0,
       0,
       panelWidth,
@@ -111,8 +109,18 @@ export default class UIScene extends Phaser.Scene {
       0x222244,
       0.95
     );
-    bg.setOrigin(0, 0);
-    this.towerInfoPanel.add(bg);
+    panelBg.setOrigin(0, 0);
+    console.log('[TowerInfoPanel] Creating panelBg, calling setInteractive');
+    panelBg.setInteractive();
+    panelBg.on('pointerdown', (pointer) => {
+      console.log('[TowerInfoPanel] panelBg pointerdown', pointer);
+    });
+    console.log('[TowerInfoPanel] panelBg depth:', panelBg.depth, 'input:', panelBg.input);
+
+    // Create the panel container
+    this.towerInfoPanel = this.add.container(panelX, panelY);
+    this.towerInfoPanel.add(panelBg);
+    console.log('[TowerInfoPanel] towerInfoPanel depth:', this.towerInfoPanel.depth);
 
     // Tower name
     const nameText = this.add.text(
@@ -199,46 +207,39 @@ export default class UIScene extends Phaser.Scene {
 
       // --- Always attach handler, check state inside ---
       upgradeBtn.on('pointerdown', () => {
-        // Defensive: recalc canUpgrade/canAfford
-        let canUpgradeNow = typeof tower.upgrade === 'function' && (!tower.maxLevel || tower.level < tower.maxLevel);
-        let upgradeCostNow = 0;
-        if (canUpgradeNow) {
+        // Defensive: check if still interactive
+        if (!upgradeBtn.input || !upgradeBtn.input.enabled) return;
+
+        // LOG: Recalculate live state at click time
+        const currentMoney = this.scene.get('GameScene').economyManager.getMoney();
+        let canUpgrade = typeof tower.upgrade === 'function' && (!tower.maxLevel || tower.level < tower.maxLevel);
+        let upgradeCost = 0;
+        if (canUpgrade) {
           if (typeof tower.calculateUpgradeCost === 'function') {
-            upgradeCostNow = tower.calculateUpgradeCost();
+            upgradeCost = tower.calculateUpgradeCost();
           } else {
-            upgradeCostNow = Math.floor(tower.towerData.cost * 0.5);
+            upgradeCost = Math.floor(tower.towerData.cost * 0.5);
           }
         }
-        const currentMoney = this.money;
-        const canAffordNow = currentMoney >= upgradeCostNow;
-        if (canUpgradeNow && canAffordNow && !upgradeBtn.input?.enabled) return; // Defensive: skip if not enabled
-        if (canUpgradeNow && canAffordNow) {
+        const canAffordUpgrade = currentMoney >= upgradeCost;
+        console.log('[UpgradeBtn] Clicked. Gold:', currentMoney, 'UpgradeCost:', upgradeCost, 'canUpgrade:', canUpgrade, 'canAffordUpgrade:', canAffordUpgrade);
+
+        // Check if can upgrade and can afford
+        if (canUpgrade && canAffordUpgrade) {
           const audioManager = this.scene.get('GameScene').audioManager;
-          if (audioManager) audioManager.playSound('ui_click');
-          if (tower.upgrade()) {
-            // Play upgrade sound if available
-            if (audioManager && typeof audioManager.playSound === 'function') {
-              audioManager.playSound('upgrade');
-            }
-            // Refresh panel with new stats
-            this.showTowerInfo(tower);
-            // Update UI money
-            this.scene
-              .get('GameScene')
-              .events.emit('updateUI', {
-                money: this.scene.get('GameScene').economyManager.getMoney(),
-              });
-          } else {
-            this.showMessage(
-              'Cannot upgrade: \ninsufficient funds\nor max level reached.',
-              3000
-            );
-          }
-        } else {
-          // Optionally: feedback if clicked when not affordable
+          if (audioManager) audioManager.playSound('upgrade');
+          const upgraded = tower.upgrade();
+          this.scene.get('GameScene').events.emit('updateUI', {
+            money: this.scene.get('GameScene').economyManager.getMoney(),
+          });
+          this.hideTowerInfo();
+        } else if (!canAffordUpgrade) {
           this.showMessage('Not enough gold to upgrade!', 1800);
+        } else {
+          this.showMessage('Cannot upgrade: \ninsufficient funds\nor max level reached.', 3000);
         }
       });
+      console.log('[UpgradeBtn] Handler attached to upgradeBtn');
       // Optionally store references if you want to update on gold change
       this.upgradeBtn = upgradeBtn;
       this.upgradeText = upgradeText;
@@ -717,9 +718,25 @@ export default class UIScene extends Phaser.Scene {
 
     // Hide tower info when clicking elsewhere (optional: could be improved)
     this.input.on('pointerdown', (pointer, currentlyOver) => {
-      // If click is not on a UI element or tower info panel, hide it
-      if (!currentlyOver.some((obj) => obj === this.towerInfoPanel)) {
-        this.hideTowerInfo();
+      console.log('[UIScene] Scene pointerdown', pointer, 'currentlyOver:', currentlyOver);
+      // If the tower info panel is open
+      if (this.towerInfoPanel) {
+        // Gather all objects that are part of the panel (panel + children)
+        const panelObjects = [this.towerInfoPanel];
+        if (this.towerInfoPanel.getAll) {
+          panelObjects.push(...this.towerInfoPanel.getAll());
+        } else if (this.towerInfoPanel.list) {
+          panelObjects.push(...this.towerInfoPanel.list);
+        }
+        // If click is NOT on the panel or any of its children, hide it
+        if (!currentlyOver.some(obj => panelObjects.includes(obj))) {
+          this.hideTowerInfo();
+        }
+      } else {
+        // If no panel, old logic (optional: could skip)
+        if (!currentlyOver.some(obj => obj === this.towerInfoPanel)) {
+          this.hideTowerInfo();
+        }
       }
     });
 

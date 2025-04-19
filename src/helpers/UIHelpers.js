@@ -19,7 +19,7 @@ export function getPriceColor(canAfford) {
 export function setButtonAffordability(button, canAfford, enabledColor = 0x00aa00, disabledColor = 0x888888) {
   if (canAfford) {
     button.setFillStyle(enabledColor);
-    button.setInteractive();
+    button.setInteractive({ useHandCursor: true });
   } else {
     button.setFillStyle(disabledColor);
     button.disableInteractive();
