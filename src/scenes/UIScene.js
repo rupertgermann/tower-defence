@@ -539,22 +539,83 @@ export default class UIScene extends Phaser.Scene {
   }
 
   createMessageDisplay() {
+    // Default config (can be overridden)
+    this.messageConfig = {
+      fontSize: '17px',
+      fontFamily: 'courier',
+      color: '#fffbe7',
+      backgroundColor: 0x000000,
+      backgroundAlpha: 0.5,
+      borderRadius: 8,
+      padding: 16,
+      width: 400,
+      height: 100,
+    };
     // Message background
-    this.messageBackground = this.add.rectangle(640, 360, 400, 100, 0x000000);
-    this.messageBackground.setOrigin(0.5, 0.5);
-    this.messageBackground.setAlpha(0.8);
+    this.messageBackground = this.add.graphics();
+    this.messageBackground.setDepth(100);
     this.messageBackground.setVisible(false);
     this.uiContainer.add(this.messageBackground);
 
     // Message text
     this.messageText = this.add.text(640, 360, '', {
-      fontSize: '24px',
-      fill: '#ffffff',
+      fontSize: this.messageConfig.fontSize,
+      fontFamily: this.messageConfig.fontFamily,
+      color: this.messageConfig.color,
       align: 'center',
+      wordWrap: { width: this.messageConfig.width - 2 * this.messageConfig.padding }
     });
     this.messageText.setOrigin(0.5, 0.5);
+    this.messageText.setDepth(101);
     this.messageText.setVisible(false);
     this.uiContainer.add(this.messageText);
+  }
+
+  // --- Show message with custom style ---
+  showMessage(message, duration = 2000, options = {}) {
+    const cfg = { ...this.messageConfig, ...options };
+    // Set text and style
+    this.messageText.setText(message);
+    this.messageText.setStyle({
+      fontSize: cfg.fontSize,
+      fontFamily: cfg.fontFamily,
+      color: cfg.color,
+      align: 'center',
+      wordWrap: { width: cfg.width - 2 * cfg.padding }
+    });
+    this.messageText.setVisible(true);
+
+    // Calculate background size based on text
+    const textBounds = this.messageText.getBounds();
+    const bgWidth = Math.max(cfg.width, textBounds.width + 2 * cfg.padding);
+    const bgHeight = Math.max(cfg.height, textBounds.height + 2 * cfg.padding);
+    this.messageBackground.clear();
+    this.messageBackground.fillStyle(cfg.backgroundColor, cfg.backgroundAlpha);
+    // Draw rounded rectangle
+    this.messageBackground.fillRoundedRect(
+      640 - bgWidth / 2,
+      360 - bgHeight / 2,
+      bgWidth,
+      bgHeight,
+      cfg.borderRadius
+    );
+    this.messageBackground.setVisible(true);
+
+    // Bring to top
+    this.messageBackground.setDepth(100);
+    this.messageText.setDepth(101);
+
+    // Clear any existing timer
+    if (this.messageTimer) {
+      this.messageTimer.remove();
+    }
+    // Hide message after duration (if not permanent)
+    if (duration > 0) {
+      this.messageTimer = this.time.delayedCall(duration, () => {
+        this.messageText.setVisible(false);
+        this.messageBackground.setVisible(false);
+      });
+    }
   }
 
   setupEventListeners() {
@@ -748,26 +809,6 @@ export default class UIScene extends Phaser.Scene {
     this.updateUIButtonStates(true);
 
     console.log(`UIScene.onGameOver called with victory=${data.victory}`);
-  }
-
-  showMessage(message, duration = 2000) {
-    // Show message
-    this.messageText.setText(message);
-    this.messageText.setVisible(true);
-    this.messageBackground.setVisible(true);
-
-    // Clear any existing timer
-    if (this.messageTimer) {
-      this.messageTimer.remove();
-    }
-
-    // Hide message after duration (if not permanent)
-    if (duration > 0) {
-      this.messageTimer = this.time.delayedCall(duration, () => {
-        this.messageText.setVisible(false);
-        this.messageBackground.setVisible(false);
-      });
-    }
   }
 
   setWaveButtonEnabled(enabled) {

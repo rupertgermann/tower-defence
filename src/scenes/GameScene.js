@@ -23,6 +23,17 @@ import ProjectileManager from '../systems/ProjectileManager.js';
 const TOP_BAR_HEIGHT = 80;
 const BOTTOM_BAR_HEIGHT = 100;
 
+// --- Generic showMessage styling options ---
+const SHOW_MESSAGE_DEFAULTS = {
+  fontSize: '14px',
+  fontFamily: 'courier',
+  backgroundAlpha: 0.6, // Adjustable transparency
+  backgroundColor: 0x000000, // Default black
+  textColor: '#fffbe7',
+  borderRadius: 8,
+  padding: 16
+};
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -343,11 +354,15 @@ export default class GameScene extends Phaser.Scene {
   handleTilePlacement(tile) {
     // Prevent placement in UI bar regions
     const canvasHeight = this.sys.game.scale.height;
-    // Use tile.displayHeight if available, else default to 64 (tile size)
     const tileHeight = tile.displayHeight || 64;
     if (tile.y < TOP_BAR_HEIGHT || tile.y > (canvasHeight - BOTTOM_BAR_HEIGHT - tileHeight)) {
-      // Use smaller font and line break for message
-      this.events.emit('showMessage', 'Cannot place towers\non UI bars!', 1800, { fontSize: '16px', fontFamily: 'courier' });
+      // Use generic styling and allow overrides
+      this.events.emit(
+        'showMessage',
+        "You can't place \na tower here",
+        1800,
+        { ...SHOW_MESSAGE_DEFAULTS }
+      );
       return;
     }
     if (tile.hasTower) return;
@@ -402,7 +417,7 @@ export default class GameScene extends Phaser.Scene {
       });
     } else {
       // Not enough money - show feedback
-      this.events.emit('showMessage', 'Not enough money!');
+      this.events.emit('showMessage', 'Not enough money!', 1800, { ...SHOW_MESSAGE_DEFAULTS });
     }
   }
 
