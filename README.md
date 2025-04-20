@@ -2,6 +2,8 @@
 
 A modern, extensible tower defense game built with Phaser 3.88.2 and ES6 modules. Defend your base from waves of enemies by strategically placing, upgrading, and combining different types of towers. Designed for easy expansion and clean architecture.
 
+Note: The complete code of this game was written by AI (mostly GPT-4.1 in Windsurf). Graphics: ChatGPT-4o. Sounds: ElevenLabs.
+
 ---
 
 ## Table of Contents
