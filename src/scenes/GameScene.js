@@ -45,6 +45,15 @@ export default class GameScene extends Phaser.Scene {
     // New helpers
     this.collisionManager = null;
     this.effectSpawner = null;
+
+    // Victory banner elements
+    this.victoryBannerBg = null;
+    this.victoryText = null;
+    this.instructionText = null;
+    this.scoreText = null;
+
+    // Track all infoZones for proper cleanup
+    this.infoZones = [];
   }
 
   preload() {
@@ -194,6 +203,23 @@ export default class GameScene extends Phaser.Scene {
       specialTiles[`${tile.x},${tile.y}`] = tile.type;
     });
 
+    // Create the special tile tooltip once per scene setup
+    if (this.specialTileTooltip) {
+      this.specialTileTooltip.destroy();
+      this.specialTileTooltip = null;
+    }
+    this.specialTileTooltip = this.add.text(0, 0, '', {
+      fontSize: '14px',
+      fill: '#fff',
+      backgroundColor: '#222a',
+      padding: { left: 8, right: 8, top: 4, bottom: 4 },
+      align: 'center',
+      wordWrap: { width: tileSize * 2 },
+      fontStyle: 'normal',
+    });
+    this.specialTileTooltip.setDepth(100);
+    this.specialTileTooltip.setVisible(false);
+
     // Create background tiles
     let tileKey = 'tile';
     if (mapData.theme === 'desert') tileKey = 'tile_desert';
@@ -247,21 +273,7 @@ export default class GameScene extends Phaser.Scene {
             tileSize, tileSize
           ).setOrigin(0, 0).setInteractive();
           infoZone.setDepth(10);
-
-          // Lazy tooltip creation
-          if (!this.specialTileTooltip) {
-            this.specialTileTooltip = this.add.text(0, 0, '', {
-              fontSize: '14px',
-              fill: '#fff',
-              backgroundColor: '#222a',
-              padding: { left: 8, right: 8, top: 4, bottom: 4 },
-              align: 'center',
-              wordWrap: { width: tileSize * 2 },
-              fontStyle: 'normal',
-            });
-            this.specialTileTooltip.setDepth(100);
-            this.specialTileTooltip.setVisible(false);
-          }
+          this.infoZones.push(infoZone);
 
           infoZone.on('pointerover', (pointer) => {
             this.specialTileTooltip.setText(desc);
@@ -614,7 +626,7 @@ export default class GameScene extends Phaser.Scene {
     // Create full-screen semi-transparent background
     const width = this.game.config.width;
     const height = this.game.config.height;
-    const background = this.add.rectangle(
+    this.victoryBannerBg = this.add.rectangle(
       width / 2,
       height / 2,
       width,
@@ -622,11 +634,11 @@ export default class GameScene extends Phaser.Scene {
       0x000000,
       0.8
     );
-    background.setOrigin(0.5);
-    background.setDepth(1000);
+    this.victoryBannerBg.setOrigin(0.5);
+    this.victoryBannerBg.setDepth(1000);
 
     // Create victory text in gold
-    const victoryText = this.add.text(width / 2, height / 2 - 80, 'VICTORY!', {
+    this.victoryText = this.add.text(width / 2, height / 2 - 80, 'VICTORY!', {
       fontSize: '96px',
       fontStyle: 'bold',
       fill: '#FFD700', // Gold color
@@ -634,11 +646,11 @@ export default class GameScene extends Phaser.Scene {
       strokeThickness: 8,
       align: 'center',
     });
-    victoryText.setOrigin(0.5);
-    victoryText.setDepth(1001);
+    this.victoryText.setOrigin(0.5);
+    this.victoryText.setDepth(1001);
 
     // Create instruction text
-    const instructionText = this.add.text(
+    this.instructionText = this.add.text(
       width / 2,
       height / 2 + 60,
       'Click anywhere to return to main menu',
@@ -648,18 +660,18 @@ export default class GameScene extends Phaser.Scene {
         align: 'center',
       }
     );
-    instructionText.setOrigin(0.5);
-    instructionText.setDepth(1001);
+    this.instructionText.setOrigin(0.5);
+    this.instructionText.setDepth(1001);
 
     // Add score text
     const score = this.economyManager.getScore();
-    const scoreText = this.add.text(width / 2, height / 2, `Score: ${score}`, {
+    this.scoreText = this.add.text(width / 2, height / 2, `Score: ${score}`, {
       fontSize: '48px',
       fill: '#00FF00', // Green color
       align: 'center',
     });
-    scoreText.setOrigin(0.5);
-    scoreText.setDepth(1001);
+    this.scoreText.setOrigin(0.5);
+    this.scoreText.setDepth(1001);
 
     // Add click handler to reload the browser window (on the entire screen)
     this.input.once('pointerdown', () => {
@@ -672,21 +684,21 @@ export default class GameScene extends Phaser.Scene {
 
     // Add animation effects
     this.tweens.add({
-      targets: victoryText,
+      targets: this.victoryText,
       scale: { from: 0.5, to: 1.2, yoyo: true, repeat: -1 },
       duration: 1000,
       ease: 'Sine.easeInOut',
     });
 
     this.tweens.add({
-      targets: instructionText,
+      targets: this.instructionText,
       alpha: { from: 0, to: 1 },
       duration: 500,
       delay: 500,
     });
 
     this.tweens.add({
-      targets: scoreText,
+      targets: this.scoreText,
       scale: { from: 0.8, to: 1.1 },
       duration: 800,
       ease: 'Back.out',
@@ -762,6 +774,33 @@ export default class GameScene extends Phaser.Scene {
     if (this.specialTileTooltip) {
       this.specialTileTooltip.destroy();
       this.specialTileTooltip = null;
+    }
+    // Destroy victory banner elements if present
+    if (this.victoryText) {
+      this.victoryText.destroy();
+      this.victoryText = null;
+    }
+    if (this.instructionText) {
+      this.instructionText.destroy();
+      this.instructionText = null;
+    }
+    if (this.scoreText) {
+      this.scoreText.destroy();
+      this.scoreText = null;
+    }
+    if (this.victoryBannerBg) {
+      this.victoryBannerBg.destroy();
+      this.victoryBannerBg = null;
+    }
+    // Remove and destroy all infoZones
+    if (this.infoZones && this.infoZones.length) {
+      this.infoZones.forEach(zone => {
+        if (zone) {
+          zone.removeAllListeners && zone.removeAllListeners();
+          zone.destroy && zone.destroy();
+        }
+      });
+      this.infoZones = [];
     }
   }
 }
