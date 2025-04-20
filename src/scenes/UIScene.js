@@ -862,7 +862,7 @@ export default class UIScene extends Phaser.Scene {
     // Update wave number
     this.wave = waveNumber;
     this.waveText.setText(
-      `Wave: ${this.wave}/${window.GAME_SETTINGS.WAVES.length}`
+      `Wave: ${this.wave}/${this.scene.get('GameScene').waveManager.getTotalWaves()}`
     );
 
     // Disable wave button during wave
