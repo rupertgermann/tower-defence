@@ -41,3 +41,4 @@ logs
 # Temporary files
 *.tmp
 *.temp
+docs/all_js_files.html
