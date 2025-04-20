@@ -18,8 +18,8 @@
   },
   {
     "enemies": ["BOSS", "HEALER", "SHIELD", "SPLIT", "TELEPORT"],
-    "count": 5,
+    "count": 25,
     "interval": 800,
-    "bossWave": true
+    "bossWave": false
   }
 ]
