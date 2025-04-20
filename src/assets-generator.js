@@ -109,7 +109,7 @@ createCircle(16, '#FF9800', 'enemy_basic.png'); // Orange basic enemy
 createCircle(16, '#FFEB3B', 'enemy_fast.png'); // Yellow fast enemy
 createCircle(16, '#9C27B0', 'enemy_armored.png'); // Purple armored enemy
 createCircle(16, '#4CAF50', 'enemy_flying.png'); // Green flying enemy
-createCircle(32, '#E91E63', 'enemy_boss.png'); // Pink boss enemy
+createCircle(28, '#E91E63', 'enemy_boss.png'); // Pink boss enemy
 
 // Create additional enemy assets
 createCircle(16, '#00FF00', 'enemy_healer.png'); // Light green healer enemy
