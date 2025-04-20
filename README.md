@@ -11,6 +11,7 @@ A modern, extensible tower defense game built with Phaser 3.88.2 and ES6 modules
 - [Commands](#commands)
 - [Gameplay](#gameplay)
 - [Assets](#assets)
+- [Screenshots](#screenshots)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
@@ -138,9 +139,35 @@ Defend your base from waves of enemies by building and upgrading towers. Survive
 
 ## Assets
 
-- Tower and enemy sprites are in `public/assets/`.
-- All towers, enemies, and waves are defined in JSON config files for easy expansion.
-- **To add new tower types:** Place images named `tower_sniper.png`, `tower_multishot.png`, and `tower_support.png` in `public/assets/` for best visuals. Placeholder images will be used if not present.
+Game assets are generated procedurally using the script in `src/assets-generator.js`.
+
+- **Tiles:** Grass, desert, mountain, path, placement
+- **Towers:** All types and upgrade levels
+- **Enemies:** Basic, fast, armored, flying, boss, healer, shield, split, teleport
+- **Projectiles:** Basic, AoE, slow, sniper, multishot
+- **Effects:** Explosion, favicon
+
+You can regenerate all assets with:
+
+```bash
+node src/assets-generator.js
+```
+
+Generated assets are placed in `public/assets/images/`.
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/main_screen.png" alt="Main Menu" width="600"/>
+</p>
+
+<p align="center">
+  <img src="docs/images/forest_map.png" alt="Forest Map" width="400"/>
+  <img src="docs/images/desert_map.png" alt="Desert Map" width="400"/>
+  <img src="docs/images/mountain_map.png" alt="Mountain Map" width="400"/>
+</p>
 
 ---
 
