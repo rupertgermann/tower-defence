@@ -213,3 +213,16 @@ pie title Implementation Progress
 - **Implemented Features**: Extracted tower, enemy, and projectile logic from `GameScene.js` into dedicated `TowerManager.js`, `EnemyManager.js`, and `ProjectileManager.js` classes. Refactored `GameScene.js` to delegate all entity management to these helpers, reducing file complexity and improving maintainability.
 - **Encountered Errors**: No errors encountered during this modularization.
 - **How Errors Were Fixed**: N/A
+
+### Generated Unique Projectile Graphics for Sniper and Multishot Towers (2025-04-20)
+
+### Implemented Features
+- Added asset generation for `projectile_sniper.png` (purple) and `projectile_multishot.png` (orange) in src/assets-generator.js.
+- These projectiles now have distinct graphics matching their tower types and colors.
+- No code changes required in tower or projectile logic, as asset keys were already correct.
+
+### Encountered Errors
+- Sniper and multishot towers used default or missing projectile graphics, as their unique assets were not generated.
+
+### How Issues Were Fixed
+- Updated the asset generator to create the missing projectile images, ensuring proper visuals in-game for these towers.

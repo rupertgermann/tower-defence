@@ -121,6 +121,8 @@ createCircle(16, '#E040FB', 'enemy_teleport.png'); // Magenta teleport enemy
 createCircle(8, '#2196F3', 'projectile_basic.png'); // Blue basic projectile
 createCircle(8, '#F44336', 'projectile_aoe.png'); // Red AOE projectile
 createCircle(8, '#00BCD4', 'projectile_slow.png'); // Cyan slow projectile
+createCircle(8, '#8E24AA', 'projectile_sniper.png'); // Purple sniper projectile
+createCircle(8, '#FF9800', 'projectile_multishot.png'); // Orange multishot projectile
 
 // Create effect assets
 createCircle(16, '#FFEB3B', 'explosion.png'); // Yellow explosion

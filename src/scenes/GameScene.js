@@ -82,6 +82,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('projectile_basic', 'assets/projectile_basic.png');
     this.load.image('projectile_aoe', 'assets/projectile_aoe.png');
     this.load.image('projectile_slow', 'assets/projectile_slow.png');
+    this.load.image('projectile_sniper', 'assets/projectile_sniper.png');
+    this.load.image('projectile_multishot', 'assets/projectile_multishot.png');
 
     // Load effects
     this.load.image('explosion', 'assets/explosion.png');
