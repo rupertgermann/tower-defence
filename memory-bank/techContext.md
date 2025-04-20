@@ -6,7 +6,7 @@
 - **Game Engine**: Phaser 3.88.2
 - **Language**: JavaScript (ES6+)
 - **Build System**: Webpack 5
-- **Module Format**: ES Modules
+- **Module Format**: ES Modules (aligned with Phaser 3.60+ ESM support)
 - **Asset Pipeline**: Custom asset generator script
 
 ### Development Environment
@@ -56,18 +56,21 @@ tower-defence/
 
 ### Phaser Game Engine
 The game leverages Phaser 3's key features:
-- **Scene Management**: Multiple scenes for game and UI
+- **Scene Management**: Multiple scenes for game and UI (GameScene, UIScene, MapSelectScene)
 - **Physics System**: Arcade physics for movement and collisions
 - **Game Objects**: Sprites, containers, and graphics primitives
 - **Animation System**: For visual effects and entity animations
-- **Event System**: For communication between components
+- **Event System**: For communication between components (following Phaser's best practices)
 - **Input Handling**: Mouse/touch input for tower placement and UI
+- **Group Management**: Phaser groups for managing collections of similar objects
+- **Tweens**: For smooth animations and visual feedback
+- **Particles**: For death animations and visual effects
 
 ### Rendering Approach
 - Canvas-based rendering via Phaser's WebGL renderer
 - Sprite-based entities with dynamic transformations
-- Layered rendering with z-index management
-- Particle effects for visual feedback
+- Layered rendering with depth management (using setDepth)
+- Particle effects for visual feedback (using Phaser's particle system)
 
 ### Game Loop Implementation
 The game uses Phaser's built-in game loop with:
@@ -101,13 +104,20 @@ The game uses a global configuration object (`GAME_SETTINGS`) that defines:
 
 This centralized configuration makes it easy to balance and tune the game.
 
-## Error Handling
+## Error Handling and Cleanup
 
 ### Custom Destroy Methods
 To handle Phaser's automatic destruction of object properties:
 - Custom destroy methods are implemented in entity classes
 - References to plain objects are nullified before calling parent destroy
 - Local variables are used to store references needed in callbacks
+
+### Robust Scene Cleanup
+The game implements thorough cleanup procedures:
+- GameScene has a dedicated cleanup method that properly destroys all game objects
+- Manager classes (TowerManager, EnemyManager, ProjectileManager) have clear methods
+- Event listeners are properly removed to prevent memory leaks
+- All references are nullified to aid garbage collection
 
 ### Event-Based Error Recovery
 The game uses events to handle and recover from errors:
@@ -118,10 +128,12 @@ The game uses events to handle and recover from errors:
 ## Performance Considerations
 
 ### Optimization Techniques
-- **Object Pooling**: Planned for projectiles and effects
+- **Manager Classes**: Dedicated managers for towers, enemies, and projectiles
 - **Render Culling**: Only rendering on-screen entities
-- **Efficient Collision Detection**: Using spatial partitioning (planned)
+- **Efficient Collision Detection**: Using Phaser's built-in collision detection
 - **Asset Optimization**: Properly sized and compressed images
+- **Object Pooling**: Planned for projectiles and effects
+- **Spatial Partitioning**: Planned for improved collision detection
 
 ### Performance Targets
 - **Desktop**: 60 FPS with full visual effects
@@ -150,11 +162,12 @@ The game uses events to handle and recover from errors:
 - `npm run generate-assets`: Run asset generation script
 
 ### Development Practices
-- Modular code organization
-- Clear separation of concerns
-- Consistent naming conventions
+- Modular code organization with ES6 modules
+- Clear separation of concerns with manager classes
+- Consistent naming conventions following Phaser standards
 - JSDoc comments for API documentation
 - Encapsulation of game systems in manager classes
+- Event-driven architecture using Phaser's event system
 
 ## Future Technical Considerations
 

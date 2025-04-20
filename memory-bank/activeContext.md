@@ -1,6 +1,6 @@
 # Tower Defense Game Active Context
 
-_Last Memory Bank Review: 17.4.2025, 15:49 (Europe/Berlin) — All memory bank files reviewed and current._
+_Last Memory Bank Review: 20.4.2025, 18:03 (Europe/Berlin) — All memory bank files reviewed and current._
 
 ## Current Development Focus
 
@@ -62,19 +62,41 @@ flowchart LR
      - Root cause: The reference to scene was lost in the tween's onComplete callback after the enemy was destroyed
      - Solution: Stored references to scene and economyManager in local variables before setting up the tween
 
+### Recent Improvements
+- Generated unique projectile graphics for Sniper and Multishot Towers
+  - Added asset generation for `projectile_sniper.png` (purple) and `projectile_multishot.png` (orange)
+  - These projectiles now have distinct graphics matching their tower types and colors
+  - Improved visual clarity during gameplay
+
+- Implemented SupportTower functionality
+  - SupportTower now properly buffs nearby towers' fire rates
+  - Uses a buff radius to determine which towers to affect
+  - Manages active buffs and removes them when towers move out of range
+  - Integrates with TowerManager to access all towers in the scene
+
+- Aligned with Phaser 3.88.2 best practices
+  - Updated to use Phaser's built-in event system for all communication
+  - Implemented proper scene cleanup with dedicated cleanup methods
+  - Utilized Phaser's group management for entity collections
+  - Leveraged Phaser's particle system for visual effects
+  - Implemented manager classes for better code organization and performance
+
 ### Design Challenges
 - Tuning tower and enemy parameters for balanced gameplay
 - Creating intuitive UI for tower selection and placement
 - Providing clear visual feedback for game events
 - Ensuring the difficulty curve is appropriate
+- Creating distinct visual effects for different tower types (currently in todo list)
+- Preventing tower placement on enemy paths (currently in todo list)
+- Optimizing performance with many entities on screen
 
 ## Next Steps
 
 ### Immediate Tasks
 1. Complete game testing and balancing (focus on difficulty curve and resource tuning)
 2. Implement visual and audio feedback for game events (attacks, deaths, UI)
-3. Finalize tower special abilities (AoE, slowing)
-4. Complete enemy variety implementation (flying, armored)
+3. Create different explosions for different tower types (from todo list)
+4. Prevent placing towers on the enemy path and use correct tiles (from todo list)
 5. Improve defeat condition and defeat screen
 
 ### Short-term Goals
@@ -108,6 +130,8 @@ flowchart LR
 - **Bug Fixes**: Implemented custom destroy method in Enemy class to prevent errors during enemy destruction; fixed tween callback context bug
 - **Expansion Plan**: Created a comprehensive four-phase expansion plan to add features beyond the MVP
 - **Victory Banner**: Implemented a dedicated victory banner in GameScene.js with gold text, semi-transparent background, and return-to-menu functionality
+- **Architecture Refactoring**: Extracted entity management into dedicated manager classes (TowerManager, EnemyManager, ProjectileManager) to improve code organization and performance
+- **Phaser Best Practices**: Updated codebase to align with Phaser 3.88.2 best practices for event handling, scene management, and object cleanup
 
 ### Pending Decisions
 - How to handle tower upgrades (branching paths vs. linear progression)

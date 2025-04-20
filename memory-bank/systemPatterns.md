@@ -29,8 +29,9 @@ flowchart TD
 The game uses Phaser's scene system to separate game logic from UI:
 - **GameScene**: Handles game mechanics, entities, and systems
 - **UIScene**: Manages user interface elements and player interaction
+- **MapSelectScene**: Handles map selection before game starts
 
-These scenes run in parallel, with the UIScene overlaid on top of the GameScene. They communicate via Phaser's event system.
+These scenes run in parallel or transition between each other, with the UIScene overlaid on top of the GameScene. They communicate via Phaser's event system following best practices for scene communication.
 
 ### Entity Component Pattern
 Game objects are implemented as self-contained entities with their own update logic:
@@ -62,11 +63,12 @@ Complex game systems are abstracted into manager classes:
 These managers provide services to the game scene and entities, maintaining their own internal state.
 
 ### Event-Driven Communication
-The game uses Phaser's event system and a custom EventEmitter utility for loose coupling between components:
+The game uses Phaser's built-in event system for loose coupling between components:
 - Game events (wave start/end, enemy death, tower info, etc.) are broadcast
 - Components subscribe to relevant events
 - UI and audio feedback are triggered via events from the game scene and systems
-- EventEmitter utility provides a decoupled publish/subscribe pattern for custom events
+- Events use consistent naming conventions and payload structures
+- Event listeners are properly cleaned up during scene transitions
 
 ```mermaid
 sequenceDiagram
@@ -87,7 +89,7 @@ The GameScene acts as a factory for game entities:
 - `spawnEnemy()`: Creates enemy instances, including advanced types based on config
 - `spawnProjectile()`: Creates projectile instances, including AoE and slow projectiles
 
-This centralizes entity creation and ensures proper initialization.
+This centralizes entity creation and ensures proper initialization. The factory methods use Phaser's best practices for object creation and management.
 
 ### Strategy Pattern
 Different tower and enemy types implement different strategies:
@@ -102,6 +104,7 @@ The game uses an observer pattern for UI and audio updates:
 - UI components update in response to state changes (resources, wave info, tower info, messages)
 - AudioManager responds to events for sound/music feedback
 - This keeps the UI and audio in sync with the game state
+- Follows Phaser's recommended event-based communication patterns
 
 ## Data Flow Patterns
 
@@ -134,13 +137,20 @@ Projectiles use a target-based movement system:
 3. If target is lost, projectile continues in last known direction
 4. Collision detection checks for hits with enemies
 
-## Error Handling Patterns
+## Error Handling and Cleanup Patterns
 
 ### Custom Destroy Pattern
 To handle Phaser's automatic destruction of object properties:
 1. Custom destroy methods are implemented in entity classes
 2. References to plain objects are nullified before calling parent destroy
 3. Local variables are used to store references needed in callbacks
+
+### Robust Scene Cleanup
+The game implements thorough cleanup procedures:
+1. GameScene has a dedicated cleanup method that properly destroys all game objects
+2. Manager classes (TowerManager, EnemyManager, ProjectileManager) have clear methods
+3. Event listeners are properly removed to prevent memory leaks
+4. All references are nullified to aid garbage collection
 
 ### Event-Based Error Recovery
 The game uses events to handle and recover from errors:
@@ -149,6 +159,14 @@ The game uses events to handle and recover from errors:
 3. The game can continue running even if some components fail
 
 ## Optimization Patterns
+
+### Manager Classes
+The game uses dedicated manager classes to optimize entity handling:
+- **TowerManager**: Manages all tower instances and their updates
+- **EnemyManager**: Manages all enemy instances and their updates
+- **ProjectileManager**: Manages all projectile instances and their updates
+- **CollisionManager**: Handles collision detection between entities
+- **EffectSpawner**: Manages visual effects and animations
 
 ### Object Pooling (Planned)
 Future optimization will implement object pooling for frequently created/destroyed objects:

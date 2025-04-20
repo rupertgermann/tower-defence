@@ -1,6 +1,6 @@
 # Tower Defense Game Progress Tracker
 
-_Last Memory Bank Review: 17.4.2025, 15:50 (Europe/Berlin) — All memory bank files reviewed and current._
+_Last Memory Bank Review: 20.4.2025, 18:04 (Europe/Berlin) — All memory bank files reviewed and current._
 
 ## Implementation Status
 
@@ -23,6 +23,8 @@ pie title Implementation Progress
 - ✅ Economy system for resource management
 - ✅ Collision detection between projectiles and enemies
 - ✅ Victory banner implementation
+- ✅ Entity manager classes (TowerManager, EnemyManager, ProjectileManager)
+- ✅ Robust scene cleanup procedures
 
 ### Entities
 - ✅ Tower base class with targeting logic
@@ -30,6 +32,8 @@ pie title Implementation Progress
 - ✅ Projectile base class with movement
 - ✅ Tower special abilities (basic implementation)
 - ✅ Enemy variety (basic implementation)
+- ✅ SupportTower implementation with buff mechanics
+- ✅ Proper entity lifecycle management (creation, updates, destruction)
 
 ### UI Elements
 - ✅ Game UI layout with top and bottom bars
@@ -37,10 +41,13 @@ pie title Implementation Progress
 - ✅ Resource display (lives, gold)
 - ✅ Wave information display
 - ✅ Wave control button
+- ✅ Event-driven UI updates using Phaser's event system
 
 ### Assets
 - ✅ Basic placeholder assets for towers, enemies, and projectiles
 - ✅ Map tiles for background, path, and placement areas
+- ✅ Unique projectile graphics for different tower types
+- ✅ Particle effects for explosions and visual feedback
 
 ## In Progress Features
 
@@ -50,6 +57,8 @@ pie title Implementation Progress
 - 🔄 Game balance tuning (difficulty curve, resource tuning)
 - 🔄 Visual and audio feedback for game events (attacks, deaths, UI)
 - 🔄 Defeat condition and defeat screen improvement
+- 🔄 Different explosions for different tower types (in todo list)
+- 🔄 Preventing tower placement on enemy paths (in todo list)
 
 ### Systems
 - 🔄 Game state management (victory implemented, defeat needs improvement)
@@ -76,11 +85,13 @@ pie title Implementation Progress
 ### Performance Concerns
 - Potential performance issues with many entities on screen (to be tested)
 - Collision detection may need optimization for larger enemy counts
+- Manager classes implemented to help with performance, but further optimization may be needed
 
 ### Design Issues
 - Tower balance needs tuning once all types are fully implemented
 - Wave difficulty progression needs adjustment after testing
 - Visual feedback for game events needs improvement
+- Need to prevent tower placement on enemy paths (in todo list)
 
 ## Testing Status
 
@@ -141,6 +152,51 @@ pie title Implementation Progress
 - Implement template pattern for tower and enemy variations
 
 ## Progress Log
+
+### Phaser Best Practices Implementation (2025-04-20)
+
+#### Implemented Features
+- Aligned codebase with Phaser 3.88.2 best practices:
+  - Used Phaser's built-in event system for all communication between components
+  - Implemented proper scene cleanup with dedicated cleanup methods in GameScene
+  - Utilized Phaser's group management for entity collections (towers, enemies, projectiles)
+  - Leveraged Phaser's particle system for visual effects and explosions
+  - Implemented manager classes for better code organization and performance
+  - Followed proper object lifecycle management (creation, updates, destruction)
+
+#### Encountered Errors
+- None reported.
+
+#### How Issues Were Fixed
+- N/A
+
+### Generated Unique Projectile Graphics for Sniper and Multishot Towers (2025-04-20)
+
+#### Implemented Features
+- Added asset generation for `projectile_sniper.png` (purple) and `projectile_multishot.png` (orange) in src/assets-generator.js.
+- These projectiles now have distinct graphics matching their tower types and colors.
+- No code changes required in tower or projectile logic, as asset keys were already correct.
+
+#### Encountered Errors
+- Sniper and multishot towers used default or missing projectile graphics, as their unique assets were not generated.
+
+#### How Issues Were Fixed
+- Updated the asset generator to create the missing projectile images, ensuring proper visuals in-game for these towers.
+
+### SupportTower Implementation (2025-04-20)
+
+#### Implemented Features
+- Completed SupportTower class implementation with buff mechanics
+- SupportTower now properly buffs nearby towers' fire rates
+- Implemented buff radius to determine which towers to affect
+- Added management of active buffs and removal when towers move out of range
+- Integrated with TowerManager to access all towers in the scene
+
+#### Encountered Errors
+- None reported.
+
+#### How Issues Were Fixed
+- N/A
 
 ### Task 1.1 - Extract common utilities into `/src/utils/`
 - **Implemented Features**: Created `src/utils/math.js` with math helpers (`distance`, `lerp`, `angleBetween`) and refactored `PathManager.js` to use these utilities.
