@@ -20,29 +20,81 @@
 ### Project Structure
 ```
 tower-defence/
-├── docs/                 # Documentation
-│   ├── concept.md        # Original game concept
-│   ├── mvp-plan.md       # MVP implementation plan
-│   ├── progress.md       # Development progress tracking
-│   └── bug-fix-plan.md   # Bug fix documentation
-├── memory-bank/          # Memory bank for project context
-├── public/               # Static assets
-│   ├── index.html        # Main HTML entry point
-│   └── assets/           # Game assets (images)
-└── src/                  # Source code
-    ├── entities/         # Game entity classes
-    │   ├── Enemy.js      # Enemy implementation
-    │   ├── Projectile.js # Projectile implementation
-    │   └── Tower.js      # Tower implementation
-    ├── scenes/           # Phaser scene classes
-    │   ├── GameScene.js  # Main game scene
-    │   └── UIScene.js    # User interface scene
-    ├── systems/          # Game system managers
+├── docs/                    # Documentation
+│   ├── concept.md           # Original game concept
+│   ├── implementation-analysis.md # Analysis of implementation
+│   ├── implementation-plan.md     # Implementation plan
+│   ├── progress.md          # Development progress tracking
+│   ├── todo.md              # Current todo list
+│   └── images/              # Documentation images
+│       ├── desert_map.png
+│       ├── forest_map.png
+│       └── mountain_map.png
+├── memory-bank/             # Memory bank for project context
+│   ├── activeContext.md     # Current work focus
+│   ├── productContext.md    # Product context
+│   ├── progress.md          # Progress tracking
+│   ├── projectbrief.md      # Project brief
+│   ├── systemPatterns.md    # System architecture
+│   └── techContext.md       # Technical context
+├── public/                  # Static assets
+│   ├── index.html           # Main HTML entry point
+│   ├── assets/              # Game assets
+│   │   ├── images/          # Background images
+│   │   │   ├── desert.png
+│   │   │   ├── forest.png
+│   │   │   └── mountain.png
+│   │   ├── ui/              # UI assets
+│   │   │   ├── mainmenu.png
+│   │   │   ├── mute.png
+│   │   │   └── unmute.png
+│   │   ├── tower_*.png      # Tower sprites
+│   │   ├── enemy_*.png      # Enemy sprites
+│   │   ├── projectile_*.png # Projectile sprites
+│   │   └── *.mp3, *.wav     # Audio files
+│   └── maps/                # Map configuration files
+│       ├── desert.json
+│       ├── forest.json
+│       └── mountain.json
+└── src/                     # Source code
+    ├── assets/              # Asset configurations
+    │   └── config/          # Game configuration
+    │       ├── extra-waves.json # Extra wave configurations
+    │       ├── towers.json      # Tower configurations
+    │       └── waves.json       # Wave configurations
+    ├── entities/            # Game entity classes
+    │   ├── Enemy.js         # Base enemy implementation
+    │   ├── HealerEnemy.js   # Healer enemy implementation
+    │   ├── MultiShotTower.js # Multi-shot tower implementation
+    │   ├── Projectile.js    # Projectile implementation
+    │   ├── ShieldEnemy.js   # Shield enemy implementation
+    │   ├── SplitEnemy.js    # Split enemy implementation
+    │   ├── SupportTower.js  # Support tower implementation
+    │   ├── TeleportEnemy.js # Teleport enemy implementation
+    │   └── Tower.js         # Base tower implementation
+    ├── helpers/             # Helper classes
+    │   ├── ConfirmationDialog.js # Dialog helper
+    │   ├── UIButton.js      # Button helper
+    │   └── UIHelpers.js     # UI helper functions
+    ├── scenes/              # Phaser scene classes
+    │   ├── GameScene.js     # Main game scene
+    │   ├── MapSelectScene.js # Map selection scene
+    │   └── UIScene.js       # User interface scene
+    ├── systems/             # Game system managers
+    │   ├── AudioManager.js  # Audio management
+    │   ├── CollisionManager.js # Collision detection
     │   ├── EconomyManager.js # Resource management
-    │   ├── PathManager.js    # Path definition and calculations
-    │   └── WaveManager.js    # Enemy wave spawning
-    ├── index.js          # Main entry point
-    └── assets-generator.js # Asset generation utility
+    │   ├── EffectSpawner.js # Visual effects
+    │   ├── EnemyManager.js  # Enemy management
+    │   ├── MapManager.js    # Map management
+    │   ├── PathManager.js   # Path definition and calculations
+    │   ├── ProjectileManager.js # Projectile management
+    │   ├── TowerManager.js  # Tower management
+    │   └── WaveManager.js   # Enemy wave spawning
+    ├── utils/               # Utility functions
+    │   └── math.js          # Math utility functions
+    ├── index.js             # Main entry point
+    └── assets-generator.js  # Asset generation utility
 ```
 
 ### Build Pipeline
