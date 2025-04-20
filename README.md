@@ -45,7 +45,7 @@ Note: The complete code of this game was written by AI (mostly GPT-4.1 in Windsu
 ### Installation
 
 ```bash
-git clone [your-repo-url]
+git clone git@github.com:rupertgermann/tower-defence.git
 cd tower-defence
 npm install
 ```
@@ -206,5 +206,7 @@ MIT License
 
 ## Credits
 
-- Game design and code: [Your Name]
+- Game design and code: GPT-4.1 in Windsurf
+- Graphics: ChatGPT-4o
+- Sounds: ElevenLabs
 - Built with Phaser 3
