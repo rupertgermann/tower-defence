@@ -63,6 +63,20 @@ export default class AudioManager {
     }
   }
 
+  /**
+   * Stop all sound effects and music for this scene
+   */
+  stopAll() {
+    // Stop all SFX
+    for (const key in this.sfx) {
+      if (this.sfx[key] && this.sfx[key].isPlaying) {
+        this.sfx[key].stop();
+      }
+    }
+    // Stop music
+    this.stopMusic();
+  }
+
   muteAll() {
     // No-op for backward compatibility
   }
